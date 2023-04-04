@@ -1,4 +1,3 @@
-import '../interfaces/model.dart';
 import '../interfaces/serializable.dart';
 
 class Name implements Serializable {

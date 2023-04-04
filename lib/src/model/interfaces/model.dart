@@ -21,4 +21,14 @@ abstract class Model implements Serializable{
   const Model();
 
   dynamic get primaryKey;
+
+  JsonMap flatValues(Schema schema, JsonMap json) {
+    final values = <String, dynamic>{};
+
+    for (final retriever in schema) {
+      values[retriever.field] = retriever.extractFrom(json);
+    }
+
+    return values;
+  }
 }
