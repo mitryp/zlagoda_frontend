@@ -6,22 +6,6 @@ import '../interfaces/model.dart';
 import '../common_models/name.dart';
 import '../common_models/address.dart';
 
-typedef JsonExtractor<T> = T Function(String field, JsonMap json);
-
-class Retriever<T, M extends Model> {
-  final String field;
-  final JsonExtractor<T> _jsonExtractor;
-  final T Function(M) getter;
-
-  const Retriever(
-      {required this.field,
-      required JsonExtractor<T> fromJSON,
-      required this.getter})
-      : _jsonExtractor = fromJSON;
-
-  T extractFrom(JsonMap json) => _jsonExtractor(field, json);
-}
-
 enum Position { cashier, manager }
 
 class Employee extends Model implements ConvertibleToRow{
