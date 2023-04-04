@@ -2,10 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../model/model.dart';
+import '../../model/interfaces/model.dart';
 import '../../services/http/http_service.dart';
 import '../../services/query_builder/query_builder.dart';
-import '../../typedefs.dart';
 
 typedef CollectionBuilder<M extends Model> = Widget Function(
   BuildContext context,
@@ -16,10 +15,13 @@ typedef CollectionBuilder<M extends Model> = Widget Function(
 class WidgetWithCollection<M extends Model> extends StatefulWidget {
   final CollectionBuilder builder;
   final HttpService<M> httpService;
+  // TODO is it ok with qb?
+  final QueryBuilder qb;
 
   const WidgetWithCollection({
     required this.httpService,
     required this.builder,
+    required this.qb,
     super.key,
   });
 
@@ -53,7 +55,7 @@ class WidgetWithCollectionState<M extends Model> extends State<WidgetWithCollect
   void fetchItems() {
     setState(() => isLoaded = false);
 
-    widget.httpService.get().then((models) {
+    widget.httpService.get(widget.qb).then((models) {
       if (!mounted) return;
       setState(() {
         items = models;

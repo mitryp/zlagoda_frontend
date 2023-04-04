@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../model/model.dart';
+import '../../model/interfaces/convertible_to_row.dart';
 import '../pages/page_base.dart';
 
 abstract class SearchFilterDelegate {
@@ -17,7 +17,7 @@ abstract class SearchFilterDelegate {
   Widget buildSort(BuildContext context);
 }
 
-class CollectionView<M extends Model> extends StatefulWidget {
+class CollectionView<M extends ConvertibleToRow> extends StatefulWidget {
   final List<M> collection;
   final SearchFilterDelegate searchFilterDelegate;
   final EventSink<void> updateSink;
@@ -37,7 +37,7 @@ class CollectionView<M extends Model> extends StatefulWidget {
   State<CollectionView<M>> createState() => _CollectionViewState();
 }
 
-class _CollectionViewState<M extends Model> extends State<CollectionView<M>> {
+class _CollectionViewState<M extends ConvertibleToRow> extends State<CollectionView<M>> {
   @override
   Widget build(BuildContext context) {
     return PageBase.column(
