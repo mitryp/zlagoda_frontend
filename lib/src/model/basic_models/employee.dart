@@ -3,14 +3,15 @@ import 'package:flutter/material.dart';
 import '../../typedefs.dart';
 import '../interfaces/convertible_to_row.dart';
 import '../interfaces/model.dart';
+import '../interfaces/serializable.dart';
 import '../common_models/name.dart';
 import '../common_models/address.dart';
 
 enum Position { cashier, manager }
 
 class Employee extends Model implements ConvertibleToRow{
-  // todo finish @Kate
   final int employeeId;
+  final String login;
   final Name name;
   final Position position;
   final int salary;
@@ -21,6 +22,7 @@ class Employee extends Model implements ConvertibleToRow{
 
   const Employee({
     required this.employeeId,
+    required this.login,
     required this.name,
     required this.position,
     required this.salary,
@@ -30,7 +32,7 @@ class Employee extends Model implements ConvertibleToRow{
     required this.address,
   });
 
-  static final List<Retriever> schema = [
+  static final Schema schema = [
     Retriever<int, Employee>(
         field: 'employeeId',
         fromJSON: (field, json) => json[field],
@@ -74,13 +76,13 @@ class Employee extends Model implements ConvertibleToRow{
   ];
 
   factory Employee.fromJSON(dynamic json) {
-    //TODO want to make it beautiful but don't know how :')
     final values = <String, dynamic>{};
     for (final retriever in schema) {
       values[retriever.field] = retriever.extractFrom(json);
     }
     return Employee(
       employeeId: values['employeeId'],
+      login: values['login'],
       name: values['name'],
       position: values['position'],
       salary: values['salary'],
@@ -95,23 +97,8 @@ class Employee extends Model implements ConvertibleToRow{
   get primaryKey => employeeId;
 
   @override
-  JsonMap toJSON() {
-    final json = <String, dynamic>{};
-
-    for (final retriever in schema) {
-      final field = retriever.field;
-      final value = retriever.getter(this);
-
-      if (value is Model) {
-        json[field] = value.toJSON();
-      } else if (value is Enum) {
-        json[field] = value.name;
-      } else {
-        json[field] = value;
-      }
-    }
-
-    return json;
+  Map<String, dynamic> toJSON() {
+    return convertToJSON(schema, this);
   }
 
   @override
