@@ -2,11 +2,17 @@ import '../../../model/basic_models/employee.dart';
 import '../../../model/common_models/name.dart';
 
 class User {
+  final String userId;
   final String login;
   final Name name;
   final Position position;
 
-  const User({required this.login, required this.position, required this.name});
+  const User({
+    required this.userId,
+    required this.login,
+    required this.position,
+    required this.name,
+  });
 
   @override
   bool operator ==(Object other) =>
