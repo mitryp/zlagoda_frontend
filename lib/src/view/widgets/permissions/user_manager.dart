@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'user.dart';
+import '../../../services/auth/user.dart';
 
 typedef UserModificationCallback = void Function(User? user);
 

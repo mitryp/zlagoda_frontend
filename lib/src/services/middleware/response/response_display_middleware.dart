@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' show Response;
 
-import '../../view/widgets/response_middleware_context.dart';
+import '../../../view/widgets/middleware_context/response_middleware_context.dart';
 import 'response_middleware.dart';
 
 typedef SnackBarBuilder = SnackBar Function(Response res);
@@ -21,8 +21,6 @@ const codesToMessages = {
 };
 
 SnackBar _defaultSnackBar(Response res) {
-  final code = res.statusCode;
-
   String? message;
   try {
     message = jsonDecode(utf8.decode(res.bodyBytes))['message'];
@@ -30,8 +28,8 @@ SnackBar _defaultSnackBar(Response res) {
     message = null;
   }
 
-  final color = successCodes(code) ? Colors.green[300] : Colors.red[100];
-  final title = codesToMessages[code] ?? 'Невідомий код відповіді';
+  final color = successCodes(res) ? Colors.green[300] : Colors.red[100];
+  final title = codesToMessages[res.statusCode] ?? 'Невідомий код відповіді';
   final subtitle = message != null ? Text(message) : null;
 
   return SnackBar(
@@ -60,16 +58,16 @@ class ResponseDisplayMiddleware extends ResponseMiddleware {
   });
 
   @override
-  Response processFilteredResponse(Response res) {
+  Response processFiltered(Response r) {
     final messenger = ScaffoldMessenger.maybeOf(context);
     if (messenger == null) {
       print('ResponseDisplayMiddleware could not find the ScaffoldMessenger '
           'of the given context');
-      return res;
+      return r;
     }
 
-    messenger.showSnackBar(snackBarBuilder(res));
+    messenger.showSnackBar(snackBarBuilder(r));
 
-    return res;
+    return r;
   }
 }

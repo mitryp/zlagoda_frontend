@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../model/basic_models/employee.dart';
-import 'user.dart';
+import '../../../services/auth/user.dart';
 import 'user_manager.dart';
 
 typedef UserAuthorizationStrategy = bool Function(User? user);

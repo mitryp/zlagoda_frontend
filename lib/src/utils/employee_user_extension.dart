@@ -1,5 +1,5 @@
-import '../../../model/basic_models/employee.dart';
-import 'user.dart';
+import '../model/basic_models/employee.dart';
+import '../services/auth/user.dart';
 
 extension EmployeeUser on Employee {
   User get user => User(
