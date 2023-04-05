@@ -11,7 +11,29 @@ class Name implements Serializable {
 
   @override
   Map<String, dynamic> toJSON() {
-    // TODO: implement toJSON
-    throw UnimplementedError();
+    return {
+      'firstName': firstName,
+      'middleName': middleName,
+      'lastName': lastName,
+    };
+  }
+
+  static Name? fromJSON(dynamic json) {
+    String? firstName, middleName, lastName;
+    try {
+      firstName = json['firstName'];
+      middleName = json['middleName'];
+      lastName = json['lastName'];
+    } on NoSuchMethodError {
+      return null;
+    }
+
+    if ([firstName, middleName, lastName].contains(null)) return null;
+
+    return Name(
+      firstName: firstName!,
+      middleName: middleName!,
+      lastName: lastName!,
+    );
   }
 }
