@@ -3,14 +3,61 @@ import 'package:flutter/material.dart';
 import '../../typedefs.dart';
 import '../interfaces/convertible_to_row.dart';
 import '../interfaces/model.dart';
+import '../interfaces/retriever/retriever.dart';
 import '../interfaces/serializable.dart';
 import '../common_models/name.dart';
 import '../common_models/address.dart';
 
-enum Position { cashier, manager }
+final Schema<Employee> schema = [
+  Retriever<String, Employee>(
+    field: 'employeeId',
+    getter: (employee) => employee.employeeId,
+  ),
+  Retriever<String, Employee>(
+    field: 'login',
+    getter: (employee) => employee.login,
+  ),
+  Retriever<Name, Employee>(
+    field: 'name',
+    getter: (employee) => employee.name,
+  ),
+  Retriever<Position, Employee>(
+    field: 'position',
+    getter: (employee) => employee.position,
+  ),
+  Retriever<int, Employee>(
+    field: 'salary',
+    getter: (employee) => employee.salary,
+  ),
+  Retriever<DateTime, Employee>(
+    field: 'workStartDate',
+    getter: (employee) => employee.workStartDate,
+  ),
+  Retriever<DateTime, Employee>(
+    field: 'birthDate',
+    getter: (employee) => employee.birthDate,
+  ),
+  Retriever<String, Employee>(
+    field: 'phone',
+    getter: (employee) => employee.phone,
+  ),
+  Retriever<Address, Employee>(
+    field: 'address',
+    getter: (employee) => employee.address,
+  ),
+];
 
-class Employee extends Model implements ConvertibleToRow{
-  final int employeeId;
+enum Position implements Serializable {
+  cashier, manager;
+
+  const Position();
+
+  @override
+  String toJson() => name;
+}
+
+class Employee extends Model implements ConvertibleToRow {
+  final String employeeId;
   final String login;
   final Name name;
   final Position position;
@@ -32,54 +79,9 @@ class Employee extends Model implements ConvertibleToRow{
     required this.address,
   });
 
-  static final Schema schema = [
-    Retriever<int, Employee>(
-        field: 'employeeId',
-        fromJSON: (field, json) => json[field],
-        getter: (employee) => employee.employeeId),
-    Retriever<Name, Employee>(
-      field: 'name',
-      fromJSON: (field, json) => Name(
-          lastName: json[field]['lastName'],
-          middleName: json[field]['middleName'],
-          firstName: json[field]['firstName']),
-      getter: (employee) => employee.name,
-    ),
-    Retriever<Position, Employee>(
-        field: 'position',
-        fromJSON: (field, json) =>
-            Position.values.firstWhere((e) => e.name == json[field]),
-        getter: (employee) => employee.position),
-    Retriever<int, Employee>(
-        field: 'salary',
-        fromJSON: (field, json) => json[field],
-        getter: (employee) => employee.salary),
-    Retriever<DateTime, Employee>(
-        field: 'workStartDate',
-        fromJSON: (field, json) => DateTime.parse(json[field].toString()),
-        getter: (employee) => employee.workStartDate),
-    Retriever<DateTime, Employee>(
-        field: 'birthDate',
-        fromJSON: (field, json) => DateTime.parse(json[field].toString()),
-        getter: (employee) => employee.birthDate),
-    Retriever<String, Employee>(
-        field: 'phone',
-        fromJSON: (field, json) => json[field],
-        getter: (employee) => employee.phone),
-    Retriever<Address, Employee>(
-        field: 'address',
-        fromJSON: (field, json) => Address(
-            city: json[field]['city'],
-            street: json[field]['street'],
-            index: json[field]['index']),
-        getter: (employee) => employee.address),
-  ];
-
   factory Employee.fromJSON(dynamic json) {
-    final values = <String, dynamic>{};
-    for (final retriever in schema) {
-      values[retriever.field] = retriever.extractFrom(json);
-    }
+    final values = Model.flatValues(schema, json);
+
     return Employee(
       employeeId: values['employeeId'],
       login: values['login'],
@@ -97,18 +99,16 @@ class Employee extends Model implements ConvertibleToRow{
   get primaryKey => employeeId;
 
   @override
-  Map<String, dynamic> toJSON() {
-    return convertToJSON(schema, this);
-  }
+  JsonMap toJson() => convertToJson(schema, this);
 
   @override
   DataRow buildRow(BuildContext context) {
     final List<String> cellsText = [
       name.fullName,
       position.toString(),
-      salary.toString(),
-      workStartDate.toString(),
-      birthDate.toString(),
+      //salary.toString(),
+      //workStartDate.toString(),
+      //birthDate.toString(),
       phone,
       address.fullAddress
     ];

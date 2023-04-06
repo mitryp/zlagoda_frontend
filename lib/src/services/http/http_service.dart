@@ -4,8 +4,8 @@ import 'package:http/http.dart' as http;
 import '../../model/basic_models/category.dart';
 import '../../model/basic_models/client.dart';
 import '../../model/basic_models/employee.dart';
-import '../../model/basic_models/goods.dart';
-import '../../model/basic_models/goods_type.dart';
+import '../../model/basic_models/store_product.dart';
+import '../../model/basic_models/product.dart';
 import '../../model/basic_models/receipt.dart';
 import '../../model/interfaces/model.dart';
 import '../query_builder/query_builder.dart';
@@ -62,7 +62,7 @@ abstract class HttpService<M extends Model> {
 
   Future<bool> post(M row) async {
     final response =
-        await http.post(Uri.http(baseRoute, _route()), body: row.toJSON());
+        await http.post(Uri.http(baseRoute, _route()), body: row.toJson());
 
     return _controller(response, (response) {
       return true;
@@ -71,7 +71,7 @@ abstract class HttpService<M extends Model> {
 
   Future<bool> update(M row) async {
     final response = await http.put(Uri.http(baseRoute, _route(row.primaryKey)),
-        body: row.toJSON());
+        body: row.toJson());
 
     return _controller(response, (response) {
       return true;
@@ -98,18 +98,18 @@ class EmployeeService extends HttpService<Employee> {
             castFunction: Employee.fromJSON);
 }
 
-class GoodsService extends HttpService<Goods> {
+class GoodsService extends HttpService<StoreProduct> {
   const GoodsService()
       : super(
       route: 'goods',
-      castFunction: Goods.fromJSON);
+      castFunction: StoreProduct.fromJSON);
 }
 
-class GoodsTypeService extends HttpService<GoodsType> {
+class GoodsTypeService extends HttpService<Product> {
   const GoodsTypeService()
       : super(
       route: 'goods_types',
-      castFunction: GoodsType.fromJSON);
+      castFunction: Product.fromJSON);
 }
 
 class CategoriesService extends HttpService<Category> {

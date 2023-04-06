@@ -1,12 +1,38 @@
 import 'package:flutter/material.dart';
 
+import '../../typedefs.dart';
 import '../interfaces/convertible_to_row.dart';
 import '../interfaces/model.dart';
 import '../common_models/name.dart';
 import '../common_models/address.dart';
+import '../interfaces/retriever/retriever.dart';
+import '../interfaces/serializable.dart';
+
+final Schema<Client> schema = [
+  Retriever<String, Client>(
+    field: 'clientId',
+    getter: (client) => client.clientId,
+  ),
+  Retriever<Name, Client>(
+    field: 'name',
+    getter: (client) => client.name,
+  ),
+  Retriever<String, Client>(
+    field: 'clientId',
+    getter: (client) => client.phone,
+  ),
+  Retriever<Address, Client>(
+    field: 'address',
+    getter: (employee) => employee.address,
+  ),
+  Retriever<int, Client>(
+    field: 'discount',
+    getter: (client) => client.discount,
+  ),
+];
 
 class Client extends Model implements ConvertibleToRow {
-  final int clientId;
+  final String clientId;
   final Name name;
   final String phone;
   final Address address;
@@ -21,19 +47,14 @@ class Client extends Model implements ConvertibleToRow {
   });
 
   factory Client.fromJSON(dynamic json) {
+    final values = Model.flatValues(schema, json);
+
     return Client(
-      clientId: json['clientId'],
-      name: Name(
-          firstName: json['name']['firstName'],
-          middleName: json['name']['middleName'],
-          lastName: json['name']['lastName']),
-      phone: json['phone'],
-      address: Address(
-          city: json['address']['city'],
-          street: json['address']['street'],
-          index: json['address']['index']
-      ),
-      discount: json['discount'],
+      clientId: values['clientId'],
+      name: values['name'],
+      phone: values['phone'],
+      address: values['address'],
+      discount: values['discount'],
     );
   }
 
@@ -41,22 +62,15 @@ class Client extends Model implements ConvertibleToRow {
   get primaryKey => clientId;
 
   @override
-  Map<String, dynamic> toJSON() {
-    return {
-      'clientId': clientId,
-      'name': name.toJSON(),
-      'phone': phone,
-      'address': address.toJSON(),
-      'discount': discount,
-    };
-  }
+  JsonMap toJson() => convertToJson(schema, this);
 
   @override
   DataRow buildRow(BuildContext context) {
     final List<String> cellsText = [
+      clientId,
       name.fullName,
-      phone,
-      address.fullAddress,
+      //phone,
+      //address.fullAddress,
       discount.toString(),
     ];
 
