@@ -1,3 +1,4 @@
+import '../../typedefs.dart';
 import '../interfaces/serializable.dart';
 
 class Name implements Serializable {
@@ -5,13 +6,20 @@ class Name implements Serializable {
   final String middleName;
   final String lastName;
 
-  const Name({required this.firstName, required this.middleName, required this.lastName});
+  const Name({
+    required this.firstName,
+    required this.middleName,
+    required this.lastName,
+  });
 
   String get fullName => '$lastName $firstName $middleName';
 
   @override
-  Map<String, dynamic> toJSON() {
-    // TODO: implement toJSON
-    throw UnimplementedError();
+  JsonMap toJson() {
+    return {
+      'firstName': firstName,
+      'middleName': middleName,
+      'lastName': lastName,
+    };
   }
 }

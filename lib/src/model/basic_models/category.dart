@@ -1,9 +1,23 @@
 import 'package:flutter/material.dart';
 
+import '../../typedefs.dart';
 import '../interfaces/convertible_to_row.dart';
 import '../interfaces/model.dart';
+import '../interfaces/retriever/retriever.dart';
+import '../interfaces/serializable.dart';
 
-class Category extends Model implements ConvertibleToRow  {
+final Schema<Category> schema = [
+  Retriever<int, Category>(
+    field: 'categoryId',
+    getter: (category) => category.categoryId,
+  ),
+  Retriever<String, Category>(
+    field: 'categoryName',
+    getter: (category) => category.categoryName,
+  ),
+];
+
+class Category extends Model implements ConvertibleToRow {
   final int categoryId;
   final String categoryName;
 
@@ -13,9 +27,11 @@ class Category extends Model implements ConvertibleToRow  {
   });
 
   factory Category.fromJSON(dynamic json) {
+    final values = Model.flatValues(schema, json);
+
     return Category(
-      categoryId: json['categoryId'],
-      categoryName: json['categoryName'],
+      categoryId: values['categoryId'],
+      categoryName: values['categoryName'],
     );
   }
 
@@ -23,12 +39,7 @@ class Category extends Model implements ConvertibleToRow  {
   get primaryKey => categoryId;
 
   @override
-  Map<String, dynamic> toJSON() {
-    return {
-      'categoryId': categoryId,
-      'categoryName': categoryName,
-    };
-  }
+  JsonMap toJson() => convertToJson(schema, this);
 
   @override
   DataRow buildRow(BuildContext context) {
