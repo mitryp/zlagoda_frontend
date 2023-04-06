@@ -7,18 +7,20 @@ import '../../services/http/http_service.dart';
 import '../../services/query_builder/query_builder.dart';
 
 typedef CollectionBuilder<M extends Model> = Widget Function(
-  BuildContext context,
+  BuildContext context, {
   List<M> items,
   EventSink<void> updateSink,
-);
+  QueryBuilder queryBuilder,
+});
 
-class WidgetWithCollection<M extends Model> extends StatefulWidget {
+class WithCollection<M extends Model> extends StatefulWidget {
   final CollectionBuilder builder;
   final HttpService<M> httpService;
+
   // TODO is it ok with qb?
   final QueryBuilder qb;
 
-  const WidgetWithCollection({
+  const WithCollection({
     required this.httpService,
     required this.builder,
     required this.qb,
@@ -26,10 +28,10 @@ class WidgetWithCollection<M extends Model> extends StatefulWidget {
   });
 
   @override
-  State<WidgetWithCollection<M>> createState() => WidgetWithCollectionState();
+  State<WithCollection<M>> createState() => WithCollectionState();
 }
 
-class WidgetWithCollectionState<M extends Model> extends State<WidgetWithCollection<M>> {
+class WithCollectionState<M extends Model> extends State<WithCollection<M>> {
   final StreamController<void> streamController = StreamController();
   late final StreamSubscription<void> updateSubscription;
 
@@ -72,6 +74,11 @@ class WidgetWithCollectionState<M extends Model> extends State<WidgetWithCollect
       );
     }
 
-    return widget.builder(context, items, streamController.sink);
+    return widget.builder(
+      context,
+      items: items,
+      updateSink: streamController.sink,
+      queryBuilder: widget.qb,
+    );
   }
 }
