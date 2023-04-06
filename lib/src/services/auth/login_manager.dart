@@ -15,17 +15,35 @@ class LoginManager {
 
   Future<AuthorizedUser?> get loginData => storage.getLoginData();
 
-  Future<User?> login(String username, String password) async {
-    final authorizedUser = await authService.login(username, password);
+  UserManager get userManager => UserManager.of(context);
 
-    if (authorizedUser == null) return null;
-
-    await storage.setLoginData(authorizedUser.user, authorizedUser.token);
-    if (context.mounted)
-      UserManager.of(context).setCurrentUser(authorizedUser.user);
-
-    return authorizedUser.user;
+  void _setCurrentUser(User? user) {
+    if (context.mounted) userManager.setCurrentUser(user);
   }
 
-  Future<void> clearLoginData() => storage.clearLoginData();
+  Future<bool> login(String username, String password) async {
+    final authorizedUser = await authService.login(username, password);
+
+    if (authorizedUser == null) return false;
+
+    await storage.setLoginData(authorizedUser.user, authorizedUser.token);
+    _setCurrentUser(authorizedUser.user);
+    return true;
+  }
+
+  Future<void> clearLoginData() {
+    _setCurrentUser(null);
+    return storage.clearLoginData();
+  }
+
+  Future<bool> authorizeCachedUser() async {
+    final cachedData = await loginData;
+
+    if (cachedData != null && await authService.authorizeToken(cachedData.token)) {
+      _setCurrentUser(cachedData.user);
+      return true;
+    }
+
+    return false;
+  }
 }

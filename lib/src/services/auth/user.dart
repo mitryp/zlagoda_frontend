@@ -22,7 +22,7 @@ class User implements Serializable {
     final name = Name.fromJson(json['name']);
     final positionName = json['position'];
     Position? position;
-    if (positionName != null)
+    if (Position.values.map((e) => e.name).contains(positionName))
       position = Position.values.firstWhere((pos) => pos.name == positionName);
 
     if ([userId, login, name, position].contains(null)) return null;
