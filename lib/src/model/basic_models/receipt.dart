@@ -3,38 +3,39 @@ import '../interfaces/model.dart';
 import '../interfaces/retriever/retriever.dart';
 import '../interfaces/serializable.dart';
 
-final Schema<Receipt> schema = [
-  Retriever<int, Receipt>(
-    field: 'receiptId',
-    getter: (receipt) => receipt.receiptId,
-  ),
-  Retriever<DateTime, Receipt>(
-    field: 'date',
-    getter: (receipt) => receipt.date,
-  ),
-  Retriever<int, Receipt>(
-    field: 'amount',
-    getter: (receipt) => receipt.amount,
-  ),
-  Retriever<int, Receipt>(
-    field: 'tax',
-    getter: (receipt) => receipt.tax,
-  ),
-  Retriever<int, Receipt>(
-    field: 'clientId',
-    getter: (receipt) => receipt.clientId,
-  ),
-  Retriever<int, Receipt>(
-    field: 'employeeId',
-    getter: (receipt) => receipt.employeeId,
-  ),
-  Retriever<List<int>, Receipt>(
-    field: 'goodsIds',
-    getter: (receipt) => receipt.goodsIds,
-  ),
-];
-
 class Receipt extends Model {
+  static final Schema<Receipt> schema = [
+    Retriever<int, Receipt>(
+      field: 'receiptId',
+      getter: (receipt) => receipt.receiptId,
+    ),
+    Retriever<DateTime, Receipt>(
+      field: 'date',
+      getter: (receipt) => receipt.date,
+    ),
+    Retriever<int, Receipt>(
+      field: 'amount',
+      getter: (receipt) => receipt.amount,
+    ),
+    Retriever<int, Receipt>(
+      field: 'tax',
+      getter: (receipt) => receipt.tax,
+    ),
+    Retriever<int, Receipt>(
+      field: 'clientId',
+      getter: (receipt) => receipt.clientId,
+    ),
+    Retriever<int, Receipt>(
+      field: 'employeeId',
+      getter: (receipt) => receipt.employeeId,
+    ),
+    Retriever<List<int>, Receipt>(
+      field: 'goodsIds',
+      getter: (receipt) => receipt.goodsIds,
+    ),
+  ];
+
+
   final int receiptId;
   final DateTime date;
   final int amount;
@@ -53,24 +54,25 @@ class Receipt extends Model {
     required this.goodsIds,
   });
 
-  factory Receipt.fromJSON(dynamic json) {
-    final values = Model.flatValues(schema, json);
+  static Receipt? fromJson(JsonMap json) {
+    final receiptJson = retrieveFromJson(schema, json);
 
-    return Receipt(
-      receiptId: values['receiptId'],
-      date: values['date'],
-      amount: values['amount'],
-      tax: values['tax'],
-      clientId: values['clientId'],
-      employeeId: values['employeeId'],
-      goodsIds: values['goodsIds'],
-    );
+    return receiptJson == null
+        ? null
+        : Receipt(
+            receiptId: receiptJson['receiptId'],
+            date: receiptJson['date'],
+            amount: receiptJson['amount'],
+            tax: receiptJson['tax'],
+            clientId: receiptJson['clientId'],
+            employeeId: receiptJson['employeeId'],
+            goodsIds: receiptJson['goodsIds'],
+          );
   }
 
   @override
   JsonMap toJson() => convertToJson(schema, this);
 
   @override
-  // TODO: implement primaryKey
-  get primaryKey => throw UnimplementedError();
+  get primaryKey => receiptId;
 }

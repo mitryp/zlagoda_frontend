@@ -3,30 +3,30 @@ import '../interfaces/model.dart';
 import '../interfaces/retriever/retriever.dart';
 import '../interfaces/serializable.dart';
 
-final Schema<Product> schema = [
-  Retriever<int, Product>(
-    field: 'typeId',
-    getter: (product) => product.typeId,
-  ),
-  Retriever<String, Product>(
-    field: 'productName',
-    getter: (product) => product.productName,
-  ),
-  Retriever<String, Product>(
-    field: 'manufacturer',
-    getter: (product) => product.manufacturer,
-  ),
-  Retriever<String, Product>(
-    field: 'specs',
-    getter: (product) => product.specs,
-  ),
-  Retriever<int, Product>(
-    field: 'categoryId',
-    getter: (product) => product.categoryId,
-  ),
-];
-
 class Product extends Model {
+  static final Schema<Product> schema = [
+    Retriever<int, Product>(
+      field: 'typeId',
+      getter: (product) => product.typeId,
+    ),
+    Retriever<String, Product>(
+      field: 'productName',
+      getter: (product) => product.productName,
+    ),
+    Retriever<String, Product>(
+      field: 'manufacturer',
+      getter: (product) => product.manufacturer,
+    ),
+    Retriever<String, Product>(
+      field: 'specs',
+      getter: (product) => product.specs,
+    ),
+    Retriever<int, Product>(
+      field: 'categoryId',
+      getter: (product) => product.categoryId,
+    ),
+  ];
+
   final int typeId;
   final String productName;
   final String manufacturer;
@@ -41,16 +41,18 @@ class Product extends Model {
     required this.categoryId,
   });
 
-  factory Product.fromJSON(dynamic json) {
-    final values = Model.flatValues(schema, json);
+  static Product? fromJson(JsonMap json) {
+    final productJson = retrieveFromJson(schema, json);
 
-    return Product(
-      typeId: values['typeId'],
-      productName: values['productName'],
-      manufacturer: values['manufacturer'],
-      specs: values['specs'],
-      categoryId: values['categoryId'],
-    );
+    return productJson == null
+        ? null
+        : Product(
+            typeId: productJson['typeId'],
+            productName: productJson['productName'],
+            manufacturer: productJson['manufacturer'],
+            specs: productJson['specs'],
+            categoryId: productJson['categoryId'],
+          );
   }
 
   @override

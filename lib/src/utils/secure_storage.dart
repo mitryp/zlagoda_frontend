@@ -24,7 +24,7 @@ Future<void> clearStorage() => _storage.deleteAll();
 
 Future<void> setLoginData(User user, String token) async {
   await setString(_tokenKey, token);
-  return setString(_userKey, jsonEncode(user.toJSON()));
+  return setString(_userKey, jsonEncode(user.toJson()));
 }
 
 Future<AuthorizedUser?> getLoginData() async {
