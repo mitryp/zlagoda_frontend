@@ -53,8 +53,6 @@ class _LoginPageState extends State<LoginPage> {
     final sessionRestored = this.sessionRestored;
     if (sessionRestored == null) return const CircularProgressIndicator();
 
-    print('Session restoration status: $sessionRestored');
-
     if (sessionRestored) {
       redirectToApp();
       return const Text('Вас переадресовано на головну сторінку');
@@ -125,7 +123,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void restoreSession() {
-    print('restoreSession called');
     loginManager.authorizeCachedUser().then((status) {
       if (mounted) {
         setState(() => sessionRestored = status);
@@ -142,13 +139,11 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void redirectToApp() {
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) {
-        if (mounted) {
-          Navigator.of(context).pushReplacementNamed('/app');
-        }
-      },
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        Navigator.of(context).pushReplacementNamed('/app');
+      }
+    });
   }
 }
 
