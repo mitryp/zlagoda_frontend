@@ -1,5 +1,4 @@
 import '../../typedefs.dart';
-import '../interfaces/retriever/extractors.dart';
 import '../interfaces/retriever/retriever.dart';
 import '../interfaces/serializable.dart';
 
@@ -36,6 +35,14 @@ class Name implements Serializable {
   JsonMap toJson() => convertToJson(schema, this);
 
   static Name? fromJson(JsonMap json) {
-    return NameExtractor().extractFrom(json, 'name');
+    final nameJson = retrieveFromJson(schema, json);
+
+    return nameJson == null
+        ? null
+        : Name(
+            firstName: nameJson['firstName'],
+            middleName: nameJson['middleName'],
+            lastName: nameJson['lastName'],
+          );
   }
 }
