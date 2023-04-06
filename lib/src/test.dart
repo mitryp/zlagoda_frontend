@@ -1,3 +1,5 @@
+import 'package:zlagoda_frontend/src/services/auth/user.dart';
+
 import 'model/basic_models/employee.dart';
 
 void main() {
@@ -24,4 +26,19 @@ void main() {
   final employee = Employee.fromJson(employeeJSON);
 
   print(employee == null ? employee : employee.toJson());
+
+  const userJson = {
+    'userId': '1',
+    'login': 'kathryn',
+    'name': {
+      'firstName': 'Kateryna',
+      'middleName': 'Ihorivna',
+      'lastName': 'Verkhohliad'
+    },
+    'position': 'manager',
+  };
+
+  final user = User.fromJSON(userJson);
+
+  print(user == null ? user : user.toJson());
 }
