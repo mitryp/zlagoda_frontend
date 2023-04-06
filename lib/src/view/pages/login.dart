@@ -22,6 +22,15 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final loginController = TextEditingController();
   final passwordController = TextEditingController();
+  bool? sessionRestored;
+
+  LoginManager get loginManager => LoginManager.of(context);
+
+  @override
+  void initState() {
+    super.initState();
+    restoreSession();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,36 +41,51 @@ class _LoginPageState extends State<LoginPage> {
           middlewareBuilders: const [
             ResponseDisplayMiddleware.new,
           ],
-          child: RequestMiddlewareContext(
-            middlewareBuilders: const [RequestAuthMiddleware.new],
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 28),
-                    child: buildZlagodaLabel(),
-                  ),
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.black.withOpacity(.5), width: .5),
-                      borderRadius: const BorderRadius.all(Radius.circular(16)),
-                    ),
-                    child: buildForm(),
-                  ),
-                ],
-              ),
-            ),
+          child: Center(
+            child: buildContent(),
           ),
         ),
       ),
     );
   }
 
-  Widget buildZlagodaLabel() =>
+  Widget buildContent() {
+    final sessionRestored = this.sessionRestored;
+    if (sessionRestored == null) return const CircularProgressIndicator();
+
+    print('Session restoration status: $sessionRestored');
+
+    if (sessionRestored) {
+      redirectToApp();
+      return const Text('Вас переадресовано на головну сторінку');
+    }
+
+    return buildFormContainer(context);
+  }
+
+  Widget buildFormContainer(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 28),
+          child: buildZlagodaLabel(context),
+        ),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black.withOpacity(.5), width: .5),
+            borderRadius: const BorderRadius.all(Radius.circular(16)),
+          ),
+          child: buildForm(context),
+        ),
+      ],
+    );
+  }
+
+  Widget buildZlagodaLabel(BuildContext context) =>
       const Text('Злагода', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600));
 
-  Widget buildForm() {
+  Widget buildForm(BuildContext context) {
     const divider = Padding(padding: EdgeInsets.only(top: 15));
 
     return Form(
@@ -100,14 +124,31 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  void restoreSession() {
+    print('restoreSession called');
+    loginManager.authorizeCachedUser().then((status) {
+      if (mounted) {
+        setState(() => sessionRestored = status);
+      }
+    });
+  }
+
   void login() async {
-    // final userManager = UserManager.of(context);
-    final loginManager = LoginManager.of(context);
+    final success = await loginManager.login(loginController.text, passwordController.text);
 
-    final user = await loginManager.login(loginController.text, passwordController.text);
-    if (user == null || !mounted) return;
+    if (success) {
+      redirectToApp();
+    }
+  }
 
-    Navigator.of(context).pushReplacementNamed('/app');
+  void redirectToApp() {
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) {
+        if (mounted) {
+          Navigator.of(context).pushReplacementNamed('/app');
+        }
+      },
+    );
   }
 }
 

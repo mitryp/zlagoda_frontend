@@ -15,11 +15,11 @@ String _basicAuthorizationHeaderValue(String username, String password) {
   return 'Basic $encodedCredentials';
 }
 
-const tokenKey = 'token';
+const _baseRoute = 'http://localhost:3000';
+const _loginRoute = '$_baseRoute/api/login';
+const _validateRoute = '$_baseRoute/api/login/validate';
 
 class AuthService {
-  static const loginRoute = '/api/login';
-
   const AuthService();
 
   Future<AuthorizedUser?> login(String username, String password) async {
@@ -41,9 +41,16 @@ class AuthService {
     return AuthorizedUser(user, token);
   }
 
+  Future<bool> authorizeToken(String token) async {
+    return http.post(
+      Uri.parse(_validateRoute),
+      headers: {'Authorization': 'Bearer $token'},
+    ).then((res) => res.statusCode >= 200 && res.statusCode < 300);
+  }
+
   Future<http.Response> _postBasicLogin(String username, String password) {
     return http.post(
-      Uri.parse(loginRoute),
+      Uri.parse(_loginRoute),
       headers: {
         'Authorization': _basicAuthorizationHeaderValue(username, password),
       },
