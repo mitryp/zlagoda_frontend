@@ -6,30 +6,30 @@ import '../interfaces/model.dart';
 import '../interfaces/retriever/retriever.dart';
 import '../interfaces/serializable.dart';
 
-final Schema<StoreProduct> schema = [
-  Retriever<String, StoreProduct>(
-    field: 'upc',
-    getter: (storeProduct) => storeProduct.upc,
-  ),
-  Retriever<int, StoreProduct>(
-    field: 'typeId',
-    getter: (storeProduct) => storeProduct.typeId,
-  ),
-  Retriever<int, StoreProduct>(
-    field: 'price',
-    getter: (storeProduct) => storeProduct.price,
-  ),
-  Retriever<int, StoreProduct>(
-    field: 'quantity',
-    getter: (storeProduct) => storeProduct.quantity,
-  ),
-  Retriever<bool, StoreProduct>(
-    field: 'isProm',
-    getter: (storeProduct) => storeProduct.isProm,
-  ),
-];
-
 class StoreProduct extends Model with ConvertibleToRow {
+  static final Schema<StoreProduct> schema = [
+    Retriever<String, StoreProduct>(
+      field: 'upc',
+      getter: (storeProduct) => storeProduct.upc,
+    ),
+    Retriever<int, StoreProduct>(
+      field: 'typeId',
+      getter: (storeProduct) => storeProduct.typeId,
+    ),
+    Retriever<int, StoreProduct>(
+      field: 'price',
+      getter: (storeProduct) => storeProduct.price,
+    ),
+    Retriever<int, StoreProduct>(
+      field: 'quantity',
+      getter: (storeProduct) => storeProduct.quantity,
+    ),
+    Retriever<bool, StoreProduct>(
+      field: 'isProm',
+      getter: (storeProduct) => storeProduct.isProm,
+    ),
+  ];
+
   final String upc;
   final int typeId;
   final int price;
@@ -44,16 +44,18 @@ class StoreProduct extends Model with ConvertibleToRow {
     required this.isProm,
   });
 
-  factory StoreProduct.fromJSON(dynamic json) {
-    final values = Model.flatValues(schema, json);
+  static StoreProduct? fromJSON(JsonMap json) {
+    final storeProductJson = retrieveFromJson(schema, json);
 
-    return StoreProduct(
-      upc: values['upc'],
-      typeId: values['typeId'],
-      price: values['price'],
-      quantity: values['quantity'],
-      isProm: values['isProm'],
-    );
+    return storeProductJson == null
+        ? null
+        : StoreProduct(
+            upc: storeProductJson['upc'],
+            typeId: storeProductJson['typeId'],
+            price: storeProductJson['price'],
+            quantity: storeProductJson['quantity'],
+            isProm: storeProductJson['isProm'],
+          );
   }
 
   @override
@@ -64,7 +66,7 @@ class StoreProduct extends Model with ConvertibleToRow {
 
   @override
   DataRow buildRow(BuildContext context) {
-    // todo how to show that the goods is prom?
+    // todo is prom
     final cellsText = [
       upc,
       price.toString(),

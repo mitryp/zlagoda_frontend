@@ -1,6 +1,7 @@
 import '../../model/basic_models/employee.dart';
 import '../../model/common_models/name.dart';
 import '../../model/interfaces/serializable.dart';
+import '../../typedefs.dart';
 
 class User implements Serializable {
   final String userId;
@@ -18,7 +19,7 @@ class User implements Serializable {
   static User? fromJSON(dynamic json) {
     final userId = json['userId'];
     final login = json['login'];
-    final name = Name.fromJSON(json['name']);
+    final name = Name.fromJson(json['name']);
     final positionName = json['position'];
     Position? position;
     if (positionName != null)
@@ -35,12 +36,12 @@ class User implements Serializable {
   }
 
   @override
-  Map<String, dynamic> toJSON() {
+  JsonMap toJson() {
     return {
       'userId': userId,
       'login': login,
       'position': position.name,
-      'name': name.toJSON(),
+      'name': name.toJson(),
     };
   }
 
@@ -52,9 +53,6 @@ class User implements Serializable {
           name == other.name &&
           login == other.login &&
           position == other.position;
-
-  @override
-  int get hashCode => name.hashCode ^ login.hashCode ^ position.hashCode;
 }
 
 class AuthorizedUser {

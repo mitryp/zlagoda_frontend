@@ -8,30 +8,30 @@ import '../common_models/address.dart';
 import '../interfaces/retriever/retriever.dart';
 import '../interfaces/serializable.dart';
 
-final Schema<Client> schema = [
-  Retriever<String, Client>(
-    field: 'clientId',
-    getter: (client) => client.clientId,
-  ),
-  Retriever<Name, Client>(
-    field: 'name',
-    getter: (client) => client.name,
-  ),
-  Retriever<String, Client>(
-    field: 'clientId',
-    getter: (client) => client.phone,
-  ),
-  Retriever<Address, Client>(
-    field: 'address',
-    getter: (employee) => employee.address,
-  ),
-  Retriever<int, Client>(
-    field: 'discount',
-    getter: (client) => client.discount,
-  ),
-];
-
 class Client extends Model implements ConvertibleToRow {
+  static final Schema<Client> schema = [
+    Retriever<String, Client>(
+      field: 'clientId',
+      getter: (client) => client.clientId,
+    ),
+    Retriever<Name, Client>(
+      field: 'name',
+      getter: (client) => client.name,
+    ),
+    Retriever<String, Client>(
+      field: 'clientId',
+      getter: (client) => client.phone,
+    ),
+    Retriever<Address, Client>(
+      field: 'address',
+      getter: (employee) => employee.address,
+    ),
+    Retriever<int, Client>(
+      field: 'discount',
+      getter: (client) => client.discount,
+    ),
+  ];
+
   final String clientId;
   final Name name;
   final String phone;
@@ -46,16 +46,18 @@ class Client extends Model implements ConvertibleToRow {
     required this.discount,
   });
 
-  factory Client.fromJSON(dynamic json) {
-    final values = Model.flatValues(schema, json);
+  static Client? fromJson(JsonMap json) {
+    final clientJson = retrieveFromJson(schema, json);
 
-    return Client(
-      clientId: values['clientId'],
-      name: values['name'],
-      phone: values['phone'],
-      address: values['address'],
-      discount: values['discount'],
-    );
+    return clientJson == null
+        ? null
+        : Client(
+            clientId: clientJson['clientId'],
+            name: clientJson['name'],
+            phone: clientJson['phone'],
+            address: clientJson['address'],
+            discount: clientJson['discount'],
+          );
   }
 
   @override
@@ -69,8 +71,6 @@ class Client extends Model implements ConvertibleToRow {
     final List<String> cellsText = [
       clientId,
       name.fullName,
-      //phone,
-      //address.fullAddress,
       discount.toString(),
     ];
 

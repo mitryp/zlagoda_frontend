@@ -8,9 +8,10 @@ import '../../model/basic_models/store_product.dart';
 import '../../model/basic_models/product.dart';
 import '../../model/basic_models/receipt.dart';
 import '../../model/interfaces/model.dart';
+import '../../typedefs.dart';
 import '../query_builder/query_builder.dart';
 
-typedef JsonCastFunction<M extends Model> = M Function(dynamic json);
+typedef JsonCastFunction<M extends Model> = M? Function(JsonMap json);
 typedef ControllerSuccessfulLogic<T> = T Function(http.Response response);
 
 /// Authors:
@@ -95,7 +96,7 @@ class EmployeeService extends HttpService<Employee> {
   const EmployeeService()
       : super(
             route: 'employees',
-            castFunction: Employee.fromJSON);
+            castFunction: Employee.fromJson);
 }
 
 class GoodsService extends HttpService<StoreProduct> {
@@ -109,26 +110,26 @@ class GoodsTypeService extends HttpService<Product> {
   const GoodsTypeService()
       : super(
       route: 'goods_types',
-      castFunction: Product.fromJSON);
+      castFunction: Product.fromJson);
 }
 
 class CategoriesService extends HttpService<Category> {
   const CategoriesService()
       : super(
       route: 'categories',
-      castFunction: Category.fromJSON);
+      castFunction: Category.fromJson);
 }
 
 class ClientsService extends HttpService<Client> {
   const ClientsService()
       : super(
       route: 'clients',
-      castFunction: Client.fromJSON);
+      castFunction: Client.fromJson);
 }
 
 class ReceiptsService extends HttpService<Receipt> {
   const ReceiptsService()
       : super(
       route: 'receipts',
-      castFunction: Receipt.fromJSON);
+      castFunction: Receipt.fromJson);
 }

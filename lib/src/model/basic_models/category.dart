@@ -6,18 +6,18 @@ import '../interfaces/model.dart';
 import '../interfaces/retriever/retriever.dart';
 import '../interfaces/serializable.dart';
 
-final Schema<Category> schema = [
-  Retriever<int, Category>(
-    field: 'categoryId',
-    getter: (category) => category.categoryId,
-  ),
-  Retriever<String, Category>(
-    field: 'categoryName',
-    getter: (category) => category.categoryName,
-  ),
-];
-
 class Category extends Model implements ConvertibleToRow {
+  static final Schema<Category> schema = [
+    Retriever<int, Category>(
+      field: 'categoryId',
+      getter: (category) => category.categoryId,
+    ),
+    Retriever<String, Category>(
+      field: 'categoryName',
+      getter: (category) => category.categoryName,
+    ),
+  ];
+
   final int categoryId;
   final String categoryName;
 
@@ -26,13 +26,15 @@ class Category extends Model implements ConvertibleToRow {
     required this.categoryName,
   });
 
-  factory Category.fromJSON(dynamic json) {
-    final values = Model.flatValues(schema, json);
+  static Category? fromJson(JsonMap json) {
+    final categoryJson = retrieveFromJson(schema, json);
 
-    return Category(
-      categoryId: values['categoryId'],
-      categoryName: values['categoryName'],
-    );
+    return categoryJson == null
+        ? null
+        : Category(
+            categoryId: categoryJson['categoryId'],
+            categoryName: categoryJson['categoryName'],
+          );
   }
 
   @override
@@ -43,9 +45,7 @@ class Category extends Model implements ConvertibleToRow {
 
   @override
   DataRow buildRow(BuildContext context) {
-    final cellsText = [
-      categoryName
-    ];
+    final cellsText = [categoryName];
 
     return buildRowFromFields(context, cellsText);
   }
