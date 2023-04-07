@@ -1,27 +1,38 @@
 import '../../typedefs.dart';
-import '../interfaces/retriever/retriever.dart';
 import '../interfaces/serializable.dart';
+import '../schema/retriever.dart';
+import '../schema/schema.dart';
 
 class Name implements Serializable {
   final String firstName;
   final String? middleName;
   final String lastName;
 
-  static final Schema<Name> schema = [
-    Retriever<String, Name>(
-      field: 'firstName',
-      getter: (name) => name.firstName,
-    ),
-    Retriever<String?, Name>(
-      field: 'middleName',
-      getter: (name) => name.middleName,
-      optional: true,
-    ),
-    Retriever<String, Name>(
-      field: 'lastName',
-      getter: (name) => name.lastName,
-    ),
-  ];
+  static final Schema<Name> schema = Schema(
+    Name.new,
+    [
+      Retriever<String, Name>('firstName', (o) => o.firstName),
+      Retriever<String?, Name>('middleName', (o) => o.middleName),
+      Retriever<String, Name>('lastName', (o) => o.lastName),
+    ],
+  );
+
+
+  // static final Schema<Name> schema = [
+  //   Retriever<String, Name>(
+  //     field: 'firstName',
+  //     getter: (name) => name.firstName,
+  //   ),
+  //   Retriever<String?, Name>(
+  //     field: 'middleName',
+  //     getter: (name) => name.middleName,
+  //     nullable: true,
+  //   ),
+  //   Retriever<String, Name>(
+  //     field: 'lastName',
+  //     getter: (name) => name.lastName,
+  //   ),
+  // ];
 
   const Name({
     required this.firstName,
@@ -32,17 +43,7 @@ class Name implements Serializable {
   String get fullName => '$lastName $firstName $middleName';
 
   @override
-  JsonMap toJson() => convertToJson(schema, this);
+  JsonMap toJson() => schema.toJson(this);
 
-  static Name? fromJson(JsonMap json) {
-    final nameJson = retrieveFromJson(schema, json);
-
-    return nameJson == null
-        ? null
-        : Name(
-            firstName: nameJson['firstName'],
-            middleName: nameJson['middleName'],
-            lastName: nameJson['lastName'],
-          );
-  }
+  static Name? fromJson(JsonMap json) => schema.fromJson(json);
 }

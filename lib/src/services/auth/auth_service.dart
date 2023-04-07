@@ -33,7 +33,7 @@ class AuthService {
         .then(decodeResponseBody)
         .catchError(logAndReturn(<String, dynamic>{}));
 
-    final user = User.fromJSON(responseJson);
+    final user = User.fromJson(responseJson);
     final token = responseJson['token'];
 
     if (user == null || token == null) return null;

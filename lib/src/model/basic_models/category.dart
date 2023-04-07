@@ -3,20 +3,17 @@ import 'package:flutter/material.dart';
 import '../../typedefs.dart';
 import '../interfaces/convertible_to_row.dart';
 import '../interfaces/model.dart';
-import '../interfaces/retriever/retriever.dart';
-import '../interfaces/serializable.dart';
+import '../schema/retriever.dart';
+import '../schema/schema.dart';
 
 class Category extends Model implements ConvertibleToRow {
-  static final Schema<Category> schema = [
-    Retriever<int, Category>(
-      field: 'categoryId',
-      getter: (category) => category.categoryId,
-    ),
-    Retriever<String, Category>(
-      field: 'categoryName',
-      getter: (category) => category.categoryName,
-    ),
-  ];
+  static final Schema<Category> schema = Schema(
+    Category.new,
+    [
+      Retriever<int, Category>('categoryId', (o) => o.categoryId),
+      Retriever<String, Category>('categoryName', (o) => o.categoryName),
+    ],
+  );
 
   final int categoryId;
   final String categoryName;
@@ -26,22 +23,13 @@ class Category extends Model implements ConvertibleToRow {
     required this.categoryName,
   });
 
-  static Category? fromJson(JsonMap json) {
-    final categoryJson = retrieveFromJson(schema, json);
-
-    return categoryJson == null
-        ? null
-        : Category(
-            categoryId: categoryJson['categoryId'],
-            categoryName: categoryJson['categoryName'],
-          );
-  }
+  static Category? fromJson(JsonMap json) => schema.fromJson(json);
 
   @override
   get primaryKey => categoryId;
 
   @override
-  JsonMap toJson() => convertToJson(schema, this);
+  JsonMap toJson() => schema.toJson(this);
 
   @override
   DataRow buildRow(BuildContext context) {

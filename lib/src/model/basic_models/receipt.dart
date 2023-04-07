@@ -1,47 +1,30 @@
 import '../../typedefs.dart';
 import '../interfaces/model.dart';
-import '../interfaces/retriever/retriever.dart';
-import '../interfaces/serializable.dart';
+import '../schema/retriever.dart';
+import '../schema/schema.dart';
 
 class Receipt extends Model {
-  static final Schema<Receipt> schema = [
-    Retriever<int, Receipt>(
-      field: 'receiptId',
-      getter: (receipt) => receipt.receiptId,
-    ),
-    Retriever<DateTime, Receipt>(
-      field: 'date',
-      getter: (receipt) => receipt.date,
-    ),
-    Retriever<int, Receipt>(
-      field: 'amount',
-      getter: (receipt) => receipt.amount,
-    ),
-    Retriever<int, Receipt>(
-      field: 'tax',
-      getter: (receipt) => receipt.tax,
-    ),
-    Retriever<int, Receipt>(
-      field: 'clientId',
-      getter: (receipt) => receipt.clientId,
-    ),
-    Retriever<int, Receipt>(
-      field: 'employeeId',
-      getter: (receipt) => receipt.employeeId,
-    ),
-    Retriever<List<int>, Receipt>(
-      field: 'goodsIds',
-      getter: (receipt) => receipt.goodsIds,
-    ),
-  ];
+  static final Schema<Receipt> schema = Schema(
+    Receipt.new,
+    [
+      Retriever<int, Receipt>('receiptId', (o) => o.receiptId),
+      Retriever<DateTime, Receipt>('date', (o) => o.date),
+      Retriever<int, Receipt>('amount', (o) => o.amount),
+      Retriever<int, Receipt>('tax', (o) => o.tax),
+      Retriever<int?, Receipt>('clientId', (o) => o.clientId),
+      Retriever<int, Receipt>('employeeId', (o) => o.employeeId),
+      Retriever<List<int>, Receipt>('goodsIds', (o) => o.goodsIds),
+    ],
+  );
 
-
+  //TODO do the same as in Swagger
   final int receiptId;
   final DateTime date;
   final int amount;
   final int tax;
-  final int clientId;
+  final int? clientId;
   final int employeeId;
+  //TODO change to JoinedSales
   final List<int> goodsIds;
 
   const Receipt({
@@ -49,29 +32,15 @@ class Receipt extends Model {
     required this.date,
     required this.amount,
     required this.tax,
-    required this.clientId,
+    this.clientId,
     required this.employeeId,
     required this.goodsIds,
   });
 
-  static Receipt? fromJson(JsonMap json) {
-    final receiptJson = retrieveFromJson(schema, json);
-
-    return receiptJson == null
-        ? null
-        : Receipt(
-            receiptId: receiptJson['receiptId'],
-            date: receiptJson['date'],
-            amount: receiptJson['amount'],
-            tax: receiptJson['tax'],
-            clientId: receiptJson['clientId'],
-            employeeId: receiptJson['employeeId'],
-            goodsIds: receiptJson['goodsIds'],
-          );
-  }
+  static Receipt? fromJson(JsonMap json) => schema.fromJson(json);
 
   @override
-  JsonMap toJson() => convertToJson(schema, this);
+  JsonMap toJson() => schema.toJson(this);
 
   @override
   get primaryKey => receiptId;

@@ -1,9 +1,21 @@
 import '../../model/basic_models/employee.dart';
 import '../../model/common_models/name.dart';
 import '../../model/interfaces/serializable.dart';
+import '../../model/schema/retriever.dart';
+import '../../model/schema/schema.dart';
 import '../../typedefs.dart';
 
 class User implements Serializable {
+  static final Schema<User> schema = Schema(
+    User.new,
+    [
+      Retriever<String, User>('userId', (o) => o.userId),
+      Retriever<String, User>('login', (o) => o.login),
+      Retriever<Name, User>('name', (o) => o.name),
+      Retriever<Position, User>('position', (o) => o.position),
+    ],
+  );
+
   final String userId;
   final String login;
   final Name name;
@@ -16,34 +28,10 @@ class User implements Serializable {
     required this.name,
   });
 
-  static User? fromJSON(dynamic json) {
-    final userId = json['userId'];
-    final login = json['login'];
-    final name = Name.fromJson(json['name']);
-    final positionName = json['position'];
-    Position? position;
-    if (Position.values.map((e) => e.name).contains(positionName))
-      position = Position.values.firstWhere((pos) => pos.name == positionName);
-
-    if ([userId, login, name, position].contains(null)) return null;
-
-    return User(
-      userId: userId,
-      login: login,
-      position: position!,
-      name: name!,
-    );
-  }
+  static User? fromJson(JsonMap json) => schema.fromJson(json);
 
   @override
-  JsonMap toJson() {
-    return {
-      'userId': userId,
-      'login': login,
-      'position': position.name,
-      'name': name.toJson(),
-    };
-  }
+  JsonMap toJson() => schema.toJson(this);
 
   @override
   bool operator ==(Object other) =>

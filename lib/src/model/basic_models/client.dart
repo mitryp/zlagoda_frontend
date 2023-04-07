@@ -5,72 +5,48 @@ import '../interfaces/convertible_to_row.dart';
 import '../interfaces/model.dart';
 import '../common_models/name.dart';
 import '../common_models/address.dart';
-import '../interfaces/retriever/retriever.dart';
-import '../interfaces/serializable.dart';
+import '../schema/retriever.dart';
+import '../schema/schema.dart';
 
 class Client extends Model implements ConvertibleToRow {
-  static final Schema<Client> schema = [
-    Retriever<String, Client>(
-      field: 'clientId',
-      getter: (client) => client.clientId,
-    ),
-    Retriever<Name, Client>(
-      field: 'name',
-      getter: (client) => client.name,
-    ),
-    Retriever<String, Client>(
-      field: 'clientId',
-      getter: (client) => client.phone,
-    ),
-    Retriever<Address, Client>(
-      field: 'address',
-      getter: (employee) => employee.address,
-    ),
-    Retriever<int, Client>(
-      field: 'discount',
-      getter: (client) => client.discount,
-    ),
-  ];
+  static final Schema<Client> schema = Schema(
+    Client.new,
+    [
+      Retriever<String, Client>('clientId', (o) => o.clientId),
+      Retriever<Name, Client>('clientName', (o) => o.clientName),
+      Retriever<String, Client>('phone', (o) => o.phone),
+      Retriever<Address?, Client>('address', (o) => o.address),
+      Retriever<int, Client>('discount', (o) => o.discount),
+    ],
+  );
 
   final String clientId;
-  final Name name;
+  final Name clientName;
   final String phone;
-  final Address address;
+  final Address? address;
   final int discount;
 
   const Client({
     required this.clientId,
-    required this.name,
+    required this.clientName,
     required this.phone,
-    required this.address,
+    this.address,
     required this.discount,
   });
 
-  static Client? fromJson(JsonMap json) {
-    final clientJson = retrieveFromJson(schema, json);
-
-    return clientJson == null
-        ? null
-        : Client(
-            clientId: clientJson['clientId'],
-            name: clientJson['name'],
-            phone: clientJson['phone'],
-            address: clientJson['address'],
-            discount: clientJson['discount'],
-          );
-  }
+  static Client? fromJson(JsonMap json) => schema.fromJson(json);
 
   @override
   get primaryKey => clientId;
 
   @override
-  JsonMap toJson() => convertToJson(schema, this);
+  JsonMap toJson() => schema.toJson(this);
 
   @override
   DataRow buildRow(BuildContext context) {
     final List<String> cellsText = [
       clientId,
-      name.fullName,
+      clientName.fullName,
       discount.toString(),
     ];
 

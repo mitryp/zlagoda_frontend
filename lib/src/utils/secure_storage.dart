@@ -32,7 +32,7 @@ Future<AuthorizedUser?> getLoginData() async {
   final userStr = await getString(_userKey);
   final User? user;
 
-  if (userStr == null || token == null || (user = User.fromJSON(jsonDecode(userStr))) == null)
+  if (userStr == null || token == null || (user = User.fromJson(jsonDecode(userStr))) == null)
     return null;
 
   return AuthorizedUser(user!, token);

@@ -1,63 +1,39 @@
 import '../../typedefs.dart';
 import '../interfaces/model.dart';
-import '../interfaces/retriever/retriever.dart';
-import '../interfaces/serializable.dart';
+import '../schema/retriever.dart';
+import '../schema/schema.dart';
 
 class Product extends Model {
-  static final Schema<Product> schema = [
-    Retriever<int, Product>(
-      field: 'typeId',
-      getter: (product) => product.typeId,
-    ),
-    Retriever<String, Product>(
-      field: 'productName',
-      getter: (product) => product.productName,
-    ),
-    Retriever<String, Product>(
-      field: 'manufacturer',
-      getter: (product) => product.manufacturer,
-    ),
-    Retriever<String, Product>(
-      field: 'specs',
-      getter: (product) => product.specs,
-    ),
-    Retriever<int, Product>(
-      field: 'categoryId',
-      getter: (product) => product.categoryId,
-    ),
-  ];
+  static final Schema<Product> schema = Schema(
+    Product.new,
+    [
+      Retriever<String, Product>('upc', (o) => o.upc),
+      Retriever<String, Product>('productName', (o) => o.productName),
+      Retriever<String, Product>('manufacturer', (o) => o.manufacturer),
+      Retriever<String, Product>('specs', (o) => o.specs),
+      Retriever<int, Product>('categoryId', (o) => o.categoryId),
+    ],
+  );
 
-  final int typeId;
+  final String upc;
   final String productName;
   final String manufacturer;
   final String specs;
   final int categoryId;
 
   const Product({
-    required this.typeId,
+    required this.upc,
     required this.productName,
     required this.manufacturer,
     required this.specs,
     required this.categoryId,
   });
 
-  static Product? fromJson(JsonMap json) {
-    final productJson = retrieveFromJson(schema, json);
-
-    return productJson == null
-        ? null
-        : Product(
-            typeId: productJson['typeId'],
-            productName: productJson['productName'],
-            manufacturer: productJson['manufacturer'],
-            specs: productJson['specs'],
-            categoryId: productJson['categoryId'],
-          );
-  }
+  static Product? fromJson(JsonMap json)  => schema.fromJson(json);
 
   @override
-  JsonMap toJson() => convertToJson(schema, this);
+  JsonMap toJson() => schema.toJson(this);
 
   @override
-  get primaryKey => typeId;
+  get primaryKey => upc;
 }

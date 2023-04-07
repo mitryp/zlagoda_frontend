@@ -6,7 +6,7 @@ extension EmployeeUser on Employee {
         // todo change this string to the value
         userId: 'employeeId',
         login: login,
-        name: name,
+        name: employeeName,
         position: position,
       );
 }

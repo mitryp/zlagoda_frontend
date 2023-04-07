@@ -1,19 +1,19 @@
-import '../../../typedefs.dart';
-import '../../basic_models/employee.dart';
-import '../../common_models/address.dart';
-import '../../common_models/name.dart';
-import '../serializable.dart';
+import '../../typedefs.dart';
+import '../basic_models/employee.dart';
+import '../common_models/address.dart';
+import '../common_models/name.dart';
 
-class JsonExtractorFactory {
-  static Extractor<T> getExtractor<T>() {
-    if (T == DateTime) return DateTimeExtractor() as Extractor<T>;
-    if (T == Address) return AddressExtractor() as Extractor<T>;
-    if (T == Name) return NameExtractor() as Extractor<T>;
-    if (T == Position) return PositionExtractor() as Extractor<T>;
-    if (T == DateTime) return DateTimeExtractor() as Extractor<T>;
+Extractor<T> makeExtractor<T>() {
+  const typesToExtractors = {
+    DateTime: DateTimeExtractor.new,
+    Address: AddressExtractor.new,
+    Name: NameExtractor.new,
+    Position: PositionExtractor.new,
+  };
 
-    return Extractor<T>();
-  }
+  final extractor = typesToExtractors[T];
+
+  return (extractor == null ? Extractor<T>() : extractor()) as Extractor<T>;
 }
 
 T? extractInlineFrom<T>(JsonMap json, String field) {
@@ -27,9 +27,8 @@ T? extractInlineFrom<T>(JsonMap json, String field) {
 }
 
 class Extractor<T> {
-  T? extractFrom(JsonMap json, String field) {
-    return extractInlineFrom<T>(json, field);
-  }
+  T? extractFrom(JsonMap json, String field) =>
+      extractInlineFrom<T>(json, field);
 }
 
 class DateTimeExtractor extends Extractor<DateTime> {
@@ -50,15 +49,7 @@ class NameExtractor extends Extractor<Name> {
 
     if (nameFromJson == null) return null;
 
-    final jsonName = retrieveFromJson(Name.schema, nameFromJson);
-
-    if(jsonName == null) return null;
-
-    return Name(
-      firstName: jsonName['firstName'],
-      middleName: jsonName['middleName'],
-      lastName: jsonName['lastName'],
-    );
+    return Name.schema.fromJson(nameFromJson);
   }
 }
 
@@ -69,15 +60,7 @@ class AddressExtractor extends Extractor<Address> {
 
     if (addressFromJson == null) return null;
 
-    final jsonName = retrieveFromJson(Address.schema, addressFromJson);
-
-    if(jsonName == null) return null;
-
-    return Address(
-      city: jsonName['city'],
-      street: jsonName['street'],
-      index: jsonName['index'],
-    );
+    return Address.schema.fromJson(addressFromJson);
   }
 }
 

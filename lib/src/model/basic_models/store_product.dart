@@ -3,72 +3,48 @@ import 'package:flutter/material.dart';
 import '../../typedefs.dart';
 import '../interfaces/convertible_to_row.dart';
 import '../interfaces/model.dart';
-import '../interfaces/retriever/retriever.dart';
-import '../interfaces/serializable.dart';
+import '../schema/retriever.dart';
+import '../schema/schema.dart';
 
 class StoreProduct extends Model with ConvertibleToRow {
-  static final Schema<StoreProduct> schema = [
-    Retriever<String, StoreProduct>(
-      field: 'upc',
-      getter: (storeProduct) => storeProduct.upc,
-    ),
-    Retriever<int, StoreProduct>(
-      field: 'typeId',
-      getter: (storeProduct) => storeProduct.typeId,
-    ),
-    Retriever<int, StoreProduct>(
-      field: 'price',
-      getter: (storeProduct) => storeProduct.price,
-    ),
-    Retriever<int, StoreProduct>(
-      field: 'quantity',
-      getter: (storeProduct) => storeProduct.quantity,
-    ),
-    Retriever<bool, StoreProduct>(
-      field: 'isProm',
-      getter: (storeProduct) => storeProduct.isProm,
-    ),
-  ];
+  static final Schema<StoreProduct> schema = Schema(
+    StoreProduct.new,
+    [
+      Retriever<int, StoreProduct>('productId', (o) => o.productId),
+      Retriever<String, StoreProduct>('upc', (o) => o.upc),
+      Retriever<int, StoreProduct>('price', (o) => o.price),
+      Retriever<int, StoreProduct>('quantity', (o) => o.quantity),
+      Retriever<bool, StoreProduct>('isProm', (o) => o.isProm),
+    ],
+  );
 
+  final int productId;
   final String upc;
-  final int typeId;
   final int price;
   final int quantity;
   final bool isProm;
 
   const StoreProduct({
+    required this.productId,
     required this.upc,
-    required this.typeId,
     required this.price,
     required this.quantity,
     required this.isProm,
   });
 
-  static StoreProduct? fromJSON(JsonMap json) {
-    final storeProductJson = retrieveFromJson(schema, json);
-
-    return storeProductJson == null
-        ? null
-        : StoreProduct(
-            upc: storeProductJson['upc'],
-            typeId: storeProductJson['typeId'],
-            price: storeProductJson['price'],
-            quantity: storeProductJson['quantity'],
-            isProm: storeProductJson['isProm'],
-          );
-  }
+  static StoreProduct? fromJSON(JsonMap json) => schema.fromJson(json);
 
   @override
-  get primaryKey => upc;
+  get primaryKey => productId;
 
   @override
-  JsonMap toJson() => convertToJson(schema, this);
+  JsonMap toJson() => schema.toJson(this);
 
   @override
   DataRow buildRow(BuildContext context) {
     // todo is prom
     final cellsText = [
-      upc,
+      productId.toString(),
       price.toString(),
       quantity.toString(),
     ];
