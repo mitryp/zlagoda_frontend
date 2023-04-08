@@ -4,6 +4,17 @@ class Filter {
   final String value;
 
   const Filter({required this.field, required this.value});
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Filter &&
+          runtimeType == other.runtimeType &&
+          field == other.field &&
+          value == other.value;
+
+  @override
+  int get hashCode => field.hashCode ^ value.hashCode;
 }
 
 /// Author: Verkhohliad Kateryna
@@ -24,7 +35,7 @@ class QueryBuilder {
   final List<Filter> _filters = [];
   Sort _sort;
 
-  QueryBuilder({required sort}): _sort = sort;
+  QueryBuilder({required Sort sort}): _sort = sort;
 
   set paginationLimit(int limit) => _paginationLimit = limit;
 
@@ -32,9 +43,9 @@ class QueryBuilder {
 
   set sort(Sort sort) => _sort = sort;
 
-  addFilter(Filter filter) => _filters.add(filter);
+  void addFilter(Filter filter) => _filters.add(filter);
 
-  removeFilter(Filter filter) => _filters.remove(filter);
+  bool removeFilter(Filter filter) => _filters.remove(filter);
 
   Map<String, String> getQueryParams() {
     var queryParams = {
@@ -45,6 +56,7 @@ class QueryBuilder {
     };
 
     for (var filter in _filters) {
+      // todo change to match the backend filter format
       queryParams[filter.field] = '_${filter.value}';
     }
 
