@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../../../model/basic_models/product.dart';
+import '../../../model/basic_models/store_product.dart';
+import '../../../services/http/http_service_factory.dart';
+import '../../widgets/resources/collections/model_collection_view.dart';
+import '../../widgets/resources/models/model_view.dart';
+
 class GoodsTabView extends StatefulWidget {
   const GoodsTabView({super.key});
 
@@ -8,10 +14,6 @@ class GoodsTabView extends StatefulWidget {
 }
 
 class _GoodsTabViewState extends State<GoodsTabView> with AutomaticKeepAliveClientMixin {
-  // Navigator.of(context).pushNamed(AppPage.receipts.route);
-
-
-
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -19,8 +21,8 @@ class _GoodsTabViewState extends State<GoodsTabView> with AutomaticKeepAliveClie
     return DefaultTabController(
       length: 3,
       child: Column(
-        children: const [
-          Align(
+        children: [
+          const Align(
             alignment: Alignment.centerLeft,
             child: FractionallySizedBox(
               widthFactor: .5,
@@ -29,31 +31,34 @@ class _GoodsTabViewState extends State<GoodsTabView> with AutomaticKeepAliveClie
                 tabs: [
                   Tab(text: 'Товари'),
                   Tab(text: 'Типи'),
-                  Tab(text: 'Categories'),
+                  Tab(text: 'Категорії'),
                 ],
               ),
             ),
           ),
           Expanded(
-            child: TabBarView(
-              children: [
-                const Placeholder(color: Colors.red),
-                const Placeholder(color: Colors.green),
-                const Placeholder(color: Colors.blue),
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: TabBarView(
+                children: [
+                  buildTest(),
+                  const Placeholder(color: Colors.green),
+                  const Placeholder(color: Colors.blue),
 
-                // todo
-                // WidgetWithCollection(
-                //     httpService: httpService,
-                //     builder: (context, items, updateSink) {
-                //       return CollectionView(
-                //         items,
-                //         updateSink: updateSink,
-                //         searchFilterDelegate: searchFilterDelegate,
-                //         onAddPressed: () {},
-                //       );
-                //     },
-                //   ),
-              ],
+                  // todo
+                  // WidgetWithCollection(
+                  //     httpService: httpService,
+                  //     builder: (context, items, updateSink) {
+                  //       return CollectionView(
+                  //         items,
+                  //         updateSink: updateSink,
+                  //         searchFilterDelegate: searchFilterDelegate,
+                  //         onAddPressed: () {},
+                  //       );
+                  //     },
+                  //   ),
+                ],
+              ),
             ),
           ),
         ],
@@ -63,4 +68,14 @@ class _GoodsTabViewState extends State<GoodsTabView> with AutomaticKeepAliveClie
 
   @override
   bool get wantKeepAlive => true;
+
+  Widget buildTest() {
+    // return const ModelCollectionView<Product>(
+    //   columnNames: ['1', '2', '3'],
+    // );
+
+    return ModelView(
+      fetchFunction: () => makeHttpService<Product>().singleById('123456789').then((v) => v!),
+    );
+  }
 }
