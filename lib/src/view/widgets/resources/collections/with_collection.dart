@@ -2,28 +2,28 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../model/interfaces/model.dart';
-import '../../services/http/http_service.dart';
-import '../../services/query_builder/query_builder.dart';
+import '../../../../model/interfaces/model.dart';
+import '../../../../services/http/model_http_service.dart';
+import '../../../../services/query_builder/query_builder.dart';
 
 typedef CollectionBuilder<M extends Model> = Widget Function(
   BuildContext context, {
-  List<M> items,
-  EventSink<void> updateSink,
-  QueryBuilder queryBuilder,
+  required List<M> items,
+  required EventSink<void> updateSink,
+  required QueryBuilder queryBuilder,
 });
 
 class WithCollection<M extends Model> extends StatefulWidget {
-  final CollectionBuilder builder;
-  final HttpService<M> httpService;
+  final CollectionBuilder<M> collectionBuilder;
+  final ModelHttpService<M> httpService;
 
   // TODO is it ok with qb?
-  final QueryBuilder qb;
+  final QueryBuilder queryBuilder;
 
   const WithCollection({
     required this.httpService,
-    required this.builder,
-    required this.qb,
+    required this.collectionBuilder,
+    required this.queryBuilder,
     super.key,
   });
 
@@ -57,7 +57,7 @@ class WithCollectionState<M extends Model> extends State<WithCollection<M>> {
   void fetchItems() {
     setState(() => isLoaded = false);
 
-    widget.httpService.get(widget.qb).then((models) {
+    widget.httpService.get(widget.queryBuilder).then((models) {
       if (!mounted) return;
       setState(() {
         items = models;
@@ -69,16 +69,14 @@ class WithCollectionState<M extends Model> extends State<WithCollection<M>> {
   @override
   Widget build(BuildContext context) {
     if (!isLoaded) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
-    return widget.builder(
+    return widget.collectionBuilder(
       context,
       items: items,
       updateSink: streamController.sink,
-      queryBuilder: widget.qb,
+      queryBuilder: widget.queryBuilder,
     );
   }
 }

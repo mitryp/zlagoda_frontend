@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../model/interfaces/convertible_to_row.dart';
-import '../pages/page_base.dart';
+import '../../../../model/interfaces/convertible_to_row.dart';
+import '../../../pages/page_base.dart';
 
-abstract class SearchFilterDelegate {
+abstract class CollectionSearchFilterDelegate {
   final EventSink<void> updateSink;
 
-  const SearchFilterDelegate({required this.updateSink});
+  const CollectionSearchFilterDelegate({required this.updateSink});
 
   List<Widget> buildSearches(BuildContext context);
 
@@ -19,7 +19,7 @@ abstract class SearchFilterDelegate {
 
 class CollectionView<M extends ConvertibleToRow> extends StatefulWidget {
   final List<M> collection;
-  final SearchFilterDelegate searchFilterDelegate;
+  final CollectionSearchFilterDelegate searchFilterDelegate;
   final EventSink<void> updateSink;
   final VoidCallback onAddPressed;
   final List<String> columnNames;
