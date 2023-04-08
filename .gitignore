@@ -44,3 +44,8 @@ app.*.map.json
 /android/app/release
 
 /lib/src/test.dart
+test_db/
+test_db/db.json
+test_db/routes.json
+test_db/singular.js
+run_resources_mock.bat
