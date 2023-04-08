@@ -11,7 +11,7 @@ typedef StatusCodeFilter = bool Function(Response res);
 bool allCodes(Response _) => true;
 
 /// True for codes in range [200, 299].
-bool successCodes(Response res) => res.statusCode >= 200 && res.statusCode < 300;
+bool successCodes(Response res) => res.statusCode >= 200 && res.statusCode < 300 || res.statusCode == 304;
 
 /// True for codes in range [400, 599].
 bool failureCodes(Response res) => res.statusCode >= 400 && res.statusCode < 600;
