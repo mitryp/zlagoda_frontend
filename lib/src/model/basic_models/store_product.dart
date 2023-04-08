@@ -1,12 +1,13 @@
-import 'package:flutter/material.dart';
+//import 'package:flutter/material.dart';
 
 import '../../typedefs.dart';
-import '../interfaces/convertible_to_row.dart';
+//import '../interfaces/convertible_to_row.dart';
 import '../interfaces/model.dart';
 import '../schema/retriever.dart';
 import '../schema/schema.dart';
 
-class StoreProduct extends Model with ConvertibleToRow {
+//class StoreProduct extends Model with ConvertibleToRow {
+class StoreProduct extends Model{
   static final Schema<StoreProduct> schema = Schema(
     StoreProduct.new,
     [
@@ -40,15 +41,15 @@ class StoreProduct extends Model with ConvertibleToRow {
   @override
   JsonMap toJson() => schema.toJson(this);
 
-  @override
-  DataRow buildRow(BuildContext context) {
-    // todo is prom
-    final cellsText = [
-      productId.toString(),
-      price.toString(),
-      quantity.toString(),
-    ];
-
-    return buildRowFromFields(context, cellsText);
-  }
+  // @override
+  // DataRow buildRow(BuildContext context) {
+  //   // todo is prom
+  //   final cellsText = [
+  //     productId.toString(),
+  //     price.toString(),
+  //     quantity.toString(),
+  //   ];
+  //
+  //   return buildRowFromFields(context, cellsText);
+  // }
 }

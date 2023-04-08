@@ -30,7 +30,6 @@ class Employee extends Model {
       Retriever<int, Employee>('salary', (o) => o.salary),
       Retriever<DateTime, Employee>('workStartDate', (o) => o.workStartDate),
       Retriever<DateTime, Employee>('birthDate', (o) => o.birthDate),
-      Retriever<DateTime, Employee>('birthDate', (o) => o.birthDate),
       Retriever<String, Employee>('phone', (o) => o.phone),
       Retriever<Address, Employee>('address', (o) => o.address),
     ],

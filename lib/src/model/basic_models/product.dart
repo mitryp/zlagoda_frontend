@@ -1,9 +1,9 @@
 import '../../typedefs.dart';
-import '../interfaces/model.dart';
+import '../other_models/search_product.dart';
 import '../schema/retriever.dart';
 import '../schema/schema.dart';
 
-class Product extends Model {
+class Product extends SearchProduct {
   static final Schema<Product> schema = Schema(
     Product.new,
     [
@@ -15,15 +15,13 @@ class Product extends Model {
     ],
   );
 
-  final String upc;
-  final String productName;
   final String manufacturer;
   final String specs;
   final int categoryId;
 
   const Product({
-    required this.upc,
-    required this.productName,
+    required super.upc,
+    required super.productName,
     required this.manufacturer,
     required this.specs,
     required this.categoryId,

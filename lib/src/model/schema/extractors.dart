@@ -2,13 +2,16 @@ import '../../typedefs.dart';
 import '../basic_models/employee.dart';
 import '../common_models/address.dart';
 import '../common_models/name.dart';
+import '../joined_models/joined_sale.dart';
 
 Extractor<T> makeExtractor<T>() {
-  const typesToExtractors = {
+  final typesToExtractors = {
     DateTime: DateTimeExtractor.new,
     Address: AddressExtractor.new,
     Name: NameExtractor.new,
+    JoinedSale: JoinedSaleExtractor.new,
     Position: PositionExtractor.new,
+    List<JoinedSale>: () => ListExtractor<JoinedSale>(),
   };
 
   final extractor = typesToExtractors[T];
@@ -20,7 +23,7 @@ T? extractInlineFrom<T>(JsonMap json, String field) {
   try {
     return json[field];
   } catch (e) {
-    print(e);
+    print('IN extractInlineFrom(): $e');
 
     return null;
   }
@@ -64,6 +67,17 @@ class AddressExtractor extends Extractor<Address> {
   }
 }
 
+class JoinedSaleExtractor extends Extractor<JoinedSale> {
+  @override
+  JoinedSale? extractFrom(JsonMap json, String field) {
+    final saleFromJson = extractInlineFrom<JsonMap>(json, field);
+
+    if (saleFromJson == null) return null;
+
+    return JoinedSale.schema.fromJson(saleFromJson);
+  }
+}
+
 class PositionExtractor extends Extractor<Position> {
   @override
   Position? extractFrom(JsonMap json, String field) {
@@ -74,5 +88,19 @@ class PositionExtractor extends Extractor<Position> {
     return Position.values.map((value) => value.name).contains(positionFromJson)
         ? Position.values.firstWhere((e) => e.name == json[field])
         : null;
+  }
+}
+
+class ListExtractor<T> extends Extractor<List<T>> {
+  @override
+  List<T>? extractFrom(JsonMap json, String field) {
+    final listFromJson = extractInlineFrom<List<dynamic>>(json, field);
+
+    if (listFromJson == null) return null;
+    return listFromJson
+        .map((item) => makeExtractor<T>().extractFrom({'': item}, ''))
+        .where((e) => e != null)
+        .toList()
+        .cast<T>();
   }
 }

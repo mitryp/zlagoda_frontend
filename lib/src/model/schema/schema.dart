@@ -13,7 +13,7 @@ class Schema<O> {
 
     for (final retriever in retrievers) {
       final retrievedValue =
-      retriever.extractor.extractFrom(json, retriever.fieldName);
+          retriever.extractor.extractFrom(json, retriever.fieldName);
 
       if (retriever.nullable || retrievedValue != null)
         namedArgs[retriever.symbol] = retrievedValue;
@@ -31,15 +31,17 @@ class Schema<O> {
       final field = retriever.fieldName;
       final retrievedValue = retriever.fieldGetter(object);
 
-      if (retrievedValue is Serializable) {
-        json[field] = retrievedValue.toJson();
-      } else if (retrievedValue is DateTime) {
-        json[field] = retrievedValue.millisecondsSinceEpoch;
-      } else {
-        json[field] = retrievedValue;
-      }
+      json[field] = processValue(retrievedValue);
     }
 
     return json;
+  }
+
+  static processValue(dynamic value) {
+    if (value is Serializable) return value.toJson();
+    if (value is List) return value.map(processValue);
+    if (value is DateTime) return value.millisecondsSinceEpoch ~/ 1000;
+
+    return value;
   }
 }

@@ -17,23 +17,6 @@ class Name implements Serializable {
     ],
   );
 
-
-  // static final Schema<Name> schema = [
-  //   Retriever<String, Name>(
-  //     field: 'firstName',
-  //     getter: (name) => name.firstName,
-  //   ),
-  //   Retriever<String?, Name>(
-  //     field: 'middleName',
-  //     getter: (name) => name.middleName,
-  //     nullable: true,
-  //   ),
-  //   Retriever<String, Name>(
-  //     field: 'lastName',
-  //     getter: (name) => name.lastName,
-  //   ),
-  // ];
-
   const Name({
     required this.firstName,
     this.middleName,

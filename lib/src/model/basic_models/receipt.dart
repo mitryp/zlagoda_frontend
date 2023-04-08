@@ -1,40 +1,42 @@
 import '../../typedefs.dart';
-import '../interfaces/model.dart';
+import '../common_models/name.dart';
+import '../joined_models/joined_sale.dart';
+import '../other_models/table_receipt.dart';
 import '../schema/retriever.dart';
 import '../schema/schema.dart';
 
-class Receipt extends Model {
+class Receipt extends TableReceipt {
   static final Schema<Receipt> schema = Schema(
     Receipt.new,
     [
       Retriever<int, Receipt>('receiptId', (o) => o.receiptId),
+      Retriever<int, Receipt>('cost', (o) => o.cost),
+      Retriever<Name?, Receipt>('clientName', (o) => o.clientName),
+      Retriever<Name, Receipt>('employeeName', (o) => o.employeeName),
       Retriever<DateTime, Receipt>('date', (o) => o.date),
-      Retriever<int, Receipt>('amount', (o) => o.amount),
       Retriever<int, Receipt>('tax', (o) => o.tax),
-      Retriever<int?, Receipt>('clientId', (o) => o.clientId),
-      Retriever<int, Receipt>('employeeId', (o) => o.employeeId),
-      Retriever<List<int>, Receipt>('goodsIds', (o) => o.goodsIds),
+      Retriever<String?, Receipt>('clientId', (o) => o.clientId),
+      Retriever<String, Receipt>('employeeId', (o) => o.employeeId),
+      Retriever<List<JoinedSale>, Receipt>('sales', (o) => o.sales),
     ],
   );
 
-  //TODO do the same as in Swagger
-  final int receiptId;
   final DateTime date;
-  final int amount;
   final int tax;
-  final int? clientId;
-  final int employeeId;
-  //TODO change to JoinedSales
-  final List<int> goodsIds;
+  final String? clientId;
+  final String employeeId;
+  final List<JoinedSale> sales;
 
   const Receipt({
-    required this.receiptId,
+    required super.receiptId,
+    required super.cost,
+    super.clientName,
+    required super.employeeName,
     required this.date,
-    required this.amount,
     required this.tax,
     this.clientId,
     required this.employeeId,
-    required this.goodsIds,
+    required this.sales,
   });
 
   static Receipt? fromJson(JsonMap json) => schema.fromJson(json);
