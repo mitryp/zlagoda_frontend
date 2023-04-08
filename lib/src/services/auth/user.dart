@@ -33,14 +33,19 @@ class User implements Serializable {
   @override
   JsonMap toJson() => schema.toJson(this);
 
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is User &&
           runtimeType == other.runtimeType &&
-          name == other.name &&
+          userId == other.userId &&
           login == other.login &&
+          name == other.name &&
           position == other.position;
+
+  @override
+  int get hashCode => userId.hashCode ^ login.hashCode ^ name.hashCode ^ position.hashCode;
 }
 
 class AuthorizedUser {

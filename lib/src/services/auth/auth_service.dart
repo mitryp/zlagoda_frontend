@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as path;
 
+import '../../config.dart';
 import '../../utils/json_decode.dart';
 import '../../utils/log_and_return.dart';
 import '../../view/pages/login.dart';
@@ -15,12 +17,26 @@ String _basicAuthorizationHeaderValue(String username, String password) {
   return 'Basic $encodedCredentials';
 }
 
-const _baseRoute = 'http://localhost:3000';
-const _loginRoute = '$_baseRoute/api/login';
-const _validateRoute = '$_baseRoute/api/login/validate';
+typedef HttpSchema = Uri Function(String authority, [String path]);
+
+enum AuthRouteStrategy {
+  mock(schema: Uri.http, 'localhost:3000'),
+  api(schema: Uri.http, '');
+
+  final String authority;
+  final HttpSchema schema;
+
+  const AuthRouteStrategy(this.authority, {required this.schema});
+
+  Uri get loginUri => schema(authority, path.join('api', 'login'));
+
+  Uri get validateUri => schema(authority, path.join('api', 'login', 'validate'));
+}
 
 class AuthService {
-  const AuthService();
+  final AuthRouteStrategy strategy;
+
+  const AuthService([this.strategy = authServiceStrategy]);
 
   Future<AuthorizedUser?> login(String username, String password) async {
     // todo remove!!! and make sure that the code works with the actual server
@@ -31,7 +47,9 @@ class AuthService {
         .catchError(logAndReturn(http.Response('', 400)))
         .then(applyResponseMiddleware)
         .then(decodeResponseBody)
-        .catchError(logAndReturn(<String, dynamic>{}));
+        .catchError(logAndReturn(null));
+
+    if (responseJson == null) return null;
 
     final user = User.fromJson(responseJson);
     final token = responseJson['token'];
@@ -41,16 +59,16 @@ class AuthService {
     return AuthorizedUser(user, token);
   }
 
-  Future<bool> authorizeToken(String token) async {
+  Future<bool> validateToken(String token) async {
     return http.post(
-      Uri.parse(_validateRoute),
+      strategy.validateUri,
       headers: {'Authorization': 'Bearer $token'},
     ).then((res) => res.statusCode >= 200 && res.statusCode < 300);
   }
 
   Future<http.Response> _postBasicLogin(String username, String password) {
     return http.post(
-      Uri.parse(_loginRoute),
+      strategy.loginUri,
       headers: {
         'Authorization': _basicAuthorizationHeaderValue(username, password),
       },

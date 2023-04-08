@@ -39,7 +39,7 @@ class LoginManager {
   Future<bool> authorizeCachedUser() async {
     final cachedData = await loginData;
 
-    if (cachedData != null && await authService.authorizeToken(cachedData.token)) {
+    if (cachedData != null && await authService.validateToken(cachedData.token)) {
       _setCurrentUser(cachedData.user);
       return true;
     }
