@@ -40,6 +40,10 @@ class Authorizer extends StatelessWidget {
     super.key,
   });
 
+  const Authorizer.redirect({required this.child, this.authorizationStrategy = hasUser, super.key})
+      : unauthorizedPlaceholder = emptyPlaceholder,
+        isRedirectingToLogin = true;
+
   @override
   Widget build(BuildContext context) {
     final userManager = UserManager.of(context);

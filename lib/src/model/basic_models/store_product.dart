@@ -13,11 +13,11 @@ class StoreProduct extends Model {
   static final Schema<StoreProduct> schema = Schema(
     StoreProduct.new,
     [
-      Retriever<int, StoreProduct>('productId', (o) => o.productId),
+      Retriever<int, StoreProduct>('productId', (o) => o.productId, labelCaption: 'ID товару'),
       Retriever<String, StoreProduct>('upc', (o) => o.upc),
-      Retriever<int, StoreProduct>('price', (o) => o.price),
-      Retriever<int, StoreProduct>('quantity', (o) => o.quantity),
-      Retriever<bool, StoreProduct>('isProm', (o) => o.isProm),
+      Retriever<int, StoreProduct>('price', (o) => o.price, labelCaption: 'Ціна'),
+      Retriever<int, StoreProduct>('quantity', (o) => o.quantity, labelCaption: 'Кількість'),
+      Retriever<bool, StoreProduct>('isProm', (o) => o.isProm, labelCaption: 'Акційний'),
     ],
   );
 
@@ -44,7 +44,7 @@ class StoreProduct extends Model {
   JsonMap toJson() => schema.toJson(this);
 
   @override
-  List<ModelTableGenerator<Model>> get connectedTables => [connectedTable<Product>(upc)];
+  List<ForeignKey<Model>> get foreignKeys => [foreignKey<Product>('upc', upc)];
 
 // @override
 // DataRow buildRow(BuildContext context) {

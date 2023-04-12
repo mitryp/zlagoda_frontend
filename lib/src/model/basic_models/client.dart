@@ -8,7 +8,7 @@ import '../common_models/address.dart';
 import '../schema/retriever.dart';
 import '../schema/schema.dart';
 
-class Client extends Model implements ConvertibleToRow {
+class Client extends Model {
   static final Schema<Client> schema = Schema(
     Client.new,
     [
@@ -42,14 +42,14 @@ class Client extends Model implements ConvertibleToRow {
   @override
   JsonMap toJson() => schema.toJson(this);
 
-  @override
-  DataRow buildRow(BuildContext context) {
-    final List<String> cellsText = [
-      clientId,
-      clientName.fullName,
-      discount.toString(),
-    ];
-
-    return buildRowFromFields(context, cellsText);
-  }
+  // @override
+  // DataRow buildRow(BuildContext context) {
+  //   final List<String> cellsText = [
+  //     clientId,
+  //     clientName.fullName,
+  //     discount.toString(),
+  //   ];
+  //
+  //   return buildRowFromFields(context, cellsText);
+  // }
 }

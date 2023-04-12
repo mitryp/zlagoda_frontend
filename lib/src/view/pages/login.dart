@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 import '../../model/basic_models/employee.dart';
 import '../../model/common_models/name.dart';
 import '../../services/auth/login_manager.dart';
 import '../../services/auth/user.dart';
 import '../../services/middleware/middleware_application.dart';
-import '../../services/middleware/request/authentication_middleware.dart';
 import '../../services/middleware/response/response_display_middleware.dart';
-import '../widgets/middleware_context/request_middleware_context.dart';
-import '../widgets/permissions/user_manager.dart';
 import '../widgets/middleware_context/response_middleware_context.dart';
 
 class LoginPage extends StatefulWidget {
@@ -39,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
       child: Scaffold(
         body: ResponseMiddlewareContext(
           middlewareBuilders: const [
-            ResponseDisplayMiddleware.new,
+            ResponseDisplayMiddleware.errors,
           ],
           child: Center(
             child: buildContent(),
@@ -51,7 +47,9 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget buildContent() {
     final sessionRestored = this.sessionRestored;
-    if (sessionRestored == null) return const CircularProgressIndicator();
+    if (sessionRestored == null) {
+      return const CircularProgressIndicator();
+    }
 
     if (sessionRestored) {
       redirectToApp();
@@ -139,6 +137,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void redirectToApp() {
+    clearResponseMiddlewares();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         Navigator.of(context).pushReplacementNamed('/app');
@@ -149,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
 
 const testUser = User(
   userId: '1',
-  login: 'mitrypk',
+  login: 'local',
   position: Position.manager,
-  name: Name(firstName: 'Дмитро', middleName: 'Григорович', lastName: 'Попов'),
+  name: Name(firstName: 'Локальний користувач', middleName: '', lastName: ''),
 );

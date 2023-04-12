@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../../model/interfaces/convertible_to_row.dart';
+import '../../../../model/schema/schema.dart';
 import '../../../pages/page_base.dart';
 
 abstract class CollectionSearchFilterDelegate {
@@ -17,16 +18,19 @@ abstract class CollectionSearchFilterDelegate {
   Widget buildSort(BuildContext context);
 }
 
-class CollectionView<M extends ConvertibleToRow> extends StatefulWidget {
+class CollectionView<M extends ConvertibleToRow<M>> extends StatefulWidget {
   final List<M> collection;
   final CollectionSearchFilterDelegate searchFilterDelegate;
   final EventSink<void> updateSink;
   final VoidCallback onAddPressed;
-  final List<String> columnNames;
+
+  // final List<String> columnNames;
+  final Schema<M> elementSchema;
 
   const CollectionView(
     this.collection, {
-    required this.columnNames,
+    // required this.columnNames,
+    required this.elementSchema,
     required this.updateSink,
     required this.searchFilterDelegate,
     required this.onAddPressed,
@@ -34,21 +38,31 @@ class CollectionView<M extends ConvertibleToRow> extends StatefulWidget {
   });
 
   @override
-  State<CollectionView<M>> createState() => _CollectionViewState();
+  State<CollectionView<M>> createState() => _CollectionViewState<M>();
 }
 
-class _CollectionViewState<M extends ConvertibleToRow> extends State<CollectionView<M>> {
+class _CollectionViewState<M extends ConvertibleToRow<M>> extends State<CollectionView<M>> {
+  late final List<String> columnNames = widget.elementSchema.retrievers
+      .where((r) => r.isShownInTable)
+      .map((r) => r.labelCaption!)
+      .toList();
+
   @override
   Widget build(BuildContext context) {
-    return PageBase.column(
-      children: [
-        buildSearchFilters(),
-        DataTable(
-          columns: widget.columnNames.map((name) => DataColumn(label: Text(name))).toList(),
-          rows: widget.collection.map((m) => m.buildRow(context)).toList(),
-        ),
-        buildAddButton(),
-      ],
+    return Scaffold(
+      body: PageBase.column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          buildSearchFilters(),
+          DataTable(
+            showCheckboxColumn: false,
+            columns: columnNames.map((name) => DataColumn(label: Text(name))).toList(),
+            rows: widget.collection.map((m) => m.buildRow(context)).toList(),
+          ),
+        ],
+      ),
+      floatingActionButton: buildAddButton(),
     );
   }
 

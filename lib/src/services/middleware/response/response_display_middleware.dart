@@ -55,7 +55,12 @@ class ResponseDisplayMiddleware extends ResponseMiddleware {
   const ResponseDisplayMiddleware(
     super.context, {
     this.snackBarBuilder = _defaultSnackBar,
-  });
+  }) : super(filter: allCodes);
+
+  const ResponseDisplayMiddleware.errors(
+    super.context, {
+    this.snackBarBuilder = _defaultSnackBar,
+  }) : super(filter: failureCodes);
 
   @override
   Response processFiltered(Response r) {

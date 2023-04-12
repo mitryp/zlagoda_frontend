@@ -12,7 +12,7 @@ class Category extends Model {
     Category.new,
     [
       Retriever<int, Category>('categoryId', (o) => o.categoryId),
-      Retriever<String, Category>('categoryName', (o) => o.categoryName, labelCaption: 'Назва'),
+      Retriever<String, Category>('categoryName', (o) => o.categoryName, labelCaption: 'Категорія'),
     ],
   );
 

@@ -1,13 +1,12 @@
-import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../../model/basic_models/category.dart';
 import '../../model/basic_models/client.dart';
 import '../../model/basic_models/employee.dart';
-import '../../model/basic_models/store_product.dart';
 import '../../model/basic_models/product.dart';
 import '../../model/basic_models/receipt.dart';
-import '../../model/interfaces/model.dart';
+import '../../model/basic_models/store_product.dart';
+import '../../model/interfaces/serializable.dart';
 import '../../typedefs.dart';
 import '../../utils/exceptions.dart';
 import '../../utils/json_decode.dart';
@@ -15,17 +14,17 @@ import '../middleware/middleware_application.dart';
 import '../middleware/response/response_middleware.dart';
 import '../query_builder/query_builder.dart';
 
-typedef JsonCastFunction<M extends Model> = M? Function(JsonMap json);
+typedef JsonCastFunction<S extends Serializable> = S? Function(JsonMap json);
 typedef ControllerSuccessfulLogic<T> = T Function(http.Response response);
 
 /// Authors:
 /// Interface - Popov Dmytro
 /// Implementation - Verkhohliad Kateryna
-abstract class ModelHttpService<M extends Model> {
+abstract class ModelHttpService<S extends Serializable> {
   static const String baseRoute = 'localhost:5000';
 
   final String route;
-  final JsonCastFunction<M> castFunction;
+  final JsonCastFunction<S> castFunction;
 
   const ModelHttpService({required this.route, required this.castFunction});
 
@@ -44,43 +43,38 @@ abstract class ModelHttpService<M extends Model> {
     throw ResourceNotFetchedException(res.reasonPhrase);
   }
 
-  Future<List<M>> get(QueryBuilder queryBuilder) async {
-    final response = await http
-        .get(Uri.http(baseRoute, _route(), queryBuilder.getQueryParams()))
-        .then(applyResponseMiddleware);
+  Future<List<S>> get(QueryBuilder queryBuilder) async {
+    final response = await http.get(Uri.http(baseRoute, _route(), queryBuilder.getQueryParams()));
 
     return _controller(response, (response) {
-      print('response: ${response.body}');
-      return decodeResponseBody(response).map(castFunction);
+      return decodeResponseBody<List<dynamic>>(response)
+          .map((m) => castFunction(m))
+          .where((e) => e != null)
+          .toList()
+          .cast<S>();
     });
   }
 
-  Future<M?> singleById(dynamic id) async {
-    final response = await http.get(Uri.http(baseRoute, _route(id))).then(applyResponseMiddleware);
+  Future<S?> singleById(dynamic id) async {
+    final response = await http.get(Uri.http(baseRoute, _route(id)));
 
     return _controller(response, (response) => castFunction(decodeResponseBody(response)));
   }
 
-  Future<bool> post(M row) async {
-    final response = await http
-        .post(Uri.http(baseRoute, _route()), body: row.toJson())
-        .then(applyResponseMiddleware);
+  Future<bool> post(S row) async {
+    final response = await http.post(Uri.http(baseRoute, _route()), body: row.toJson());
 
-    return _controller(response, (response) {
-      return true;
-    });
+    return _controller(response, (response) => true);
   }
 
-  Future<bool> update(M row) async {
-    final response = await http
-        .put(Uri.http(baseRoute, _route(row.primaryKey)), body: row.toJson())
-        .then(applyResponseMiddleware);
+  Future<bool> update(S row, dynamic primaryKey) async {
+    final response = await http.put(Uri.http(baseRoute, _route(primaryKey)), body: row.toJson());
 
     return _controller(response, (response) => true);
   }
 
   Future<bool> delete(dynamic id) async {
-    final response = await http.put(Uri.http(baseRoute, _route(id))).then(applyResponseMiddleware);
+    final response = await http.put(Uri.http(baseRoute, _route(id)));
 
     return _controller(response, (response) => true);
   }

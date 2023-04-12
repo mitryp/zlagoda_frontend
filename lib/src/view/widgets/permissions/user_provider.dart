@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../services/auth/user.dart';
@@ -19,6 +20,13 @@ class UserProvider extends StatefulWidget {
 
 class _UserProviderState extends State<UserProvider> {
   User? currentUser;
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty('userId', currentUser?.userId));
+    properties.add(DiagnosticsProperty('login', currentUser?.login));
+  }
 
   @override
   Widget build(BuildContext context) {

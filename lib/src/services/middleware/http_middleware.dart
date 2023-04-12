@@ -10,13 +10,6 @@ abstract class HttpMiddleware<T> {
 
   const HttpMiddleware(this.context, {this.filter = _alwaysSatisfied});
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) || other is HttpMiddleware && runtimeType == other.runtimeType;
-
-  @override
-  int get hashCode => runtimeType.toString().hashCode;
-
   FutureOr<T> process(T t) {
     if (!filter(t)) return t;
 

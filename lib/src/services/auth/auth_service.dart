@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 
 import '../../config.dart';
+import '../../typedefs.dart';
 import '../../utils/json_decode.dart';
 import '../../utils/log_and_return.dart';
 import '../../view/pages/login.dart';
@@ -46,7 +47,7 @@ class AuthService {
     final responseJson = await _postBasicLogin(username, password)
         .catchError(logAndReturn(http.Response('', 400)))
         .then(applyResponseMiddleware)
-        .then(decodeResponseBody)
+        .then(decodeResponseBody<JsonMap?>)
         .catchError(logAndReturn(null));
 
     if (responseJson == null) return null;

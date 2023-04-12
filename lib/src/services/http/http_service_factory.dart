@@ -4,12 +4,11 @@ import '../../model/basic_models/employee.dart';
 import '../../model/basic_models/product.dart';
 import '../../model/basic_models/receipt.dart';
 import '../../model/basic_models/store_product.dart';
-import '../../model/interfaces/model.dart';
+import '../../model/interfaces/serializable.dart';
+import '../../typedefs.dart';
 import 'model_http_service.dart';
 
-typedef ResourceServiceConstructor = ModelHttpService Function();
-
-const _classesToConstructors = <Type, ResourceServiceConstructor>{
+const _classesToConstructors = <Type, Constructor<ModelHttpService>>{
   Employee: EmployeeService.new,
   StoreProduct: StoreProductService.new,
   Product: ProductService.new,
@@ -18,12 +17,12 @@ const _classesToConstructors = <Type, ResourceServiceConstructor>{
   Category: CategoryService.new
 };
 
-ModelHttpService<M> makeHttpService<M extends Model>() {
-  final serviceConstructor = _classesToConstructors[M];
+ModelHttpService<S> makeHttpService<S extends Serializable>() {
+  final serviceConstructor = _classesToConstructors[S];
 
   if (serviceConstructor == null) {
-    throw StateError('No ResourceHttpService found for model type $M');
+    throw StateError('No ResourceHttpService found for type $S');
   }
 
-  return serviceConstructor() as ModelHttpService<M>;
+  return serviceConstructor() as ModelHttpService<S>;
 }

@@ -3,40 +3,54 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../../model/interfaces/convertible_to_row.dart';
-import '../../../../model/interfaces/model.dart';
+import '../../../../model/model_scheme_factory.dart';
+import '../../../../model/schema/schema.dart';
 import '../../../../services/http/http_service_factory.dart';
 import '../../../../services/http/model_http_service.dart';
 import '../../../../services/query_builder/query_builder.dart';
 import 'collection_view.dart';
 import 'with_collection.dart';
 
-class ModelCollectionView<M extends ConvertibleToRow> extends StatelessWidget {
-  final List<String> columnNames;
+typedef CsfDelegateConstructor = CollectionSearchFilterDelegate Function({
+  required EventSink<void> updateSink,
+});
 
-  const ModelCollectionView({required this.columnNames, super.key});
+abstract class ModelCollectionView<R extends ConvertibleToRow<R>> extends StatefulWidget {
+  final CsfDelegateConstructor searchFilterDelegate;
 
-  ModelHttpService<M> get httpService => makeHttpService<M>();
+  const ModelCollectionView({required this.searchFilterDelegate, super.key});
+
+  @override
+  State<ModelCollectionView<R>> createState() => _ModelCollectionViewState<R>();
+}
+
+class _ModelCollectionViewState<R extends ConvertibleToRow<R>> extends State<ModelCollectionView<R>> {
+  late final queryBuilder = QueryBuilder(sort: const Sort(field: '', order: Order.asc));
+
+  ModelHttpService<R> get httpService => makeHttpService<R>();
+
+  Schema<R> get elementSchema => makeModelSchema<R>();
 
   @override
   Widget build(BuildContext context) {
-    return WithCollection<M>(
+    return WithCollection<R>(
       httpService: httpService,
-      queryBuilder: QueryBuilder(sort: const Sort(field: 'name', order: Order.asc)),
+      queryBuilder: queryBuilder,
       collectionBuilder: buildCollection,
     );
   }
 
   Widget buildCollection(
     BuildContext context, {
-    required List<M> items,
+    required List<R> items,
     required QueryBuilder queryBuilder,
     required EventSink<void> updateSink,
   }) {
-    return CollectionView<M>(
+    return CollectionView<R>(
       items,
-      columnNames: columnNames,
+      elementSchema: elementSchema,
       updateSink: updateSink,
-      searchFilterDelegate: CSFDelegate(updateSink: updateSink),
+      searchFilterDelegate: widget.searchFilterDelegate(updateSink: updateSink),
       onAddPressed: () {},
     );
   }

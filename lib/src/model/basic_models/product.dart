@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 
 import '../../typedefs.dart';
+import '../../utils/navigation.dart';
 import '../interfaces/convertible_to_row.dart';
-import '../interfaces/model.dart';
 import '../model_reference.dart';
 import '../other_models/search_product.dart';
 import '../schema/retriever.dart';
 import '../schema/schema.dart';
 import 'category.dart';
 
-
-class Product extends SearchProduct with ConvertibleToRow {
+class Product extends SearchProduct with ConvertibleToRow<Product> {
   static final Schema<Product> schema = Schema(
     Product.new,
     [
       Retriever<String, Product>('upc', (o) => o.upc, labelCaption: 'UPC'),
       Retriever<String, Product>('productName', (o) => o.productName, labelCaption: 'Назва'),
       Retriever<String, Product>('manufacturer', (o) => o.manufacturer, labelCaption: 'Виробник'),
-      Retriever<String, Product>('specs', (o) => o.specs, labelCaption: 'Характеристики'),
+      Retriever<String, Product>('specs', (o) => o.specs,
+          labelCaption: 'Характеристики', fieldDisplayMode: FieldDisplayMode.inModelView),
       Retriever<int, Product>('categoryId', (o) => o.categoryId),
     ],
   );
@@ -43,17 +43,19 @@ class Product extends SearchProduct with ConvertibleToRow {
   get primaryKey => upc;
 
   @override
-  DataRow buildRow(BuildContext context) {
-    // TODO: implement buildRow
-    return DataRow(cells: [
-      DataCell(Text(productName)),
-      DataCell(Text(manufacturer)),
-      DataCell(Text(specs)),
-    ]);
-  }
+  List<ForeignKey> get foreignKeys => [foreignKey<Category>('categoryId', categoryId)];
+
+  // @override
+  // DataRow buildRow(BuildContext context) {
+  //   return rowFrom(this, context: context);
+  //
+  //   return DataRow(
+  //     onSelectChanged: (_) => AppNavigation.of(context).toModelView<Product>(upc),
+  //     cells: cellsFromValues(context, this),
+  //   );
+  // }
 
   @override
-  List<ModelTableGenerator<Model>> get connectedTables => [
-        connectedTable<Category>(categoryId),
-      ];
+  void redirectToModelView(BuildContext context) =>
+      AppNavigation.of(context).toModelView<Product>(upc);
 }

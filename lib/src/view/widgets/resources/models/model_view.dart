@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../../../../model/basic_models/employee.dart';
 import '../../../../model/interfaces/model.dart';
 import '../../../../typedefs.dart';
+import '../../../../utils/exceptions.dart';
 import '../../../../utils/locales.dart';
 import '../../../pages/page_base.dart';
+import '../../permissions/authorizer.dart';
+import '../../text_link.dart';
 import 'model_table.dart';
 
 class ModelView<M extends Model> extends StatefulWidget {
@@ -19,6 +23,7 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
   late final M model;
   late final List<ModelTable> connectedModelTables;
   bool isResourceLoaded = false;
+  ResourceNotFetchedException? exception;
 
   @override
   void initState() {
@@ -27,8 +32,14 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
   }
 
   void fetchResources() async {
-    model = await widget.fetchFunction();
-    connectedModelTables = await Future.wait(model.connectedTables.map((f) => f.call()));
+    try {
+      model = await widget.fetchFunction();
+    } on ResourceNotFetchedException catch (e) {
+      if (!mounted) return;
+      return setState(() => exception = e);
+    }
+    // connectedModelTables = await Future.wait(model.connectedTables.map((f) => f.call()));
+    connectedModelTables = await Future.wait(model.foreignKeys.map((f) => f.tableGenerator.call()));
 
     if (!mounted) return;
     setState(() => isResourceLoaded = true);
@@ -36,34 +47,74 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
 
   @override
   Widget build(BuildContext context) {
+    if (exception != null) {
+      return buildErrorMessage();
+    }
     if (!isResourceLoaded) {
-      return const Center(child: CircularProgressIndicator());
+      return buildLoadingPlaceholder();
     }
 
-    return PageBase.column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TableHeader(makeModelLocalizedName(model.runtimeType)),
-        const Padding(padding: EdgeInsets.only(top: 8)),
-        ModelTable(model, showModelName: false),
-        if (connectedModelTables.isNotEmpty) buildConnectedModels(),
-      ],
+    return Scaffold(
+      appBar: AppBar(),
+      body: SingleChildScrollView(
+        child: PageBase.row(
+          bodyPadding: const EdgeInsets.all(25),
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TableHeader(makeModelLocalizedName(model.runtimeType)),
+                ModelTable(model, showModelName: false),
+              ],
+            ),
+            if (connectedModelTables.isNotEmpty) ...[
+              const SizedBox(width: 125),
+              buildConnectedModels(),
+            ],
+          ],
+        ),
+      ),
+      floatingActionButton: buildEditButton(),
+    );
+  }
+
+  Authorizer buildEditButton() {
+    return Authorizer.emptyUnauthorized(
+      authorizationStrategy: hasPosition(Position.manager),
+      child: ElevatedButton.icon(
+        label: const Text('Редагувати'),
+        icon: const Icon(Icons.edit),
+        onPressed: () {}, // todo
+      ),
+    );
+  }
+
+  Center buildLoadingPlaceholder() => const Center(child: CircularProgressIndicator());
+
+  Center buildErrorMessage() {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('Помилка при завантаженні: ${exception!.message}'),
+          TextLink.text(
+            text: const Text('Повернутися назад'),
+            onTap: Navigator.of(context).pop,
+          ),
+        ],
+      ),
     );
   }
 
   Widget buildConnectedModels() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const TableHeader('Пов\'язані моделі'),
-          Flex(
-            direction: Axis.horizontal,
-            children: connectedModelTables.map(EmbeddedModelTableCard.new).toList(),
-          ),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const TableHeader("Пов'язані ресурси"),
+        ...connectedModelTables.map(EmbeddedModelTableCard.new),
+      ],
     );
   }
 }
@@ -93,7 +144,10 @@ class TableHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8).copyWith(left: 20),
-      child: Text(text, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),),
+      child: Text(
+        text,
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+      ),
     );
   }
 }
