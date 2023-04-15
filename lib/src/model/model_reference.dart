@@ -27,10 +27,11 @@ class ForeignKey<M extends Model> {
 }
 
 ModelTableGenerator<M> connectedTable<M extends Model>(dynamic primaryKey) =>
-        () => ModelReference<M>(primaryKey).fetch().then(ModelTable.new);
+    () => ModelReference<M>(primaryKey).fetch().then(ModelTable.new);
 
 ForeignKey<M> foreignKey<M extends Model>(String foreignKeyName, dynamic primaryKeyValue) {
   final ref = ModelReference<M>(primaryKeyValue);
 
-  return ForeignKey<M>(foreignKeyName, reference: ref, tableGenerator: () => ref.fetch().then(ModelTable.new));
+  return ForeignKey<M>(foreignKeyName,
+      reference: ref, tableGenerator: () => ref.fetch().then(ModelTable.new));
 }

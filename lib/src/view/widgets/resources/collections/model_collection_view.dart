@@ -12,19 +12,26 @@ import 'collection_view.dart';
 import 'with_collection.dart';
 
 typedef CsfDelegateConstructor = CollectionSearchFilterDelegate Function({
+  required QueryBuilder queryBuilder,
   required EventSink<void> updateSink,
 });
 
 abstract class ModelCollectionView<R extends ConvertibleToRow<R>> extends StatefulWidget {
   final CsfDelegateConstructor searchFilterDelegate;
+  final String defaultSortField;
 
-  const ModelCollectionView({required this.searchFilterDelegate, super.key});
+  const ModelCollectionView({
+    required this.defaultSortField,
+    required this.searchFilterDelegate,
+    super.key,
+  });
 
   @override
   State<ModelCollectionView<R>> createState() => _ModelCollectionViewState<R>();
 }
 
-class _ModelCollectionViewState<R extends ConvertibleToRow<R>> extends State<ModelCollectionView<R>> {
+class _ModelCollectionViewState<R extends ConvertibleToRow<R>>
+    extends State<ModelCollectionView<R>> {
   late final queryBuilder = QueryBuilder(sort: const Sort(field: '', order: Order.asc));
 
   ModelHttpService<R> get httpService => makeHttpService<R>();
@@ -50,14 +57,20 @@ class _ModelCollectionViewState<R extends ConvertibleToRow<R>> extends State<Mod
       items,
       elementSchema: elementSchema,
       updateSink: updateSink,
-      searchFilterDelegate: widget.searchFilterDelegate(updateSink: updateSink),
+      searchFilterDelegate: widget.searchFilterDelegate(
+        queryBuilder: queryBuilder,
+        updateSink: updateSink,
+      ),
       onAddPressed: () {},
     );
   }
 }
 
 class CSFDelegate extends CollectionSearchFilterDelegate {
-  const CSFDelegate({required super.updateSink});
+  const CSFDelegate({
+    required QueryBuilder queryBuilder,
+    required super.updateSink,
+  });
 
   @override
   List<Widget> buildFilters(BuildContext context) {

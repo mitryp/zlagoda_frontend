@@ -25,7 +25,7 @@ Iterable<dynamic> rowValues<R extends ConvertibleToRow<R>>(R convertible) {
   return schema.retrievers.where((r) => r.isShownInTable).map((r) => r.fieldGetter(convertible));
 }
 
-List<DataCell> cellsFromValues<R extends ConvertibleToRow<R>>(BuildContext context, R convertible) {
+List<DataCell> cellsFromValues<R extends ConvertibleToRow<R>>(R convertible, {required BuildContext context}) {
   final values = rowValues<R>(convertible);
 
   return values.map((v) => DataCell(Text('$v'))).toList();
@@ -33,7 +33,7 @@ List<DataCell> cellsFromValues<R extends ConvertibleToRow<R>>(BuildContext conte
 
 DataRow rowFrom<R extends ConvertibleToRow<R>>(R convertible, {required BuildContext context}) {
   return DataRow(
-    cells: cellsFromValues(context, convertible),
+    cells: cellsFromValues(convertible, context: context),
     onSelectChanged: (_) => convertible.redirectToModelView(context),
   );
 }
