@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'model/basic_models/employee.dart';
-import 'model/common_models/name.dart';
-import 'view/app_pages.dart';
-import 'view/main_viewport.dart';
-import 'theme.dart';
-import 'view/pages/login.dart';
-import 'view/pages/page_base.dart';
+import 'config.dart';
 import 'services/auth/user.dart';
-import 'view/widgets/permissions/user_manager.dart';
+import 'theme.dart';
+import 'view/main_viewport.dart';
+import 'view/pages/login.dart';
 import 'view/widgets/permissions/user_provider.dart';
 
 class ZlagodaApplication extends StatefulWidget {
@@ -24,6 +20,8 @@ class _ZlagodaApplicationState extends State<ZlagodaApplication> {
 
   @override
   Widget build(BuildContext context) {
+    print(authServiceStrategy);
+
     return UserProvider(
       nestedNavigatorKey: globalNavigatorKey,
       child: MaterialApp(

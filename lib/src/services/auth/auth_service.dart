@@ -22,7 +22,7 @@ typedef HttpSchema = Uri Function(String authority, [String path]);
 
 enum AuthRouteStrategy {
   mock(schema: Uri.http, 'localhost:3000'),
-  api(schema: Uri.http, '');
+  api(schema: Uri.http, 'localhost:5000');
 
   final String authority;
   final HttpSchema schema;
@@ -45,7 +45,7 @@ class AuthService {
       return const AuthorizedUser(testUser, 'token');
 
     final responseJson = await _postBasicLogin(username, password)
-        .catchError(logAndReturn(http.Response('', 400)))
+        .catchError(logAndReturn(http.Response('', 503)))
         .then(applyResponseMiddleware)
         .then(decodeResponseBody<JsonMap?>)
         .catchError(logAndReturn(null));

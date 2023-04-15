@@ -12,19 +12,19 @@ class User implements Serializable {
       Retriever<String, User>('userId', (o) => o.userId),
       Retriever<String, User>('login', (o) => o.login),
       Retriever<Name, User>('name', (o) => o.name),
-      Retriever<Position, User>('position', (o) => o.position),
+      Retriever<Position, User>('role', (o) => o.role),
     ],
   );
 
   final String userId;
   final String login;
   final Name name;
-  final Position position;
+  final Position role;
 
   const User({
     required this.userId,
     required this.login,
-    required this.position,
+    required this.role,
     required this.name,
   });
 
@@ -42,10 +42,10 @@ class User implements Serializable {
           userId == other.userId &&
           login == other.login &&
           name == other.name &&
-          position == other.position;
+          role == other.role;
 
   @override
-  int get hashCode => userId.hashCode ^ login.hashCode ^ name.hashCode ^ position.hashCode;
+  int get hashCode => userId.hashCode ^ login.hashCode ^ name.hashCode ^ role.hashCode;
 }
 
 class AuthorizedUser {

@@ -149,6 +149,6 @@ class _LoginPageState extends State<LoginPage> {
 const testUser = User(
   userId: '1',
   login: 'local',
-  position: Position.manager,
+  role: Position.manager,
   name: Name(firstName: 'Локальний користувач', middleName: '', lastName: ''),
 );

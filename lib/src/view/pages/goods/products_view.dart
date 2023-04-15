@@ -6,11 +6,15 @@ import '../../widgets/resources/collections/collection_view.dart';
 import '../../widgets/resources/collections/model_collection_view.dart';
 
 class ProductsView extends ModelCollectionView<Product> {
-  const ProductsView({super.key}) : super(searchFilterDelegate: TestSfd.new);
+  const ProductsView({super.key})
+      : super(
+          defaultSortField: 'productName',
+          searchFilterDelegate: ProductsSearchFilters.new,
+        );
 }
 
-class TestSfd extends CollectionSearchFilterDelegate {
-  const TestSfd({
+class ProductsSearchFilters extends CollectionSearchFilterDelegate {
+  const ProductsSearchFilters({
     required QueryBuilder queryBuilder,
     required super.updateSink,
   });

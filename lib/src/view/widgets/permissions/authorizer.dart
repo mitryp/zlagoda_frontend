@@ -60,4 +60,4 @@ bool hasUser(User? user) => user != null;
 
 /// Returns true if the users position equals to the given [position].
 ///
-UserAuthorizationStrategy hasPosition(Position position) => (user) => user?.position == position;
+UserAuthorizationStrategy hasPosition(Position position) => (user) => user?.role == position;
