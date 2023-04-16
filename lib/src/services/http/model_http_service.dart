@@ -44,7 +44,7 @@ abstract class ModelHttpService<S extends Serializable> {
   }
 
   Future<List<S>> get(QueryBuilder queryBuilder) async {
-    final response = await http.get(Uri.http(baseRoute, _route(), queryBuilder.getQueryParams()));
+    final response = await http.get(Uri.http(baseRoute, _route(), queryBuilder.queryParams));
 
     return _controller(response, (response) {
       return decodeResponseBody<List<dynamic>>(response)

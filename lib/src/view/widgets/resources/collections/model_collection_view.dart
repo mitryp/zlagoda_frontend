@@ -8,6 +8,7 @@ import '../../../../model/schema/schema.dart';
 import '../../../../services/http/http_service_factory.dart';
 import '../../../../services/http/model_http_service.dart';
 import '../../../../services/query_builder/query_builder.dart';
+import '../../../../services/query_builder/sort.dart';
 import 'collection_view.dart';
 import 'with_collection.dart';
 
@@ -18,7 +19,7 @@ typedef CsfDelegateConstructor = CollectionSearchFilterDelegate Function({
 
 abstract class ModelCollectionView<R extends ConvertibleToRow<R>> extends StatefulWidget {
   final CsfDelegateConstructor searchFilterDelegate;
-  final String defaultSortField;
+  final SortField defaultSortField;
 
   const ModelCollectionView({
     required this.defaultSortField,
@@ -32,7 +33,7 @@ abstract class ModelCollectionView<R extends ConvertibleToRow<R>> extends Statef
 
 class _ModelCollectionViewState<R extends ConvertibleToRow<R>>
     extends State<ModelCollectionView<R>> {
-  late final queryBuilder = QueryBuilder(sort: const Sort(field: '', order: Order.asc));
+  late final queryBuilder = QueryBuilder(sort: Sort(widget.defaultSortField));
 
   ModelHttpService<R> get httpService => makeHttpService<R>();
 

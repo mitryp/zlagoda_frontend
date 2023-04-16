@@ -1,4 +1,3 @@
-import '../../typedefs.dart';
 import '../interfaces/serializable.dart';
 import '../model_reference.dart';
 
