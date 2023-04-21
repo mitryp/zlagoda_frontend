@@ -1,17 +1,37 @@
 import '../../typedefs.dart';
 import '../common_models/name.dart';
 import '../interfaces/model.dart';
-import '../schema/retriever.dart';
+import '../schema/field_description.dart';
+import '../schema/field_type.dart';
 import '../schema/schema.dart';
 
 class TableReceipt extends Model {
   static final Schema<TableReceipt> schema = Schema(
     TableReceipt.new,
     [
-      Retriever<int, TableReceipt>('receiptId', (o) => o.receiptId),
-      Retriever<int, TableReceipt>('cost', (o) => o.cost),
-      Retriever<Name?, TableReceipt>('clientName', (o) => o.clientName),
-      Retriever<Name, TableReceipt>('employeeName', (o) => o.employeeName),
+      FieldDescription<int, TableReceipt>(
+        'receiptId',
+        (o) => o.receiptId,
+        labelCaption: 'Номер чеку',
+        fieldType: FieldType.number,
+      ),
+      FieldDescription<int, TableReceipt>(
+        'cost',
+        (o) => o.cost,
+        labelCaption: 'Вартість',
+      ),
+      FieldDescription<Name?, TableReceipt>(
+        'clientName',
+        (o) => o.clientName,
+        labelCaption: "Ім'я клієнта",
+        fieldType: FieldType.auto,
+      ),
+      FieldDescription<Name, TableReceipt>(
+        'employeeName',
+        (o) => o.employeeName,
+        labelCaption: "Ім'я працівника",
+        fieldType: FieldType.auto,
+      ),
     ],
   );
 

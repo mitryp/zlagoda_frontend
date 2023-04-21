@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../model_scheme_factory.dart';
-import '../schema/retriever.dart';
+import '../schema/field_description.dart';
 import '../schema/schema.dart';
 import 'serializable.dart';
 
@@ -17,12 +17,12 @@ mixin ConvertibleToRow<R extends ConvertibleToRow<R>> on Serializable {
 }
 
 /// Returns the values of the fields of the [convertible] which are displayed in the DataRow in the order
-/// of their [Retriever]s in the [Schema].
+/// of their [FieldDescription]s in the [Schema].
 ///
 Iterable<dynamic> rowValues<R extends ConvertibleToRow<R>>(R convertible) {
   final schema = makeModelSchema<R>();
 
-  return schema.retrievers.where((r) => r.isShownInTable).map((r) => r.fieldGetter(convertible));
+  return schema.fields.where((r) => r.isShownInTable).map((r) => r.fieldGetter(convertible));
 }
 
 List<DataCell> cellsFromValues<R extends ConvertibleToRow<R>>(R convertible, {required BuildContext context}) {

@@ -1,11 +1,13 @@
 //import 'package:flutter/material.dart';
 
 import '../../typedefs.dart';
+import '../common_models/address.dart';
+import '../common_models/name.dart';
 import '../interfaces/model.dart';
 import '../interfaces/serializable.dart';
-import '../common_models/name.dart';
-import '../common_models/address.dart';
-import '../schema/retriever.dart';
+import '../schema/enum_constraints.dart';
+import '../schema/field_description.dart';
+import '../schema/field_type.dart';
 import '../schema/schema.dart';
 
 enum Position implements Serializable {
@@ -16,6 +18,9 @@ enum Position implements Serializable {
 
   @override
   String toJson() => name;
+
+  @override
+  String toString() => this == Position.cashier ? 'Касир' : 'Менеджер';
 }
 
 class Employee extends Model {
@@ -23,15 +28,63 @@ class Employee extends Model {
   static final Schema<Employee> schema = Schema(
     Employee.new,
     [
-      Retriever<String, Employee>('employeeId', (o) => o.employeeId),
-      Retriever<String, Employee>('login', (o) => o.login),
-      Retriever<Name, Employee>('employeeName', (o) => o.employeeName),
-      Retriever<Position, Employee>('position', (o) => o.position),
-      Retriever<int, Employee>('salary', (o) => o.salary),
-      Retriever<DateTime, Employee>('workStartDate', (o) => o.workStartDate),
-      Retriever<DateTime, Employee>('birthDate', (o) => o.birthDate),
-      Retriever<String, Employee>('phone', (o) => o.phone),
-      Retriever<Address, Employee>('address', (o) => o.address),
+      FieldDescription<String, Employee>(
+        'employeeId',
+        (o) => o.employeeId,
+        labelCaption: 'Табельний номер',
+      ),
+      FieldDescription<String, Employee>(
+        'login',
+        (o) => o.login,
+        labelCaption: 'Логін',
+        fieldDisplayMode: FieldDisplayMode.inModelView,
+      ),
+      FieldDescription<Name, Employee>(
+        'employeeName',
+        (o) => o.employeeName,
+        labelCaption: 'Ім\'я',
+        fieldType: FieldType.auto,
+      ),
+      FieldDescription<Position, Employee>.enumType(
+        'position',
+        (o) => o.position,
+        labelCaption: 'Посада',
+        enumConstraint: const EnumConstraint(Position.values),
+      ),
+      FieldDescription<int, Employee>(
+        'salary',
+        (o) => o.salary,
+        labelCaption: 'Зарплатня',
+        fieldType: FieldType.currency,
+        fieldDisplayMode: FieldDisplayMode.inModelView,
+      ),
+      FieldDescription<DateTime, Employee>(
+        'workStartDate',
+        (o) => o.workStartDate,
+        labelCaption: 'Дата початку роботи',
+        fieldType: FieldType.date,
+        fieldDisplayMode: FieldDisplayMode.inModelView,
+      ),
+      FieldDescription<DateTime, Employee>(
+        'birthDate',
+        (o) => o.birthDate,
+        labelCaption: 'Дата народження',
+        fieldType: FieldType.date,
+        fieldDisplayMode: FieldDisplayMode.inModelView,
+      ),
+      FieldDescription<String, Employee>(
+        'phone',
+        (o) => o.phone,
+        labelCaption: 'Телефон',
+        fieldDisplayMode: FieldDisplayMode.inModelView,
+      ),
+      FieldDescription<Address, Employee>(
+        'address',
+        (o) => o.address,
+        labelCaption: 'Адреса проживання',
+        fieldType: FieldType.auto,
+        fieldDisplayMode: FieldDisplayMode.inModelView,
+      ),
     ],
   );
 

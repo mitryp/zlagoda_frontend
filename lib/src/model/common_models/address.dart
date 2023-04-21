@@ -1,15 +1,27 @@
 import '../../typedefs.dart';
 import '../interfaces/serializable.dart';
-import '../schema/retriever.dart';
+import '../schema/field_description.dart';
 import '../schema/schema.dart';
 
 class Address implements Serializable {
   static final Schema<Address> schema = Schema(
     Address.new,
     [
-      Retriever<String, Address>('city', (o) => o.city),
-      Retriever<String, Address>('street', (o) => o.street),
-      Retriever<String, Address>('index', (o) => o.index),
+      FieldDescription<String, Address>(
+        'city',
+        (o) => o.city,
+        labelCaption: 'Місто',
+      ),
+      FieldDescription<String, Address>(
+        'street',
+        (o) => o.street,
+        labelCaption: 'Вулиця',
+      ),
+      FieldDescription<String, Address>(
+        'index',
+        (o) => o.index,
+        labelCaption: 'Поштовий індекс',
+      ),
     ],
   );
 
@@ -24,6 +36,9 @@ class Address implements Serializable {
   });
 
   String get fullAddress => '$city, $street, $index';
+
+  @override
+  String toString() => fullAddress;
 
   @override
   JsonMap toJson() => schema.toJson(this);

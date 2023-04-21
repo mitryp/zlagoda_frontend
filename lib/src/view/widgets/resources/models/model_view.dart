@@ -8,6 +8,7 @@ import '../../../../utils/locales.dart';
 import '../../../pages/page_base.dart';
 import '../../permissions/authorizer.dart';
 import '../../text_link.dart';
+import 'model_edit_view.dart';
 import 'model_table.dart';
 
 class ModelView<M extends Model> extends StatefulWidget {
@@ -28,17 +29,20 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
   @override
   void initState() {
     super.initState();
-    fetchResources();
+    fetchResources().whenComplete(() => WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (context) => ModelEditForm(model: model)));
+        })); // todo remove
   }
 
-  void fetchResources() async {
+  Future<void> fetchResources() async {
     try {
       model = await widget.fetchFunction();
     } on ResourceNotFetchedException catch (e) {
       if (!mounted) return;
       return setState(() => exception = e);
     }
-    // connectedModelTables = await Future.wait(model.connectedTables.map((f) => f.call()));
     connectedModelTables = await Future.wait(model.foreignKeys.map((f) => f.tableGenerator.call()));
 
     if (!mounted) return;
@@ -65,7 +69,7 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TableHeader(makeModelLocalizedName(model.runtimeType)),
+                TableHeader(makeModelLocalizedName<M>(model.runtimeType)),
                 ModelTable(model, showModelName: false),
               ],
             ),
@@ -80,20 +84,26 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
     );
   }
 
-  Authorizer buildEditButton() {
+  Widget buildEditButton() {
     return Authorizer.emptyUnauthorized(
       authorizationStrategy: hasPosition(Position.manager),
       child: ElevatedButton.icon(
         label: const Text('Редагувати'),
         icon: const Icon(Icons.edit),
-        onPressed: () {}, // todo
+        onPressed: () {
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => ModelEditForm(
+              model: model,
+            ),
+          ));
+        },
       ),
     );
   }
 
-  Center buildLoadingPlaceholder() => const Center(child: CircularProgressIndicator());
+  Widget buildLoadingPlaceholder() => const Center(child: CircularProgressIndicator());
 
-  Center buildErrorMessage() {
+  Widget buildErrorMessage() {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -128,7 +138,7 @@ class EmbeddedModelTableCard<M extends Model> extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(8.0).copyWith(top: 12),
+        padding: const EdgeInsets.all(8).copyWith(top: 12),
         child: child,
       ),
     );

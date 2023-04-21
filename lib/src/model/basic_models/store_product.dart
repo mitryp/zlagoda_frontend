@@ -1,10 +1,11 @@
 //import 'package:flutter/material.dart';
 
 import '../../typedefs.dart';
+
 //import '../interfaces/convertible_to_row.dart';
 import '../interfaces/model.dart';
 import '../model_reference.dart';
-import '../schema/retriever.dart';
+import '../schema/field_description.dart';
 import '../schema/schema.dart';
 import 'product.dart';
 
@@ -13,11 +14,29 @@ class StoreProduct extends Model {
   static final Schema<StoreProduct> schema = Schema(
     StoreProduct.new,
     [
-      Retriever<int, StoreProduct>('productId', (o) => o.productId, labelCaption: 'ID товару'),
-      Retriever<String, StoreProduct>('upc', (o) => o.upc),
-      Retriever<int, StoreProduct>('price', (o) => o.price, labelCaption: 'Ціна'),
-      Retriever<int, StoreProduct>('quantity', (o) => o.quantity, labelCaption: 'Кількість'),
-      Retriever<bool, StoreProduct>('isProm', (o) => o.isProm, labelCaption: 'Акційний'),
+      FieldDescription<int, StoreProduct>('productId', (o) => o.productId,
+          labelCaption: 'ID товару'),
+      FieldDescription<String, StoreProduct>.foreignKey(
+        'upc',
+        (o) => o.upc,
+        labelCaption: 'UPC',
+        defaultForeignKey: foreignKey('upc', ''),
+      ), // todo default goods
+      FieldDescription<int, StoreProduct>(
+        'price',
+        (o) => o.price,
+        labelCaption: 'Ціна',
+      ),
+      FieldDescription<int, StoreProduct>(
+        'quantity',
+        (o) => o.quantity,
+        labelCaption: 'Кількість',
+      ),
+      FieldDescription<bool, StoreProduct>(
+        'isProm',
+        (o) => o.isProm,
+        labelCaption: 'Акційний',
+      ),
     ],
   );
 

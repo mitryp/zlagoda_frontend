@@ -1,7 +1,9 @@
 import '../../model/basic_models/employee.dart';
 import '../../model/common_models/name.dart';
 import '../../model/interfaces/serializable.dart';
-import '../../model/schema/retriever.dart';
+import '../../model/schema/enum_constraints.dart';
+import '../../model/schema/field_description.dart';
+import '../../model/schema/field_type.dart';
 import '../../model/schema/schema.dart';
 import '../../typedefs.dart';
 
@@ -9,10 +11,28 @@ class User implements Serializable {
   static final Schema<User> schema = Schema(
     User.new,
     [
-      Retriever<String, User>('userId', (o) => o.userId),
-      Retriever<String, User>('login', (o) => o.login),
-      Retriever<Name, User>('name', (o) => o.name),
-      Retriever<Position, User>('role', (o) => o.role),
+      FieldDescription<String, User>(
+        'userId',
+        (o) => o.userId,
+        labelCaption: 'Табельний номер',
+      ),
+      FieldDescription<String, User>(
+        'login',
+        (o) => o.login,
+        labelCaption: 'Логін',
+      ),
+      FieldDescription<Name, User>(
+        'name',
+        (o) => o.name,
+        labelCaption: "Ім'я",
+        fieldType: FieldType.auto,
+      ),
+      FieldDescription<Position, User>.enumType(
+        'role',
+        (o) => o.role,
+        labelCaption: 'Посада',
+        enumConstraint: const EnumConstraint(Position.values),
+      ),
     ],
   );
 
@@ -32,7 +52,6 @@ class User implements Serializable {
 
   @override
   JsonMap toJson() => schema.toJson(this);
-
 
   @override
   bool operator ==(Object other) =>

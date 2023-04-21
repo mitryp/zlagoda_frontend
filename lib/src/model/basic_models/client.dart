@@ -1,22 +1,43 @@
-import 'package:flutter/material.dart';
-
 import '../../typedefs.dart';
-import '../interfaces/convertible_to_row.dart';
-import '../interfaces/model.dart';
-import '../common_models/name.dart';
 import '../common_models/address.dart';
-import '../schema/retriever.dart';
+import '../common_models/name.dart';
+import '../interfaces/model.dart';
+import '../schema/field_description.dart';
+import '../schema/field_type.dart';
 import '../schema/schema.dart';
 
 class Client extends Model {
   static final Schema<Client> schema = Schema(
     Client.new,
     [
-      Retriever<String, Client>('clientId', (o) => o.clientId),
-      Retriever<Name, Client>('clientName', (o) => o.clientName),
-      Retriever<String, Client>('phone', (o) => o.phone),
-      Retriever<Address?, Client>('address', (o) => o.address),
-      Retriever<int, Client>('discount', (o) => o.discount),
+      FieldDescription<String, Client>(
+        'clientId',
+        (o) => o.clientId,
+        labelCaption: 'Номер картки покупця',
+      ),
+      FieldDescription<Name, Client>(
+        'clientName',
+        (o) => o.clientName,
+        fieldType: FieldType.auto,
+        labelCaption: "Ім'я клієнта"
+      ),
+      FieldDescription<String, Client>(
+        'phone',
+        (o) => o.phone,
+        labelCaption: 'Номер телефону',
+      ),
+      FieldDescription<Address?, Client>(
+        'address',
+        (o) => o.address,
+        fieldType: FieldType.auto,
+        labelCaption: 'Адреса',
+      ),
+      FieldDescription<int, Client>(
+        'discount',
+        (o) => o.discount,
+        labelCaption: 'Знижка',
+        fieldType: FieldType.number,
+      ),
     ],
   );
 
@@ -42,14 +63,14 @@ class Client extends Model {
   @override
   JsonMap toJson() => schema.toJson(this);
 
-  // @override
-  // DataRow buildRow(BuildContext context) {
-  //   final List<String> cellsText = [
-  //     clientId,
-  //     clientName.fullName,
-  //     discount.toString(),
-  //   ];
-  //
-  //   return buildRowFromFields(context, cellsText);
-  // }
+// @override
+// DataRow buildRow(BuildContext context) {
+//   final List<String> cellsText = [
+//     clientId,
+//     clientName.fullName,
+//     discount.toString(),
+//   ];
+//
+//   return buildRowFromFields(context, cellsText);
+// }
 }

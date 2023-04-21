@@ -1,9 +1,11 @@
 //import 'package:flutter/material.dart';
 
 import '../../typedefs.dart';
+
 //import '../interfaces/convertible_to_row.dart';
 import '../interfaces/model.dart';
-import '../schema/retriever.dart';
+import '../schema/field_description.dart';
+import '../schema/field_type.dart';
 import '../schema/schema.dart';
 
 //class Category extends Model implements ConvertibleToRow {
@@ -11,8 +13,18 @@ class Category extends Model {
   static final Schema<Category> schema = Schema(
     Category.new,
     [
-      Retriever<int, Category>('categoryId', (o) => o.categoryId),
-      Retriever<String, Category>('categoryName', (o) => o.categoryName, labelCaption: 'Категорія'),
+      FieldDescription<int, Category>(
+        'categoryId',
+        (o) => o.categoryId,
+        labelCaption: 'ID категорії',
+        isEditable: false,
+        fieldType: FieldType.auto,
+      ),
+      FieldDescription<String, Category>(
+        'categoryName',
+        (o) => o.categoryName,
+        labelCaption: 'Категорія',
+      ),
     ],
   );
 
@@ -32,10 +44,13 @@ class Category extends Model {
   @override
   JsonMap toJson() => schema.toJson(this);
 
-  // @override
-  // DataRow buildRow(BuildContext context) {
-  //   final cellsText = [categoryName];
-  //
-  //   return buildRowFromFields(context, cellsText);
-  // }
+  @override
+  String toString() => 'Категорія "$categoryName"';
+
+// @override
+// DataRow buildRow(BuildContext context) {
+//   final cellsText = [categoryName];
+//
+//   return buildRowFromFields(context, cellsText);
+// }
 }

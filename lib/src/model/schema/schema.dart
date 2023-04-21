@@ -1,17 +1,17 @@
 import '../../typedefs.dart';
 import '../interfaces/serializable.dart';
-import 'retriever.dart';
+import 'field_description.dart';
 
 class Schema<O> {
   final Function classConstructor;
-  final List<Retriever<dynamic, O>> retrievers;
+  final List<FieldDescription<dynamic, O>> fields;
 
-  const Schema(this.classConstructor, this.retrievers);
+  const Schema(this.classConstructor, this.fields);
 
   O? fromJson(JsonMap json) {
     final namedArgs = <Symbol, dynamic>{};
 
-    for (final retriever in retrievers) {
+    for (final retriever in fields) {
       final retrievedValue =
           retriever.extractor.extractFrom(json, retriever.fieldName);
 
@@ -27,7 +27,7 @@ class Schema<O> {
   JsonMap toJson(O object) {
     final json = <String, dynamic>{};
 
-    for (final retriever in retrievers) {
+    for (final retriever in fields) {
       final field = retriever.fieldName;
       final retrievedValue = retriever.fieldGetter(object);
 

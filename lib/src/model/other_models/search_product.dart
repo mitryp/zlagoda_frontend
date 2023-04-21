@@ -1,14 +1,23 @@
 import '../../typedefs.dart';
-import '../interfaces/model.dart';
-import '../schema/retriever.dart';
+import '../basic_models/product.dart';
+import '../schema/field_description.dart';
 import '../schema/schema.dart';
+import 'search_model.dart';
 
-class SearchProduct extends Model {
+class SearchProduct extends SearchModel<Product> {
   static final Schema<SearchProduct> schema = Schema(
     SearchProduct.new,
     [
-      Retriever<String, SearchProduct>('upc', (o) => o.upc),
-      Retriever<String, SearchProduct>('productName', (o) => o.productName),
+      FieldDescription<String, SearchProduct>(
+        'upc',
+        (o) => o.upc,
+        labelCaption: 'UPC',
+      ),
+      FieldDescription<String, SearchProduct>(
+        'productName',
+        (o) => o.productName,
+        labelCaption: 'Назва',
+      ),
     ],
   );
 

@@ -1,6 +1,6 @@
 import '../../typedefs.dart';
 import '../interfaces/serializable.dart';
-import '../schema/retriever.dart';
+import '../schema/field_description.dart';
 import '../schema/schema.dart';
 
 class Name implements Serializable {
@@ -11,9 +11,21 @@ class Name implements Serializable {
   static final Schema<Name> schema = Schema(
     Name.new,
     [
-      Retriever<String, Name>('firstName', (o) => o.firstName),
-      Retriever<String?, Name>('middleName', (o) => o.middleName),
-      Retriever<String, Name>('lastName', (o) => o.lastName),
+      FieldDescription<String, Name>(
+        'firstName',
+        (o) => o.firstName,
+        labelCaption: 'Ім\'я',
+      ),
+      FieldDescription<String?, Name>(
+        'middleName',
+        (o) => o.middleName,
+        labelCaption: 'По батькові',
+      ),
+      FieldDescription<String, Name>(
+        'lastName',
+        (o) => o.lastName,
+        labelCaption: 'Прізвище',
+      ),
     ],
   );
 
@@ -23,7 +35,10 @@ class Name implements Serializable {
     required this.lastName,
   });
 
-  String get fullName => '$lastName $firstName $middleName';
+  String get fullName => '$lastName $firstName${middleName != null ? ' $middleName' : ''}';
+
+  @override
+  String toString() => fullName;
 
   @override
   JsonMap toJson() => schema.toJson(this);

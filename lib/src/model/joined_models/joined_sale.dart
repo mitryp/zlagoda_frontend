@@ -1,16 +1,34 @@
 import '../../typedefs.dart';
-import '../interfaces/serializable.dart';
-import '../schema/retriever.dart';
+import '../basic_models/product.dart';
+import '../interfaces/model.dart';
+import '../model_reference.dart';
+import '../schema/field_description.dart';
 import '../schema/schema.dart';
 
-class JoinedSale implements Serializable {
+class JoinedSale extends Model {
   static final Schema<JoinedSale> schema = Schema(
     JoinedSale.new,
     [
-      Retriever<String, JoinedSale>('productName', (o) => o.productName),
-      Retriever<String, JoinedSale>('upc', (o) => o.upc),
-      Retriever<int, JoinedSale>('price', (o) => o.price),
-      Retriever<int, JoinedSale>('quantity', (o) => o.quantity),
+      FieldDescription<String, JoinedSale>(
+        'productName',
+        (o) => o.productName,
+        labelCaption: 'Назва товару',
+      ),
+      FieldDescription<String, JoinedSale>(
+        'upc',
+        (o) => o.upc,
+        labelCaption: 'UPC',
+      ),
+      FieldDescription<int, JoinedSale>(
+        'price',
+        (o) => o.price,
+        labelCaption: 'Ціна',
+      ),
+      FieldDescription<int, JoinedSale>(
+        'quantity',
+        (o) => o.quantity,
+        labelCaption: 'Кількість',
+      ),
     ],
   );
 
@@ -25,6 +43,13 @@ class JoinedSale implements Serializable {
     required this.price,
     required this.quantity,
   });
+
+  @override
+  get primaryKey => throw UnimplementedError('JoinedSale is not a real model, '
+      "don't call its primaryKey");
+
+  @override
+  List<ForeignKey<Model>> get foreignKeys => [foreignKey<Product>('upc', upc)];
 
   static JoinedSale? fromJson(JsonMap json) => schema.fromJson(json);
 

@@ -13,7 +13,7 @@ class ModelTable<M extends Model> extends StatelessWidget {
 
   const ModelTable(this.model, {this.showModelName = true, super.key});
 
-  Schema<M> get schema => makeModelSchema(model.runtimeType);
+  Schema<M> get schema => makeModelSchema<M>(model.runtimeType);
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,10 @@ class ModelTable<M extends Model> extends StatelessWidget {
         if (showModelName)
           Padding(
             padding: const EdgeInsets.only(bottom: 10.0),
-            child: Text(makeModelLocalizedName<M>(), style: const TextStyle(fontSize: 16),),
+            child: Text(
+              makeModelLocalizedName<M>(),
+              style: const TextStyle(fontSize: 16),
+            ),
           ),
         DataTable(
           headingRowHeight: 0,
@@ -38,16 +41,16 @@ class ModelTable<M extends Model> extends StatelessWidget {
 
   List<DataRow> buildRows() {
     final labelsToValues = Map.fromEntries(
-      schema.retrievers
+      schema.fields
           .where((field) => field.isShownOnIndividualPage)
-          .map((r) => MapEntry(r.labelCaption!, r.fieldGetter(model))),
+          .map((field) => MapEntry(field.labelCaption!, field.presentFieldOf(model))),
     );
 
     return labelsToValues.entries.map(rowFromEntry).toList();
   }
 
   DataRow rowFromEntry(MapEntry<String, dynamic> e) => DataRow(cells: [
-      DataCell(Text(e.key)),
-      DataCell(Text(e.value.toString())),
-    ]);
+        DataCell(Text(e.key)),
+        DataCell(Text(e.value.toString())),
+      ]);
 }
