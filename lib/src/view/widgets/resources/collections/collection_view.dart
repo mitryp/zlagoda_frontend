@@ -3,23 +3,26 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../../model/interfaces/convertible_to_row.dart';
+import '../../../../model/model_scheme_factory.dart';
 import '../../../../model/schema/schema.dart';
+import '../../../../services/http/http_service_factory.dart';
+import '../../../../services/http/model_http_service.dart';
 import '../../../../services/query_builder/query_builder.dart';
 import '../../../../services/query_builder/sort.dart';
 import '../../../pages/page_base.dart';
 
 abstract class CollectionSearchFilterDelegate {
-  final EventSink<void> updateSink;
+  final VoidCallback updateCallback;
   final QueryBuilder queryBuilder;
 
   const CollectionSearchFilterDelegate({
-    required this.updateSink,
+    required this.updateCallback,
     required this.queryBuilder,
   });
 
   void updateSort(Sort sort) {
     queryBuilder.sort = sort;
-    updateSink.add(null);
+    updateCallback();
   }
 
   List<Widget> buildSearches(BuildContext context);
@@ -29,35 +32,49 @@ abstract class CollectionSearchFilterDelegate {
   Widget buildSort(BuildContext context);
 }
 
-class CollectionView<M extends ConvertibleToRow<M>> extends StatefulWidget {
-  final List<M> collection;
-  final CollectionSearchFilterDelegate searchFilterDelegate;
-  final EventSink<void> updateSink;
+typedef CsfDelegateConstructor = CollectionSearchFilterDelegate Function({
+  required QueryBuilder queryBuilder,
+  required VoidCallback updateCallback,
+});
+
+/*
+  CollectionView:
+    -> filters/sorting/search
+    -> table, which can be updated by the filters
+    -> add button
+ */
+
+class CollectionView<R extends ConvertibleToRow<R>> extends StatefulWidget {
   final VoidCallback onAddPressed;
+  final QueryBuilder queryBuilder;
+  final CsfDelegateConstructor searchFilterDelegate;
 
-  // final List<String> columnNames;
-  final Schema<M> elementSchema;
-
-  const CollectionView(
-    this.collection, {
-    // required this.columnNames,
-    required this.elementSchema,
-    required this.updateSink,
+  const CollectionView({
     required this.searchFilterDelegate,
     required this.onAddPressed,
+    required this.queryBuilder,
     super.key,
   });
 
   @override
-  State<CollectionView<M>> createState() => _CollectionViewState<M>();
+  State<CollectionView<R>> createState() => _CollectionViewState<R>();
 }
 
-class _CollectionViewState<M extends ConvertibleToRow<M>>
-    extends State<CollectionView<M>> {
-  late final List<String> columnNames = widget.elementSchema.retrievers
-      .where((r) => r.isShownInTable)
-      .map((r) => r.labelCaption!)
-      .toList();
+class _CollectionViewState<R extends ConvertibleToRow<R>> extends State<CollectionView<R>> {
+  late final ModelHttpService<R> httpService = makeHttpService<R>();
+  late CollectionSearchFilterDelegate searchFilterDelegate = widget.searchFilterDelegate(
+    queryBuilder: widget.queryBuilder,
+    updateCallback: fetchItems,
+  );
+  late final StreamController<void> updateStreamController = StreamController();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchItems();
+  }
+
+  void fetchItems() => updateStreamController.sink.add(null);
 
   @override
   Widget build(BuildContext context) {
@@ -67,12 +84,9 @@ class _CollectionViewState<M extends ConvertibleToRow<M>>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           buildSearchFilters(),
-          DataTable(
-            showCheckboxColumn: false,
-            columns: columnNames
-                .map((name) => DataColumn(label: Text(name)))
-                .toList(),
-            rows: widget.collection.map((m) => m.buildRow(context)).toList(),
+          CollectionTable(
+            itemsSupplier: () => httpService.get(widget.queryBuilder),
+            updateStream: updateStreamController.stream,
           ),
         ],
       ),
@@ -86,11 +100,11 @@ class _CollectionViewState<M extends ConvertibleToRow<M>>
     return Card(
       child: Row(
         children: [
-          ...widget.searchFilterDelegate.buildSearches(context),
+          ...searchFilterDelegate.buildSearches(context),
           divider,
-          ...widget.searchFilterDelegate.buildFilters(context),
+          ...searchFilterDelegate.buildFilters(context),
           divider,
-          widget.searchFilterDelegate.buildSort(context)
+          searchFilterDelegate.buildSort(context)
         ],
       ),
     );
@@ -100,4 +114,82 @@ class _CollectionViewState<M extends ConvertibleToRow<M>>
         onPressed: widget.onAddPressed,
         child: const Text('Додати'),
       );
+}
+
+class CollectionTable<R extends ConvertibleToRow<R>> extends StatefulWidget {
+  final Future<List<R>> Function() itemsSupplier;
+  final Stream<void> updateStream;
+
+  const CollectionTable({required this.itemsSupplier, required this.updateStream, super.key});
+
+  @override
+  State<CollectionTable<R>> createState() => _CollectionTableState<R>();
+}
+
+class _CollectionTableState<R extends ConvertibleToRow<R>> extends State<CollectionTable<R>> {
+  late final StreamSubscription<void> updateSubscription;
+  late List<R> items;
+  bool isLoaded = false;
+  Object? error;
+
+  late final List<String> columnNames =
+      schema.fields.where((r) => r.isShownInTable).map((r) => r.labelCaption).toList();
+
+  Schema<R> get schema => makeModelSchema<R>();
+
+  @override
+  void initState() {
+    super.initState();
+    updateSubscription = widget.updateStream.listen((_) => loadItems());
+    loadItems();
+  }
+
+  @override
+  void dispose() {
+    updateSubscription.cancel();
+    super.dispose();
+  }
+
+  Future<void> loadItems() {
+    setState(() {
+      isLoaded = false;
+      error = null;
+    });
+
+    return widget.itemsSupplier().then(
+      (items) {
+        if (mounted) {
+          setState(() {
+            this.items = items;
+            isLoaded = true;
+          });
+        }
+      },
+    ).catchError((err) {
+      if (mounted) {
+        setState(() => error = err);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (error != null) {
+      return Center(
+        child: Text('Помилка при завантаженні колекції: $error'),
+      );
+    }
+
+    if (!isLoaded) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    return DataTable(
+      showCheckboxColumn: false,
+      columns: columnNames.map((name) => DataColumn(label: Text(name))).toList(),
+      rows: items.map((m) => m.buildRow(context)).toList(),
+    );
+  }
 }
