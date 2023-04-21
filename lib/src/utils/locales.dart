@@ -1,4 +1,5 @@
 import '../model/basic_models/category.dart';
+import '../model/basic_models/employee.dart';
 import '../model/basic_models/product.dart';
 import '../model/basic_models/store_product.dart';
 import '../model/interfaces/model.dart';
@@ -6,9 +7,10 @@ import '../model/interfaces/model.dart';
 const _localizedModelNames = {
   Product: 'Товар',
   StoreProduct: 'Товар у магазині',
-  Category: 'Категорія'
+  Category: 'Категорія',
+  Employee: 'Працівник'
 };
 
 String makeModelLocalizedName<M extends Model>([Type? modelType]) {
-  return _localizedModelNames[modelType ?? M] ?? 'Нелокалізована модель $M';
+  return _localizedModelNames[modelType ?? M] ?? 'Нелокалізована модель ${modelType ?? M}';
 }

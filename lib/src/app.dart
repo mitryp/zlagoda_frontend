@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'config.dart';
 import 'services/auth/user.dart';
 import 'theme.dart';
 import 'view/main_viewport.dart';
@@ -20,15 +19,13 @@ class _ZlagodaApplicationState extends State<ZlagodaApplication> {
 
   @override
   Widget build(BuildContext context) {
-    print(authServiceStrategy);
-
     return UserProvider(
       nestedNavigatorKey: globalNavigatorKey,
       child: MaterialApp(
         navigatorKey: globalNavigatorKey,
         debugShowCheckedModeBanner: false,
         title: 'Злагода',
-        initialRoute: '/app',
+        initialRoute: '/login',
         routes: {
           '/app': (context) => const MainViewport(),
           '/login': (context) => const LoginPage(),

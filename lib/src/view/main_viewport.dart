@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:zlagoda_frontend/src/view/widgets/resources/models/model_view.dart';
 
+import '../model/basic_models/employee.dart';
+import '../model/basic_models/product.dart';
+import '../services/http/http_service_factory.dart';
 import '../services/middleware/response/auth_handle_middleware.dart';
 import '../services/middleware/response/response_display_middleware.dart';
 import 'app_pages.dart';
@@ -30,10 +34,6 @@ class _MainViewportState extends State<MainViewport> {
   }
 
   Widget buildMainScaffold() {
-    // return ModelView<StoreProduct>(
-    //   fetchFunction: () => makeHttpService<StoreProduct>().singleById(1).then((v) => v!),
-    // );
-
     return Scaffold(
       body: Row(
         children: [
@@ -48,6 +48,12 @@ class _MainViewportState extends State<MainViewport> {
   }
 
   Widget buildMainView() {
+    // return Expanded(
+    //   child: ModelView<Employee>(
+    //     fetchFunction: () => makeHttpService<Employee>().singleById(0).then((v) => v!),
+    //   ),
+    // );
+
     return Expanded(
       child: ClipPath(
         child: Navigator(
