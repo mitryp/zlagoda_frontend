@@ -3,29 +3,39 @@ import 'filter.dart';
 import 'sort.dart';
 
 class QueryBuilder {
-  int _paginationLimit = 10;
-  int _paginationPage = 0;
+  int paginationLimit = 10;
+  int paginationPage = 0;
   final List<Filter> _filters = [];
-  Sort _sort;
+  Sort sort;
 
-  QueryBuilder({required Sort sort}): _sort = sort;
-
-  set paginationLimit(int limit) => _paginationLimit = limit;
-
-  set paginationPage(int offset) => _paginationPage = offset;
-
-  set sort(Sort sort) => _sort = sort;
+  QueryBuilder({required this.sort});
 
   void addFilter(Filter filter) => _filters.add(filter);
 
-  bool removeFilter(FilterField filterField) => _filters.remove(Filter(filterField, ''));
+  bool removeFilter(FilterOption filterField) => _filters.remove(Filter(filterField, ''));
+
+  List<Filter> get filters => _filters;
 
   Map<String, dynamic> get queryParams {
+    // var queryParams = {
+    //   'sortBy': sort.sortField,
+    //   'order': sort.order.name,
+    //   'limit': '$paginationLimit',
+    //   'offset': '${paginationPage * paginationLimit}',
+    // };
+    // for (var filter in _filters) {
+    //   var value = filter.value;
+    //
+    //   if (filter.value is DateTime) value = value.millisecondsSinceEpoch / 1000;
+    //   if (filter.value is Position) value = value.name;
+    //
+    //   queryParams['${filter.fieldName}Filter'] = '$value';
+
     var queryParams = {
-      'sortBy': _sort.fieldName,
-      'order': _sort.order.name,
-      'limit': _paginationLimit,
-      'offset': _paginationPage * _paginationLimit,
+      '_sort': sort.sortField,
+      '_order': sort.order.name,
+      '_limit': '$paginationLimit',
+      '_page': '$paginationPage',
     };
 
     for (var filter in _filters) {
@@ -34,7 +44,7 @@ class QueryBuilder {
       if (filter.value is DateTime) value = value.millisecondsSinceEpoch / 1000;
       if (filter.value is Position) value = value.name;
 
-      queryParams['${filter.fieldName}Filter'] = value;
+      queryParams[filter.fieldName] = '$value';
     }
 
     return queryParams;

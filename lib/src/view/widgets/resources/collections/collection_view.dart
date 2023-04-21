@@ -4,12 +4,23 @@ import 'package:flutter/material.dart';
 
 import '../../../../model/interfaces/convertible_to_row.dart';
 import '../../../../model/schema/schema.dart';
+import '../../../../services/query_builder/query_builder.dart';
+import '../../../../services/query_builder/sort.dart';
 import '../../../pages/page_base.dart';
 
 abstract class CollectionSearchFilterDelegate {
   final EventSink<void> updateSink;
+  final QueryBuilder queryBuilder;
 
-  const CollectionSearchFilterDelegate({required this.updateSink});
+  const CollectionSearchFilterDelegate({
+    required this.updateSink,
+    required this.queryBuilder,
+  });
+
+  void updateSort(Sort sort) {
+    queryBuilder.sort = sort;
+    updateSink.add(null);
+  }
 
   List<Widget> buildSearches(BuildContext context);
 
@@ -41,7 +52,8 @@ class CollectionView<M extends ConvertibleToRow<M>> extends StatefulWidget {
   State<CollectionView<M>> createState() => _CollectionViewState<M>();
 }
 
-class _CollectionViewState<M extends ConvertibleToRow<M>> extends State<CollectionView<M>> {
+class _CollectionViewState<M extends ConvertibleToRow<M>>
+    extends State<CollectionView<M>> {
   late final List<String> columnNames = widget.elementSchema.retrievers
       .where((r) => r.isShownInTable)
       .map((r) => r.labelCaption!)
@@ -57,7 +69,9 @@ class _CollectionViewState<M extends ConvertibleToRow<M>> extends State<Collecti
           buildSearchFilters(),
           DataTable(
             showCheckboxColumn: false,
-            columns: columnNames.map((name) => DataColumn(label: Text(name))).toList(),
+            columns: columnNames
+                .map((name) => DataColumn(label: Text(name)))
+                .toList(),
             rows: widget.collection.map((m) => m.buildRow(context)).toList(),
           ),
         ],

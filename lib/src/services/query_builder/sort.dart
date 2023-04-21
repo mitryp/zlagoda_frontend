@@ -1,35 +1,40 @@
 enum Order { asc, desc }
 
 class Sort {
-  late final String fieldName;
+  late final SortOption sortOption;
   late final Order order;
 
-  Sort(SortField field, [Order? order]) {
-    fieldName = field.name;
-    this.order = order ?? field.order;
+  Sort(this.sortOption, [Order? order]) {
+    this.order = order ?? sortOption.defaultOrder;
   }
+
+  String get sortField => sortOption.name;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
           other is Sort &&
               runtimeType == other.runtimeType &&
-              fieldName == other.fieldName;
+              sortField == other.sortField;
 
   @override
-  int get hashCode => fieldName.hashCode ^ order.hashCode;
+  int get hashCode => sortOption.hashCode ^ order.hashCode;
 }
 
-enum SortField {
-  employeeName(Order.asc),
-  clientName(Order.asc),
-  categoryName(Order.asc),
-  productName(Order.asc),
-  storeProductName(Order.asc),
-  quantity(Order.desc),
-  date(Order.desc);
+enum SortOption {
+  employeeName(Order.asc, 'За ПІБ працівника'),
+  clientName(Order.asc, 'За ПІБ клієнта'),
+  categoryName(Order.asc, 'За назвою категорії'),
+  productName(Order.asc, 'За назвою товару'),
+  quantity(Order.desc, 'За кількістю'),
+  manufacturer(Order.asc, 'За виробником'),//TODO remove
+  date(Order.desc, 'За датою');
 
-  final Order order;
+  final Order defaultOrder;
+  final String caption;
 
-  const SortField(this.order);
+  const SortOption(this.defaultOrder, this.caption);
+
+  String get fieldName => name;
+
 }

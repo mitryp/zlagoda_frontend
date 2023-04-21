@@ -31,7 +31,6 @@ abstract class ModelHttpService<S extends Serializable> {
   String makeRoute([Object? path]) => 'api/$route${path != null ? '/$path' : ''}';
 
   Future<List<S>> get(QueryBuilder queryBuilder) async {
-
     final response = await http
         .get(Uri.http(baseRoute, makeRoute(), queryBuilder.queryParams))
         .catchError((err) => http.Response(err.message, 503));

@@ -51,3 +51,5 @@ run_resources_mock.bat
 
 lib/test.dart
 lib/src/test.dart
+db.json
+routes.json

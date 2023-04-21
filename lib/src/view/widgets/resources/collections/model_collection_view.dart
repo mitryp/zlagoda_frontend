@@ -19,7 +19,7 @@ typedef CsfDelegateConstructor = CollectionSearchFilterDelegate Function({
 
 abstract class ModelCollectionView<R extends ConvertibleToRow<R>> extends StatefulWidget {
   final CsfDelegateConstructor searchFilterDelegate;
-  final SortField defaultSortField;
+  final SortOption defaultSortField;
 
   const ModelCollectionView({
     required this.defaultSortField,
@@ -69,7 +69,7 @@ class _ModelCollectionViewState<R extends ConvertibleToRow<R>>
 
 class CSFDelegate extends CollectionSearchFilterDelegate {
   const CSFDelegate({
-    required QueryBuilder queryBuilder,
+    required super.queryBuilder,
     required super.updateSink,
   });
 
