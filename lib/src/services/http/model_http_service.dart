@@ -28,25 +28,15 @@ abstract class ModelHttpService<S extends Serializable> {
 
   const ModelHttpService({required this.route, required this.castFunction});
 
-  String _route([Object? path]) => 'api/$route${path != null ? '/$path' : ''}';
-
-  Future<T> _controller<T>(
-    http.Response response,
-    ControllerSuccessfulLogic<T> successLogic,
-  ) async {
-    final res = await applyResponseMiddleware(response);
-
-    if (successCodes(res)) {
-      return successLogic(res);
-    }
-
-    throw ResourceNotFetchedException(res.reasonPhrase);
-  }
+  String makeRoute([Object? path]) => 'api/$route${path != null ? '/$path' : ''}';
 
   Future<List<S>> get(QueryBuilder queryBuilder) async {
-    final response = await http.get(Uri.http(baseRoute, _route(), queryBuilder.queryParams));
 
-    return _controller(response, (response) {
+    final response = await http
+        .get(Uri.http(baseRoute, makeRoute(), queryBuilder.queryParams))
+        .catchError((err) => http.Response(err.message, 503));
+
+    return httpServiceController(response, (response) {
       return decodeResponseBody<List<dynamic>>(response)
           .map((m) => castFunction(m))
           .where((e) => e != null)
@@ -56,28 +46,52 @@ abstract class ModelHttpService<S extends Serializable> {
   }
 
   Future<S?> singleById(dynamic id) async {
-    final response = await http.get(Uri.http(baseRoute, _route(id)));
+    final response = await http
+        .get(Uri.http(baseRoute, makeRoute(id)))
+        .catchError((err) => http.Response(err.message, 503));
 
-    return _controller(response, (response) => castFunction(decodeResponseBody(response)));
+    return httpServiceController(
+      response,
+      (response) => castFunction(decodeResponseBody<Map<String, dynamic>>(response)),
+    );
   }
 
   Future<bool> post(S row) async {
-    final response = await http.post(Uri.http(baseRoute, _route()), body: row.toJson());
+    final response = await http
+        .post(Uri.http(baseRoute, makeRoute()), body: row.toJson())
+        .catchError((err) => http.Response(err.message, 503));
 
-    return _controller(response, (response) => true);
+    return httpServiceController(response, (response) => true);
   }
 
   Future<bool> update(S row, dynamic primaryKey) async {
-    final response = await http.put(Uri.http(baseRoute, _route(primaryKey)), body: row.toJson());
+    final response = await http
+        .put(Uri.http(baseRoute, makeRoute(primaryKey)), body: row.toJson())
+        .catchError((err) => http.Response(err.message, 503));
 
-    return _controller(response, (response) => true);
+    return httpServiceController(response, (response) => true);
   }
 
   Future<bool> delete(dynamic id) async {
-    final response = await http.put(Uri.http(baseRoute, _route(id)));
+    final response = await http
+        .put(Uri.http(baseRoute, makeRoute(id)))
+        .catchError((err) => http.Response(err.message, 503));
 
-    return _controller(response, (response) => true);
+    return httpServiceController(response, (response) => true);
   }
+}
+
+Future<T> httpServiceController<T>(
+  http.Response response,
+  ControllerSuccessfulLogic<T> successLogic,
+) async {
+  final res = await applyResponseMiddleware(response);
+
+  if (successCodes(res)) {
+    return successLogic(res);
+  }
+
+  throw ResourceNotFetchedException(res.reasonPhrase);
 }
 
 /*
