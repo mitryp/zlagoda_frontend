@@ -4,7 +4,7 @@ class Filter<T> {
   late final String fieldName;
   final T value;
 
-  Filter(FilterField<T> field, this.value) {
+  Filter(FilterOption<T> field, this.value) {
     fieldName = field.name;
   }
 
@@ -19,7 +19,7 @@ class Filter<T> {
   int get hashCode => fieldName.hashCode ^ value.hashCode;
 }
 
-enum FilterField<T> {
+enum FilterOption<T> {
   dateMin<DateTime>(),
   dateMax<DateTime>(),
   employeeName<String>(),
