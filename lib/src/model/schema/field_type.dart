@@ -5,10 +5,11 @@ typedef PresentationFunction<T> = String Function(T);
 
 enum FieldType<T> {
   auto<dynamic>(_never),
+  serializable<dynamic>(_never),
   text<String>(_stringConverter),
   number<int>(int.parse),
   currency<int>(_currencyConverter, _presentCurrency),
-  date<DateTime>(DateTime.parse, _presentDate),
+  date<DateTime>(_parseDate, _presentDate),
   constrainedToEnum<dynamic>(_never),
   foreignKey<dynamic>(_never);
 
@@ -28,7 +29,11 @@ int _currencyConverter(String coins) => (double.parse(_stringConverter(coins)) *
 
 String _toString(d) => d.toString();
 
-String _presentDate(DateTime date) => '${date.day}.${date.month}.${date.year}';
+String _presentDate(date) => '${date.day}.${date.month}.${date.year}';
+DateTime _parseDate(String date) {
+  final parts = date.split('.').map(int.parse).toList();
+  return DateTime(parts[2], parts[1], parts[0]);
+}
 
 String _presentCurrency(int coins) => (coins / 100).toStringAsFixed(2);
 

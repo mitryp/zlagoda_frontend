@@ -1,12 +1,16 @@
+import 'package:flutter/material.dart';
+
 import '../../typedefs.dart';
+import '../../utils/navigation.dart';
 import '../common_models/address.dart';
 import '../common_models/name.dart';
+import '../interfaces/convertible_to_row.dart';
 import '../interfaces/model.dart';
 import '../schema/field_description.dart';
 import '../schema/field_type.dart';
 import '../schema/schema.dart';
 
-class Client extends Model {
+class Client extends Model with ConvertibleToRow<Client> {
   static final Schema<Client> schema = Schema(
     Client.new,
     [
@@ -18,8 +22,8 @@ class Client extends Model {
       FieldDescription<Name, Client>(
         'clientName',
         (o) => o.clientName,
-        fieldType: FieldType.auto,
-        labelCaption: "Ім'я клієнта"
+        labelCaption: "Ім'я клієнта",
+        fieldType: FieldType.serializable,
       ),
       FieldDescription<String, Client>(
         'phone',
@@ -29,13 +33,13 @@ class Client extends Model {
       FieldDescription<Address?, Client>(
         'address',
         (o) => o.address,
-        fieldType: FieldType.auto,
         labelCaption: 'Адреса',
+        fieldType: FieldType.serializable,
       ),
       FieldDescription<int, Client>(
         'discount',
         (o) => o.discount,
-        labelCaption: 'Знижка',
+        labelCaption: 'Знижка (%)',
         fieldType: FieldType.number,
       ),
     ],
@@ -63,14 +67,7 @@ class Client extends Model {
   @override
   JsonMap toJson() => schema.toJson(this);
 
-// @override
-// DataRow buildRow(BuildContext context) {
-//   final List<String> cellsText = [
-//     clientId,
-//     clientName.fullName,
-//     discount.toString(),
-//   ];
-//
-//   return buildRowFromFields(context, cellsText);
-// }
+  @override
+  void redirectToModelView(BuildContext context) =>
+      AppNavigation.of(context).toModelView<Client>(primaryKey);
 }

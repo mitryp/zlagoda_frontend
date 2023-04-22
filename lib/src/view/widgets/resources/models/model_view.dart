@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../../../../model/basic_models/employee.dart';
 import '../../../../model/interfaces/model.dart';
+import '../../../../theme.dart';
 import '../../../../typedefs.dart';
 import '../../../../utils/exceptions.dart';
 import '../../../../utils/locales.dart';
+import '../../../../utils/navigation.dart';
 import '../../../pages/page_base.dart';
 import '../../permissions/authorizer.dart';
 import '../../text_link.dart';
@@ -30,7 +32,7 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
   void initState() {
     super.initState();
     fetchResources().whenComplete(() => WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted) return;
+          if (!mounted || exception != null) return;
           Navigator.of(context)
               .push(MaterialPageRoute(builder: (context) => ModelEditForm(model: model)));
         })); // todo remove
@@ -137,9 +139,13 @@ class EmbeddedModelTableCard<M extends Model> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8).copyWith(top: 12),
-        child: child,
+      child: InkWell(
+        borderRadius: defaultBorderRadius,
+        onTap: () => child.redirectToModelView(context),
+        child: Padding(
+          padding: const EdgeInsets.all(8).copyWith(top: 12),
+          child: child,
+        ),
       ),
     );
   }

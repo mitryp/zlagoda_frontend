@@ -1,10 +1,13 @@
-//import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import '../../typedefs.dart';
+import '../../utils/navigation.dart';
 import '../common_models/address.dart';
 import '../common_models/name.dart';
+import '../interfaces/convertible_to_row.dart';
 import '../interfaces/model.dart';
 import '../interfaces/serializable.dart';
+import '../schema/date_constraints.dart';
 import '../schema/enum_constraints.dart';
 import '../schema/field_description.dart';
 import '../schema/field_type.dart';
@@ -25,8 +28,7 @@ enum Position implements Serializable {
   String toString() => caption;
 }
 
-class Employee extends Model {
-//class Employee extends Model implements ConvertibleToRow {
+class Employee extends Model with ConvertibleToRow<Employee> {
   static final Schema<Employee> schema = Schema(
     Employee.new,
     [
@@ -41,11 +43,11 @@ class Employee extends Model {
         labelCaption: 'Логін',
         fieldDisplayMode: FieldDisplayMode.inModelView,
       ),
-      FieldDescription<Name, Employee>(
+      FieldDescription<Name, Employee>.serializable(
         'employeeName',
         (o) => o.employeeName,
         labelCaption: 'Ім\'я',
-        fieldType: FieldType.auto,
+        serializableEditorBuilder: nameEditorBuilder,
       ),
       FieldDescription<Position, Employee>.enumType(
         'position',
@@ -65,6 +67,10 @@ class Employee extends Model {
         (o) => o.workStartDate,
         labelCaption: 'Дата початку роботи',
         fieldType: FieldType.date,
+        dateConstraints: const DateConstraints(
+          toFirstDate: Duration(days: 365 * 100),
+          toLastDate: Duration(),
+        ),
         fieldDisplayMode: FieldDisplayMode.inModelView,
       ),
       FieldDescription<DateTime, Employee>(
@@ -72,6 +78,10 @@ class Employee extends Model {
         (o) => o.birthDate,
         labelCaption: 'Дата народження',
         fieldType: FieldType.date,
+        dateConstraints: const DateConstraints(
+          toFirstDate: Duration(days: 365 * 100),
+          toLastDate: Duration(days: 365 * 18),
+        ),
         fieldDisplayMode: FieldDisplayMode.inModelView,
       ),
       FieldDescription<String, Employee>(
@@ -80,11 +90,11 @@ class Employee extends Model {
         labelCaption: 'Телефон',
         fieldDisplayMode: FieldDisplayMode.inModelView,
       ),
-      FieldDescription<Address, Employee>(
+      FieldDescription<Address, Employee>.serializable(
         'address',
         (o) => o.address,
         labelCaption: 'Адреса проживання',
-        fieldType: FieldType.auto,
+        serializableEditorBuilder: addressEditorBuilder,
         fieldDisplayMode: FieldDisplayMode.inModelView,
       ),
     ],
@@ -120,15 +130,7 @@ class Employee extends Model {
   @override
   JsonMap toJson() => schema.toJson(this);
 
-// @override
-// DataRow buildRow(BuildContext context) {
-//   final List<String> cellsText = [
-//     name.fullName,
-//     position.toString(),
-//     phone,
-//     address.fullAddress
-//   ];
-//
-//   return buildRowFromFields(context, cellsText);
-// }
+  @override
+  void redirectToModelView(BuildContext context) =>
+      AppNavigation.of(context).toModelView<Employee>(primaryKey);
 }

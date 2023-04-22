@@ -1,4 +1,8 @@
+import 'package:flutter/cupertino.dart';
+
+import '../interfaces/serializable.dart';
 import '../model_reference.dart';
+import 'date_constraints.dart';
 import 'enum_constraints.dart';
 import 'extractors.dart';
 import 'field_type.dart';
@@ -7,6 +11,11 @@ typedef FieldGetter<R, O> = R Function(O);
 typedef FieldValidator = String? Function(String?);
 
 String? _noValidation(_) => null;
+
+typedef SerializableFieldEditor<S extends Serializable> = Future<S> Function(
+  BuildContext context,
+  S? serializable,
+);
 
 class FieldDescription<R, O> {
   final String fieldName;
@@ -18,7 +27,8 @@ class FieldDescription<R, O> {
   final FieldType fieldType;
   final EnumConstraint? enumConstraint;
   final ForeignKey? defaultForeignKey;
-  // final R
+  final SerializableFieldEditor? serializableEditorBuilder;
+  final DateConstraints? dateConstraints;
 
   const FieldDescription(
     this.fieldName,
@@ -30,8 +40,11 @@ class FieldDescription<R, O> {
     this.validator = _noValidation,
     this.fieldType = FieldType.text,
     this.defaultForeignKey,
+    this.serializableEditorBuilder,
+    this.dateConstraints,
   })  : assert(fieldType != FieldType.constrainedToEnum || enumConstraint != null),
-        assert(fieldType != FieldType.foreignKey || defaultForeignKey != null);
+        assert(fieldType != FieldType.foreignKey || defaultForeignKey != null),
+        assert(fieldType != FieldType.date || dateConstraints != null);
 
   const FieldDescription.foreignKey(
     this.fieldName,
@@ -42,7 +55,9 @@ class FieldDescription<R, O> {
     this.isEditable = true,
   })  : enumConstraint = null,
         validator = _noValidation,
-        fieldType = FieldType.foreignKey;
+        fieldType = FieldType.foreignKey,
+        serializableEditorBuilder = null,
+        dateConstraints = null;
 
   const FieldDescription.enumType(
     this.fieldName,
@@ -53,18 +68,34 @@ class FieldDescription<R, O> {
     this.isEditable = true,
   })  : validator = _noValidation,
         fieldType = FieldType.constrainedToEnum,
-        defaultForeignKey = null;
+        defaultForeignKey = null,
+        serializableEditorBuilder = null,
+        dateConstraints = null;
+
+  const FieldDescription.serializable(
+    this.fieldName,
+    this.fieldGetter, {
+    required this.labelCaption,
+    required this.serializableEditorBuilder,
+    this.fieldDisplayMode = FieldDisplayMode.everywhere,
+  })  : fieldType = FieldType.serializable,
+        isEditable = true,
+        defaultForeignKey = null,
+        enumConstraint = null,
+        validator = _noValidation,
+        dateConstraints = null;
 
   Symbol get symbol => Symbol(fieldName);
 
-  bool get isShownOnIndividualPage => fieldDisplayMode != FieldDisplayMode.whenEditing;
+  bool get isShownOnIndividualPage =>
+      fieldDisplayMode != FieldDisplayMode.whenEditing && fieldDisplayMode != FieldDisplayMode.none;
 
   /// [FieldDisplayMode.everywhere] has no effect if the [labelCaption] is null.
   bool get isShownInTable => fieldDisplayMode == FieldDisplayMode.everywhere;
 
   Extractor<R> get extractor => makeExtractor<R>();
 
-  bool get nullable => null is R;
+  bool get isNullable => null is R;
 
   Type get returnType => R;
 
@@ -107,7 +138,8 @@ class FieldDescription<R, O> {
 enum FieldDisplayMode {
   everywhere,
   inModelView,
-  whenEditing;
+  whenEditing,
+  none;
 }
 
 final _typePresentations = {

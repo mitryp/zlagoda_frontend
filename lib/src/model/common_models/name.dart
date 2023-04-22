@@ -1,4 +1,7 @@
+import 'package:flutter/material.dart';
+
 import '../../typedefs.dart';
+import '../../view/widgets/resources/serializable_editor_popup.dart';
 import '../interfaces/serializable.dart';
 import '../schema/field_description.dart';
 import '../schema/schema.dart';
@@ -44,4 +47,14 @@ class Name implements Serializable {
   JsonMap toJson() => schema.toJson(this);
 
   static Name? fromJson(JsonMap json) => schema.fromJson(json);
+}
+
+Future<Name> nameEditorBuilder(BuildContext context, Serializable? initialName) {
+  final initial = initialName as Name? ??
+      const Name(
+        firstName: '',
+        lastName: '',
+      );
+
+  return showSerializableEditor<Name>(context, initial).then((v) => v ?? initial);
 }

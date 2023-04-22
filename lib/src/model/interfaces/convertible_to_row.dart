@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../model_scheme_factory.dart';
+import '../model_schema_factory.dart';
 import '../schema/field_description.dart';
 import '../schema/schema.dart';
 import 'serializable.dart';

@@ -24,13 +24,13 @@ class TableReceipt extends Model {
         'clientName',
         (o) => o.clientName,
         labelCaption: "Ім'я клієнта",
-        fieldType: FieldType.auto,
+        fieldType: FieldType.serializable,
       ),
       FieldDescription<Name, TableReceipt>(
         'employeeName',
         (o) => o.employeeName,
         labelCaption: "Ім'я працівника",
-        fieldType: FieldType.auto,
+        fieldType: FieldType.serializable,
       ),
     ],
   );

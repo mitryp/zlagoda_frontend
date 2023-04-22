@@ -1,15 +1,14 @@
-//import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import '../../typedefs.dart';
-
-//import '../interfaces/convertible_to_row.dart';
+import '../../utils/navigation.dart';
+import '../interfaces/convertible_to_row.dart';
 import '../interfaces/model.dart';
 import '../schema/field_description.dart';
 import '../schema/field_type.dart';
 import '../schema/schema.dart';
 
-//class Category extends Model implements ConvertibleToRow {
-class Category extends Model {
+class Category extends Model with ConvertibleToRow<Category> {
   static final Schema<Category> schema = Schema(
     Category.new,
     [
@@ -19,6 +18,7 @@ class Category extends Model {
         labelCaption: 'ID категорії',
         isEditable: false,
         fieldType: FieldType.auto,
+        fieldDisplayMode: FieldDisplayMode.none,
       ),
       FieldDescription<String, Category>(
         'categoryName',
@@ -47,10 +47,7 @@ class Category extends Model {
   @override
   String toString() => 'Категорія "$categoryName"';
 
-// @override
-// DataRow buildRow(BuildContext context) {
-//   final cellsText = [categoryName];
-//
-//   return buildRowFromFields(context, cellsText);
-// }
+  @override
+  void redirectToModelView(BuildContext context) =>
+      AppNavigation.of(context).toModelView<Category>(primaryKey);
 }

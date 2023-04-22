@@ -25,7 +25,7 @@ class User implements Serializable {
         'name',
         (o) => o.name,
         labelCaption: "Ім'я",
-        fieldType: FieldType.auto,
+        fieldType: FieldType.serializable,
       ),
       FieldDescription<Position, User>.enumType(
         'role',

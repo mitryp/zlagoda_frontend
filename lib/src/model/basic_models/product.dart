@@ -67,17 +67,7 @@ class Product extends SearchProduct with ConvertibleToRow<Product> {
   @override
   List<ForeignKey> get foreignKeys => [foreignKey<Category>('categoryId', categoryId)];
 
-  // @override
-  // DataRow buildRow(BuildContext context) {
-  //   return rowFrom(this, context: context);
-  //
-  //   return DataRow(
-  //     onSelectChanged: (_) => AppNavigation.of(context).toModelView<Product>(upc),
-  //     cells: cellsFromValues(context, this),
-  //   );
-  // }
-
   @override
   void redirectToModelView(BuildContext context) =>
-      AppNavigation.of(context).toModelView<Product>(upc);
+      AppNavigation.of(context).toModelView<Product>(primaryKey);
 }

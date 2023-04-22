@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 
 import '../../model/interfaces/model.dart';
-import '../../model/model_scheme_factory.dart';
+import '../../model/model_schema_factory.dart';
 import '../../model/other_models/search_model.dart';
 import '../../utils/json_decode.dart';
 import 'model_http_service.dart';

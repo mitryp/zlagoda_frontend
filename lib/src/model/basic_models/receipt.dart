@@ -2,6 +2,7 @@ import '../../typedefs.dart';
 import '../common_models/name.dart';
 import '../joined_models/joined_sale.dart';
 import '../other_models/table_receipt.dart';
+import '../schema/date_constraints.dart';
 import '../schema/field_description.dart';
 import '../schema/field_type.dart';
 import '../schema/schema.dart';
@@ -30,12 +31,14 @@ class Receipt extends TableReceipt {
         'clientName',
         (o) => o.clientName,
         labelCaption: "Ім'я клієнта",
+        fieldType: FieldType.serializable,
       ),
       FieldDescription<DateTime, Receipt>(
         'date',
         (o) => o.date,
         labelCaption: 'Дата',
         fieldType: FieldType.date,
+        dateConstraints: const DateConstraints(toFirstDate: Duration(days: 365 * 100)),
       ),
       FieldDescription<int, Receipt>(
         'tax',
@@ -47,6 +50,7 @@ class Receipt extends TableReceipt {
         'employeeName',
         (o) => o.employeeName,
         labelCaption: "Ім'я касира",
+        fieldType: FieldType.serializable,
       ),
       FieldDescription<String, Receipt>(
         'employeeId',

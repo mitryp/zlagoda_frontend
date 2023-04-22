@@ -1,4 +1,7 @@
+import 'package:flutter/material.dart';
+
 import '../../typedefs.dart';
+import '../../view/widgets/resources/serializable_editor_popup.dart';
 import '../interfaces/serializable.dart';
 import '../schema/field_description.dart';
 import '../schema/schema.dart';
@@ -42,4 +45,15 @@ class Address implements Serializable {
 
   @override
   JsonMap toJson() => schema.toJson(this);
+}
+
+Future<Address> addressEditorBuilder(BuildContext context, Serializable? initialName) {
+  final initial = initialName as Address? ??
+      const Address(
+        city: '',
+        street: '',
+        index: '',
+      );
+
+  return showSerializableEditor<Address>(context, initial).then((v) => v ?? initial);
 }

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../../../model/interfaces/model.dart';
-import '../../../../model/model_scheme_factory.dart';
+import '../../../../model/model_schema_factory.dart';
 import '../../../../model/schema/schema.dart';
 import '../../../../utils/locales.dart';
+import '../../../../utils/navigation.dart';
 
 typedef FieldGetter<R, M> = R Function(M);
 
@@ -14,6 +15,10 @@ class ModelTable<M extends Model> extends StatelessWidget {
   const ModelTable(this.model, {this.showModelName = true, super.key});
 
   Schema<M> get schema => makeModelSchema<M>(model.runtimeType);
+
+  void redirectToModelView(BuildContext context) {
+    AppNavigation.of(context).toModelView<M>(model.primaryKey);
+  }
 
   @override
   Widget build(BuildContext context) {

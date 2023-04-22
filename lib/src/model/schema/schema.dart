@@ -15,7 +15,7 @@ class Schema<O> {
       final retrievedValue =
           retriever.extractor.extractFrom(json, retriever.fieldName);
 
-      if (retriever.nullable || retrievedValue != null)
+      if (retriever.isNullable || retrievedValue != null)
         namedArgs[retriever.symbol] = retrievedValue;
       else
         return null;
