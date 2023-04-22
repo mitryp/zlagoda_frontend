@@ -10,7 +10,10 @@ class QueryBuilder {
 
   QueryBuilder({required this.sort});
 
-  void addFilter(Filter filter) => _filters.add(filter);
+  void addFilter(Filter filter) {
+    _filters.remove(filter);
+    _filters.add(filter);
+  }
 
   bool removeFilter(FilterOption filterField) => _filters.remove(Filter(filterField, ''));
 
@@ -37,4 +40,24 @@ class QueryBuilder {
 
     return queryParams;
   }
+
+  // Map<String, dynamic> get queryParams {
+  //   var queryParams = {
+  //     '_sort': sort.sortField,
+  //     '_order': sort.order.name,
+  //     '_limit': '$paginationLimit',
+  //     '_page': '$paginationPage',
+  //   };
+  //
+  //   for (var filter in _filters) {
+  //     var value = filter.value;
+  //
+  //     if (filter.value is DateTime) value = value.millisecondsSinceEpoch / 1000;
+  //     if (filter.value is Position) value = value.name;
+  //
+  //     queryParams[filter.fieldName] = '$value';
+  //   }
+  //
+  //   return queryParams;
+  // }
 }

@@ -4,11 +4,13 @@ import '../../../../services/query_builder/filter.dart';
 import 'types.dart';
 
 class SearchFilter extends StatefulWidget {
+  final String caption;
   final AddFilter addFilter;
   final RemoveFilter removeFilter;
   final FilterOption<String> filterOption;
 
   const SearchFilter({
+    required this.caption,
     required this.filterOption,
     required this.removeFilter,
     required this.addFilter,
@@ -34,22 +36,27 @@ class _SearchFilterState extends State<SearchFilter> {
     super.dispose();
   }
 
-  //TODO FINISH
   void _handleInput(String value) async {
     setState(() {
       if (value.isEmpty)
         widget.removeFilter(widget.filterOption);
-      else
+      else {
         widget.addFilter(Filter(widget.filterOption, value));
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
+    return ConstrainedBox(
+        constraints: const BoxConstraints(
+          minWidth: 100,
+          maxWidth: 200
+        ),
         child: TextField(
-      controller: _controller,
-      onChanged: (String value) => _handleInput(value),
-    ));
+          controller: _controller,
+          onChanged: (String value) => _handleInput(value),
+          decoration: InputDecoration(label: Text(widget.caption)),
+        ));
   }
 }

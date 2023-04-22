@@ -44,7 +44,9 @@ class ProductsSearchFilters extends CollectionSearchFilterDelegate {
       CheckboxFilter(
           filterOption: FilterOption.isProm,
           addFilter: addFilter,
-          removeFilter: removeFilter)
+          removeFilter: removeFilter,
+          title: 'Тільки акційні товари',
+      )
     ];
   }
 
@@ -52,10 +54,18 @@ class ProductsSearchFilters extends CollectionSearchFilterDelegate {
   List<Widget> buildSearches(BuildContext context) {
     // TODO: implement buildSearches
     return [
-      // SearchFilter(
-      //     filterOption: FilterOption.categoryName,
-      //     removeFilter: removeFilter,
-      //     addFilter: addFilter)
+      SearchFilter(
+          filterOption: FilterOption.categoryName,
+          removeFilter: removeFilter,
+          addFilter: addFilter,
+          caption: 'Назва категорії...',
+      ),
+      SearchFilter(
+        filterOption: FilterOption.productName,
+        removeFilter: removeFilter,
+        addFilter: addFilter,
+        caption: 'Назва продукту...',
+      ),
     ];
   }
 

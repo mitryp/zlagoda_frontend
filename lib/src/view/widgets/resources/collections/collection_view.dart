@@ -109,14 +109,21 @@ class _CollectionViewState<R extends ConvertibleToRow<R>> extends State<Collecti
     const divider = VerticalDivider();
 
     return Card(
-      child: Row(
+      child: Column(
         children: [
-          ...searchFilterDelegate.buildSearches(context),
-          divider,
-          ...searchFilterDelegate.buildFilters(context),
-          divider,
-          searchFilterDelegate.buildSort(context)
-        ],
+          Row(
+            children: [
+              searchFilterDelegate.buildSort(context),
+              divider,
+              ...searchFilterDelegate.buildFilters(context),
+            ],
+          ),
+          Row (
+            children: [
+              ...searchFilterDelegate.buildSearches(context),
+            ],
+          )
+        ]
       ),
     );
   }
