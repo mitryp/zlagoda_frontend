@@ -4,8 +4,8 @@ import 'sort.dart';
 
 class QueryBuilder {
   int paginationLimit = 10;
-  int paginationPage = 0;
-  final List<Filter> _filters = [];
+  int paginationPage = 1;
+  final Set<Filter> _filters = {};
   Sort sort;
 
   QueryBuilder({required this.sort});
@@ -14,29 +14,17 @@ class QueryBuilder {
 
   bool removeFilter(FilterOption filterField) => _filters.remove(Filter(filterField, ''));
 
-  List<Filter> get filters => _filters;
+  Set<Filter> get filters => _filters;
 
   Map<String, dynamic> get queryParams {
-    // var queryParams = {
-    //   'sortBy': sort.sortField,
-    //   'order': sort.order.name,
-    //   'limit': '$paginationLimit',
-    //   'offset': '${paginationPage * paginationLimit}',
-    // };
-    // for (var filter in _filters) {
-    //   var value = filter.value;
-    //
-    //   if (filter.value is DateTime) value = value.millisecondsSinceEpoch / 1000;
-    //   if (filter.value is Position) value = value.name;
-    //
-    //   queryParams['${filter.fieldName}Filter'] = '$value';
-
     var queryParams = {
-      '_sort': sort.sortField,
-      '_order': sort.order.name,
-      '_limit': '$paginationLimit',
-      '_page': '$paginationPage',
+      'sortBy': sort.sortField,
+      'order': sort.order.name,
+      'limit': '$paginationLimit',
     };
+
+    if(paginationLimit != 0)
+      queryParams['offset'] = '${paginationPage * paginationLimit}';
 
     for (var filter in _filters) {
       var value = filter.value;
@@ -44,7 +32,7 @@ class QueryBuilder {
       if (filter.value is DateTime) value = value.millisecondsSinceEpoch / 1000;
       if (filter.value is Position) value = value.name;
 
-      queryParams[filter.fieldName] = '$value';
+      queryParams['${filter.fieldName}Filter'] = '$value';
     }
 
     return queryParams;

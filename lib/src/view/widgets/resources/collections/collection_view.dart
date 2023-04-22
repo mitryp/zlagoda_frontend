@@ -7,6 +7,7 @@ import '../../../../model/model_scheme_factory.dart';
 import '../../../../model/schema/schema.dart';
 import '../../../../services/http/http_service_factory.dart';
 import '../../../../services/http/model_http_service.dart';
+import '../../../../services/query_builder/filter.dart';
 import '../../../../services/query_builder/query_builder.dart';
 import '../../../../services/query_builder/sort.dart';
 import '../../../pages/page_base.dart';
@@ -22,6 +23,16 @@ abstract class CollectionSearchFilterDelegate {
 
   void updateSort(Sort sort) {
     queryBuilder.sort = sort;
+    updateCallback();
+  }
+
+  void addFilter(Filter filter) {
+    queryBuilder.addFilter(filter);
+    updateCallback();
+  }
+
+  void removeFilter(FilterOption filterOption) {
+    queryBuilder.removeFilter(filterOption);
     updateCallback();
   }
 

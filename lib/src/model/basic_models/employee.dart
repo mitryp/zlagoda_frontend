@@ -11,16 +11,18 @@ import '../schema/field_type.dart';
 import '../schema/schema.dart';
 
 enum Position implements Serializable {
-  cashier,
-  manager;
+  cashier('Касир'),
+  manager('Менеджер');
 
-  const Position();
+  final String caption;
+
+  const Position(this.caption);
 
   @override
   String toJson() => name;
 
   @override
-  String toString() => this == Position.cashier ? 'Касир' : 'Менеджер';
+  String toString() => caption;
 }
 
 class Employee extends Model {

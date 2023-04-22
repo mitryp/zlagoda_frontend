@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../../../model/basic_models/product.dart';
+import '../../../services/query_builder/filter.dart';
 import '../../../services/query_builder/sort.dart';
-import '../../widgets/queries/sort_widget.dart';
+import '../../widgets/queries/filters/checkbox_filter.dart';
+import '../../widgets/queries/filters/date_filter.dart';
+import '../../widgets/queries/filters/chips_filter.dart';
+import '../../widgets/queries/filters/search_filter.dart';
+import '../../widgets/queries/sort_block.dart';
 import '../../widgets/resources/collections/collection_view.dart';
 import '../../widgets/resources/collections/model_collection_view.dart';
 
@@ -26,13 +31,32 @@ class ProductsSearchFilters extends CollectionSearchFilterDelegate {
   @override
   List<Widget> buildFilters(BuildContext context) {
     // TODO: implement buildFilters
-    return [];
+    return [
+      DateFilter(
+        addFilter: addFilter,
+        removeFilter: removeFilter,
+      ),
+      ChipsFilter(
+          filterOption: FilterOption.categoryName,
+          availableChoices: const ['Овочі', 'Фрукти'],
+          addFilter: addFilter,
+          removeFilter: removeFilter),
+      CheckboxFilter(
+          filterOption: FilterOption.isProm,
+          addFilter: addFilter,
+          removeFilter: removeFilter)
+    ];
   }
 
   @override
   List<Widget> buildSearches(BuildContext context) {
     // TODO: implement buildSearches
-    return [];
+    return [
+      // SearchFilter(
+      //     filterOption: FilterOption.categoryName,
+      //     removeFilter: removeFilter,
+      //     addFilter: addFilter)
+    ];
   }
 
   @override
@@ -43,10 +67,10 @@ class ProductsSearchFilters extends CollectionSearchFilterDelegate {
       SortOption.manufacturer,
     ];
 
-    return SortWidget(
+    return SortBlock(
       sortOptions: sortOptions,
       initialSort: queryBuilder.sort,
-      addSortToQB: updateSort,
+      setSort: updateSort,
     );
   }
 }

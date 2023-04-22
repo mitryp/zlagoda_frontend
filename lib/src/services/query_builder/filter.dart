@@ -1,12 +1,12 @@
 import '../../model/basic_models/employee.dart';
 
 class Filter<T> {
-  late final String fieldName;
+  final FilterOption<T> filterOption;
   final T value;
 
-  Filter(FilterOption<T> field, this.value) {
-    fieldName = field.name;
-  }
+  const Filter(this.filterOption, this.value);
+
+  String get fieldName => filterOption.name;
 
   @override
   bool operator ==(Object other) =>
@@ -16,7 +16,7 @@ class Filter<T> {
           fieldName == other.fieldName;
 
   @override
-  int get hashCode => fieldName.hashCode ^ value.hashCode;
+  int get hashCode => fieldName.hashCode;
 }
 
 enum FilterOption<T> {

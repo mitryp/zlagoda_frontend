@@ -4,26 +4,26 @@ import '../../../services/query_builder/sort.dart';
 
 typedef SetSort = void Function(Sort);
 
-class SortWidget extends StatefulWidget {
+class SortBlock extends StatefulWidget {
   final List<SortOption> sortOptions;
   final Sort initialSort;
-  final SetSort addSortToQB;
+  final SetSort setSort;
 
-  const SortWidget({
+  const SortBlock({
     required this.sortOptions,
     required this.initialSort,
-    required this.addSortToQB,
+    required this.setSort,
     super.key,
   });
 
   @override
-  State<SortWidget> createState() => _SortWidgetState();
+  State<SortBlock> createState() => _SortBlockState();
 
-  List<Widget> get sortWidgets =>
+  List<Widget> get sortTextWidgets =>
       sortOptions.map((sortOption) => Text(sortOption.caption)).toList();
 }
 
-class _SortWidgetState extends State<SortWidget> {
+class _SortBlockState extends State<SortBlock> {
   late Sort currentSort = widget.initialSort;
 
   @override
@@ -36,7 +36,7 @@ class _SortWidgetState extends State<SortWidget> {
 
   void updateSort(Sort sort) {
     currentSort = sort;
-    widget.addSortToQB(sort);
+    widget.setSort(sort);
   }
 
   void _toggleSortOrder() {
@@ -50,13 +50,14 @@ class _SortWidgetState extends State<SortWidget> {
   }
 
   void _changeSortField(int index, List<bool> selectedSortFields) {
+    if (widget.sortOptions[index] == currentSort.sortOption) return;
+
     setState(() {
       for (int i = 0; i < selectedSortFields.length; i++) {
         selectedSortFields[i] = i == index;
-
-        if (selectedSortFields[i])
-          updateSort(Sort(widget.sortOptions[i]));
       }
+
+      updateSort(Sort(widget.sortOptions[index]));
     });
   }
 
@@ -82,7 +83,7 @@ class _SortWidgetState extends State<SortWidget> {
         minWidth: 80.0,
       ),
       isSelected: selectedSortFields,
-      children: widget.sortWidgets,
+      children: widget.sortTextWidgets,
     );
   }
 

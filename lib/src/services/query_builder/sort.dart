@@ -36,5 +36,4 @@ enum SortOption {
   const SortOption(this.defaultOrder, this.caption);
 
   String get fieldName => name;
-
 }
