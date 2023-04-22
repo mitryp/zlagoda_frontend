@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 
 import '../../model/basic_models/category.dart';
@@ -30,10 +32,19 @@ abstract class ModelHttpService<S extends Serializable> {
 
   String makeRoute([Object? path]) => 'api/$route${path != null ? '/$path' : ''}';
 
+  Future<http.Response> makeRequest(HttpMethod method, Uri path, {Object? body}) async {
+    final req = http.Request(method.name, path)..body = body != null ? jsonEncode(body) : '';
+
+    final processedReq = await applyRequestMiddleware(req);
+    print(processedReq.headers);
+    return http.Client().send(processedReq).then(http.Response.fromStream);
+  }
+
   Future<List<S>> get(QueryBuilder queryBuilder) async {
-    final response = await http
-        .get(Uri.http(baseRoute, makeRoute(), queryBuilder.queryParams))
-        .catchError((err) => http.Response(err.message, 503));
+    final response = await makeRequest(
+      HttpMethod.get,
+      Uri.http(baseRoute, makeRoute(), queryBuilder.queryParams),
+    ).catchError((err) => http.Response(err.message, 503));
 
     return httpServiceController(response, (response) {
       return decodeResponseBody<List<dynamic>>(response)
@@ -45,9 +56,8 @@ abstract class ModelHttpService<S extends Serializable> {
   }
 
   Future<S?> singleById(dynamic id) async {
-    final response = await http
-        .get(Uri.http(baseRoute, makeRoute(id)))
-        .catchError((err) => http.Response(err.message, 503));
+    final response = await makeRequest(HttpMethod.get, Uri.http(baseRoute, makeRoute(id)))
+        .catchError((err) => http.Response('$err', 503));
 
     return httpServiceController(
       response,
@@ -56,24 +66,27 @@ abstract class ModelHttpService<S extends Serializable> {
   }
 
   Future<bool> post(S row) async {
-    final response = await http
-        .post(Uri.http(baseRoute, makeRoute()), body: row.toJson())
-        .catchError((err) => http.Response(err.message, 503));
+    final response = await makeRequest(
+      HttpMethod.post,
+      Uri.http(baseRoute, makeRoute()),
+      body: row.toJson(),
+    ).catchError((err) => http.Response(err.message, 503));
 
     return httpServiceController(response, (response) => true);
   }
 
   Future<bool> update(S row, dynamic primaryKey) async {
-    final response = await http
-        .put(Uri.http(baseRoute, makeRoute(primaryKey)), body: row.toJson())
-        .catchError((err) => http.Response(err.message, 503));
+    final response = await makeRequest(
+      HttpMethod.put,
+      Uri.http(baseRoute, makeRoute(primaryKey)),
+      body: row.toJson(),
+    ).catchError((err) => http.Response(err.message, 503));
 
     return httpServiceController(response, (response) => true);
   }
 
   Future<bool> delete(dynamic id) async {
-    final response = await http
-        .put(Uri.http(baseRoute, makeRoute(id)))
+    final response = await makeRequest(HttpMethod.delete, Uri.http(baseRoute, makeRoute(id)))
         .catchError((err) => http.Response(err.message, 503));
 
     return httpServiceController(response, (response) => true);
@@ -91,6 +104,13 @@ Future<T> httpServiceController<T>(
   }
 
   throw ResourceNotFetchedException(res.reasonPhrase);
+}
+
+enum HttpMethod {
+  get,
+  post,
+  put,
+  delete;
 }
 
 /*

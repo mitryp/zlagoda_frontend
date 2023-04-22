@@ -19,8 +19,10 @@ void clearResponseMiddlewares() {
   ResponseMiddlewareContext.responseMiddlewareSet.clear();
 }
 
-FutureOr<Request> applyRequestMiddleware(Request request) =>
-    _applyMiddlewaresOn(request, from: RequestMiddlewareContext.requestMiddlewareSet);
+FutureOr<Request> applyRequestMiddleware(Request request) {
+  print(RequestMiddlewareContext.requestMiddlewareSet);
+  return _applyMiddlewaresOn(request, from: RequestMiddlewareContext.requestMiddlewareSet);
+}
 
 void clearRequestMiddlewares() => RequestMiddlewareContext.requestMiddlewareSet.clear();
 

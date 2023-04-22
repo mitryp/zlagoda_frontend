@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:zlagoda_frontend/src/view/widgets/resources/models/model_view.dart';
 
 import '../model/basic_models/employee.dart';
-import '../model/basic_models/product.dart';
 import '../services/http/http_service_factory.dart';
+import '../services/middleware/request/authentication_middleware.dart';
 import '../services/middleware/response/auth_handle_middleware.dart';
 import '../services/middleware/response/response_display_middleware.dart';
 import 'app_pages.dart';
+import 'widgets/middleware_context/request_middleware_context.dart';
 import 'widgets/middleware_context/response_middleware_context.dart';
 import 'widgets/permissions/authorizer.dart';
 import 'widgets/permissions/user_manager.dart';
@@ -40,7 +41,10 @@ class _MainViewportState extends State<MainViewport> {
           buildNavigationRail(),
           ResponseMiddlewareContext(
             middlewareBuilders: const [ResponseDisplayMiddleware.errors, AuthHandleMiddleware.new],
-            child: buildMainView(),
+            child: RequestMiddlewareContext(
+              middlewareBuilders: const [RequestAuthMiddleware.new],
+              child: buildMainView(),
+            ),
           ),
         ],
       ),
@@ -48,11 +52,11 @@ class _MainViewportState extends State<MainViewport> {
   }
 
   Widget buildMainView() {
-    // return Expanded(
-    //   child: ModelView<Employee>(
-    //     fetchFunction: () => makeHttpService<Employee>().singleById(0).then((v) => v!),
-    //   ),
-    // );
+    return Expanded(
+      child: ModelView<Employee>(
+        fetchFunction: () => makeHttpService<Employee>().singleById(0).then((v) => v!),
+      ),
+    );
 
     return Expanded(
       child: ClipPath(
@@ -60,7 +64,6 @@ class _MainViewportState extends State<MainViewport> {
           key: nestedNavigatorKey,
           initialRoute: AppPage.goods.route,
           onGenerateRoute: onGenerateNestedRoute,
-          // todo transitionDelegate?
         ),
       ),
     );
