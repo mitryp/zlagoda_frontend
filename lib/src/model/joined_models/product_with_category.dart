@@ -47,7 +47,11 @@ class ProductWithCategory extends _ProductWithCategory with ConvertibleToRow<Pro
 
   @override
   void redirectToModelView(BuildContext context) =>
-      AppNavigation.of(context).openModelViewFor(product, [ModelTable(category)]);
+      AppNavigation.of(context).openModelViewFor(product, [ModelTable<Category>(category)]);
 
-
+  @override
+  DataRow buildRow(BuildContext context) => DataRow(
+        cells: [...product.buildRow(context).cells, ...category.buildRow(context).cells],
+        onSelectChanged: (_) => redirectToModelView(context),
+      );
 }

@@ -109,7 +109,6 @@ Future<T> httpServiceController<T>(
 ) async {
   final res = await applyResponseMiddleware(response);
 
-  print(res.body);
   if (successCodes(res)) {
     return successLogic(res);
   }

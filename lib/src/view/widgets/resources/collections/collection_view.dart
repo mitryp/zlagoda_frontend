@@ -150,10 +150,7 @@ class _CollectionTableState<R extends ConvertibleToRow<R>> extends State<Collect
   bool isLoaded = false;
   Object? error;
 
-  late final List<String> columnNames =
-      schema.fields.where((r) => r.isShownInTable).map((r) => r.labelCaption).toList();
-
-  Schema<R> get schema => makeModelSchema<R>();
+  late final List<String> columnNames = columnNamesOf<R>();
 
   @override
   void initState() {
