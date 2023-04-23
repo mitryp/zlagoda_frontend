@@ -15,19 +15,17 @@ import 'http_middleware.dart';
 FutureOr<Response> applyResponseMiddleware(Response response) =>
     _applyMiddlewaresOn(response, from: ResponseMiddlewareContext.responseMiddlewareSet);
 
+FutureOr<Request> applyRequestMiddleware(Request request) =>
+    _applyMiddlewaresOn(request, from: RequestMiddlewareContext.requestMiddlewareSet);
+
 void clearResponseMiddlewares() {
   ResponseMiddlewareContext.responseMiddlewareSet.clear();
-}
-
-FutureOr<Request> applyRequestMiddleware(Request request) {
-  print(RequestMiddlewareContext.requestMiddlewareSet);
-  return _applyMiddlewaresOn(request, from: RequestMiddlewareContext.requestMiddlewareSet);
 }
 
 void clearRequestMiddlewares() => RequestMiddlewareContext.requestMiddlewareSet.clear();
 
 FutureOr<R> _applyMiddlewaresOn<R>(R r, {required Iterable<HttpMiddleware<R>> from}) async {
-  final middlewares = from;
+  final middlewares = {...from};
 
   var processed = r;
   for (final mw in middlewares) {

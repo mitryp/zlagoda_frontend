@@ -20,7 +20,8 @@ abstract class MiddlewareContext<T extends HttpMiddleware> extends StatefulWidge
   State<MiddlewareContext<T>> createState() => MiddlewareContextState<T>();
 }
 
-class MiddlewareContextState<T extends HttpMiddleware> extends State<MiddlewareContext<T>> with AutomaticKeepAliveClientMixin {
+class MiddlewareContextState<T extends HttpMiddleware> extends State<MiddlewareContext<T>>
+    with AutomaticKeepAliveClientMixin {
   late final Set<T> localMiddlewares;
   bool isRegistered = false;
 
@@ -29,7 +30,9 @@ class MiddlewareContextState<T extends HttpMiddleware> extends State<MiddlewareC
 
   void register(BuildContext context) {
     localMiddlewares = widget.middlewareBuilders.map((builder) => builder(context)).toSet();
-    widget.staticMiddlewareSet.addAll(localMiddlewares);
+    widget.staticMiddlewareSet
+      ..removeAll(localMiddlewares)
+      ..addAll(localMiddlewares);
     isRegistered = true;
   }
 
