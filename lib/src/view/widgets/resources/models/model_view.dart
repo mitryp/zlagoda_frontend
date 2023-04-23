@@ -84,23 +84,6 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
     );
   }
 
-  Widget buildEditButton() {
-    return Authorizer.emptyUnauthorized(
-      authorizationStrategy: hasPosition(Position.manager),
-      child: ElevatedButton.icon(
-        label: const Text('Редагувати'),
-        icon: const Icon(Icons.edit),
-        onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => ModelEditForm(
-              model: model,
-            ),
-          ));
-        },
-      ),
-    );
-  }
-
   Widget buildLoadingPlaceholder() => const Center(child: CircularProgressIndicator());
 
   Widget buildErrorMessage() {
@@ -125,6 +108,23 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
         const TableHeader("Пов'язані ресурси"),
         ...connectedModelTables.map(EmbeddedModelTableCard.new),
       ],
+    );
+  }
+
+  Widget buildEditButton() {
+    return Authorizer.emptyUnauthorized(
+      authorizationStrategy: hasPosition(Position.manager),
+      child: ElevatedButton.icon(
+        label: const Text('Редагувати'),
+        icon: const Icon(Icons.edit),
+        onPressed: () {
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => ModelEditForm(
+              model: model,
+            ),
+          ));
+        },
+      ),
     );
   }
 }

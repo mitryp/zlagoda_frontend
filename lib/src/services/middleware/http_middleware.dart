@@ -21,10 +21,10 @@ abstract class HttpMiddleware<T> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is HttpMiddleware<T> && filter == other.filter;
+      other is HttpMiddleware<T> && filter == other.filter && context == other.context;
 
   @override
-  int get hashCode => filter.hashCode;
+  int get hashCode => filter.hashCode ^ context.hashCode;
 }
 
 bool _alwaysSatisfied(dynamic _) => true;

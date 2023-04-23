@@ -54,7 +54,8 @@ abstract class ModelHttpService<SCol extends Serializable, SSingle extends Seria
       HttpMethod.get,
       Uri.http(baseRoute, makeRoute(), queryBuilder.queryParams),
     ).catchError(
-        (err) => http.Response(err is http.ClientException ? err.message : 'Unknown $err', 503));
+      (err) => http.Response(err is http.ClientException ? err.message : 'Unknown $err', 503),
+    );
 
     return httpServiceController(response, (response) {
       return decodeResponseBody<List<dynamic>>(response)
