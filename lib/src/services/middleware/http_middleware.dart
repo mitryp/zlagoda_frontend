@@ -11,12 +11,20 @@ abstract class HttpMiddleware<T> {
   const HttpMiddleware(this.context, {this.filter = _alwaysSatisfied});
 
   FutureOr<T> process(T t) {
-    if (!filter(t)) return t;
+    if (!filter(t) || !context.mounted) return t;
 
     return processFiltered(t);
   }
 
   FutureOr<T> processFiltered(T r);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is HttpMiddleware<T> && filter == other.filter;
+
+  @override
+  int get hashCode => filter.hashCode;
 }
 
 bool _alwaysSatisfied(dynamic _) => true;

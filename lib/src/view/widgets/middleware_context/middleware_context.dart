@@ -20,13 +20,11 @@ abstract class MiddlewareContext<T extends HttpMiddleware> extends StatefulWidge
   State<MiddlewareContext<T>> createState() => MiddlewareContextState<T>();
 }
 
-class MiddlewareContextState<T extends HttpMiddleware> extends State<MiddlewareContext<T>>
-    with AutomaticKeepAliveClientMixin {
+
+class MiddlewareContextState<T extends HttpMiddleware> extends State<MiddlewareContext<T>> {
+
   late final Set<T> localMiddlewares;
   bool isRegistered = false;
-
-  @override
-  bool get wantKeepAlive => isRegistered;
 
   void register(BuildContext context) {
     localMiddlewares = widget.middlewareBuilders.map((builder) => builder(context)).toSet();
@@ -55,8 +53,5 @@ class MiddlewareContextState<T extends HttpMiddleware> extends State<MiddlewareC
   }
 
   @override
-  Widget build(BuildContext context) {
-    super.build(context);
-    return widget.child;
-  }
+  Widget build(BuildContext context) => widget.child;
 }

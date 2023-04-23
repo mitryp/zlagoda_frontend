@@ -6,6 +6,7 @@
 // import '../../utils/json_decode.dart';
 // import 'model_http_service.dart';
 //
+
 // extension SearchModelHttpServiceExtension<M extends Model, SM extends SearchModel<M>>
 //     on ModelHttpService<M> {
 //   Future<List<SM>> fetchSearchItems() async {
