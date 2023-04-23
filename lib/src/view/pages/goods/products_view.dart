@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../model/basic_models/product.dart';
 import '../../../model/joined_models/product_with_category.dart';
+import '../../../model/search_models/short_category.dart';
 import '../../../services/query_builder/filter.dart';
 import '../../../services/query_builder/sort.dart';
 import '../../widgets/queries/filters/checkbox_filter.dart';
@@ -56,17 +57,17 @@ class ProductsSearchFilters extends CollectionSearchFilterDelegate {
   List<Widget> buildSearches(BuildContext context) {
     // TODO: implement buildSearches
     return [
-      // SearchButton(
-      //   filterOption: FilterOption.categoryName,
-      //   searchCaption: 'Пошук за категорією',
-      //   addFilter: addFilter,
-      //   removeFilter: removeFilter,
-      // ),
+      SearchButton<int, ShortCategory>(
+        filterOption: FilterOption.categoryId,
+        searchCaption: 'Пошук за категорією',
+        addFilter: addFilter,
+        removeFilter: removeFilter,
+      ),
       SearchFilter(
         filterOption: FilterOption.productName,
         removeFilter: removeFilter,
         addFilter: addFilter,
-        caption: 'Назва продукту...',
+        caption: 'Назва товару...',
       ),
     ];
   }

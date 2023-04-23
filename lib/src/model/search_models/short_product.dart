@@ -1,9 +1,10 @@
 import '../../typedefs.dart';
+import '../basic_models/product.dart';
 import '../interfaces/search_model.dart';
 import '../schema/field_description.dart';
 import '../schema/schema.dart';
 
-class ShortProduct extends SearchModel {
+class ShortProduct extends SearchModel<String> {
   static final Schema<ShortProduct> schema = Schema(
       ShortProduct.new,
       [
@@ -19,7 +20,7 @@ class ShortProduct extends SearchModel {
         ),
       ]);
 
-      ShortProduct(upc, productName): super(upc, productName);
+      ShortProduct(String upc, String productName): super(upc, productName);
 
   static ShortProduct? fromJson(JsonMap json) => schema.fromJson(json);
 

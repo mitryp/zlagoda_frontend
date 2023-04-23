@@ -15,7 +15,7 @@ class AppNavigation {
   const AppNavigation.of(this.context);
 
   ModelHttpService<dynamic, S> _serviceOf<S extends Serializable>() =>
-      makeHttpService<S>() as ModelHttpService<dynamic, S>;
+      makeModelHttpService<S>() as ModelHttpService<dynamic, S>;
 
   void toModelView<SSingle extends Model>(dynamic primaryKey) {
     assert(SSingle != Model);

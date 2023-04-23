@@ -72,7 +72,8 @@ class CollectionView<SCol extends ConvertibleToRow<SCol>> extends StatefulWidget
 class _CollectionViewState<SCol extends ConvertibleToRow<SCol>>
     extends State<CollectionView<SCol>> {
   late final ModelHttpService<SCol, dynamic> httpService =
-      makeHttpService<SCol>() as ModelHttpService<SCol, dynamic>;
+      makeModelHttpService<SCol>() as ModelHttpService<SCol, dynamic>;
+
   late CollectionSearchFilterDelegate searchFilterDelegate = widget.searchFilterDelegate(
     queryBuilder: widget.queryBuilder,
     updateCallback: fetchItems,

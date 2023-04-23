@@ -22,8 +22,8 @@ class Sort {
 }
 
 enum SortOption {
-  employeeName(Order.asc, 'За ПІБ працівника'),
-  clientName(Order.asc, 'За ПІБ клієнта'),
+  employeeSurname(Order.asc, 'За прізвищем працівника'),
+  clientSurname(Order.asc, 'За прізвищем клієнта'),
   categoryName(Order.asc, 'За назвою категорії'),
   productName(Order.asc, 'За назвою товару'),
   quantity(Order.desc, 'За кількістю'),

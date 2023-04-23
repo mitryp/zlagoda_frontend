@@ -2,24 +2,29 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-class SearchPopupDelegate extends SearchDelegate {
-  final List<String> initialSuggestions;
-  final String? searchHint;
+import '../../../model/interfaces/search_model.dart';
 
-  SearchPopupDelegate(this.initialSuggestions, [this.searchHint = 'Пошук']);
+class SearchPopupDelegate<SM extends SearchModel> extends SearchDelegate<SM?> {
+  final List<SM> initialOptions;
+  final String? searchHint;
+  SM? result;
+
+  SearchPopupDelegate(this.initialOptions, [this.searchHint = 'Пошук']);
 
   @override
   List<Widget>? buildActions(BuildContext context) => [
         IconButton(
-          onPressed: () => close(context, query),
+          onPressed: () => close(context, result),
           icon: const Icon(Icons.check),
         ),
         IconButton(
           onPressed: () {
             if (query.isEmpty)
               close(context, null);
-            else
+            else {
               query = '';
+              result = null;
+            }
           },
           icon: const Icon(Icons.close),
         )
@@ -36,11 +41,11 @@ class SearchPopupDelegate extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    List<String> suggestions = initialSuggestions.where((suggestion) {
-      final result = suggestion.toLowerCase();
+    List<SM> suggestions = initialOptions.where((option) {
+      final suggestion = option.descriptiveField.toLowerCase();
       final input = query.toLowerCase();
 
-      return result.contains(input);
+      return suggestion.contains(input);
     }).toList();
 
     suggestions = suggestions.sublist(0, min(suggestions.length, 20));
@@ -51,11 +56,11 @@ class SearchPopupDelegate extends SearchDelegate {
           final suggestion = suggestions[index];
 
           return ListTile(
-              title: Text(suggestion),
+              title: Text(suggestion.descriptiveField),
               onTap: () {
-                query = suggestion;
-                close(context, query);
-                // showResults(context);
+                query = suggestion.descriptiveField;
+                result = suggestion;
+                close(context, result);
               });
         });
   }

@@ -22,11 +22,14 @@ class Filter<T> {
 enum FilterOption<T> {
   dateMin<DateTime>(),
   dateMax<DateTime>(),
-  employeeName<String>(),
+  employeeSurname<String>(),
   position<Position>(),
-  clientName<String>(),
+  clientSurname<String>(),
   discount<int>(),
+  //TODO decide on whether we need both filters
   categoryName<String>(),
+  categoryId<int>(),
+  //
   productName<String>(),
   isProm<bool>(),
   upc<String>();

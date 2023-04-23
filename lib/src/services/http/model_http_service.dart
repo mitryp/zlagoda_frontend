@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:http/http.dart' as http;
 
 import '../../model/basic_models/category.dart';
@@ -12,11 +10,9 @@ import '../../model/interfaces/serializable.dart';
 import '../../model/joined_models/product_with_category.dart';
 import '../../model/other_models/table_receipt.dart';
 import '../../typedefs.dart';
-import '../../utils/exceptions.dart';
 import '../../utils/json_decode.dart';
-import '../middleware/middleware_application.dart';
-import '../middleware/response/response_middleware.dart';
 import '../query_builder/query_builder.dart';
+import 'http_service_helper.dart';
 
 typedef JsonCastFunction<S extends Serializable> = S? Function(JsonMap json);
 typedef ControllerSuccessfulLogic<T> = T Function(http.Response response);
@@ -42,12 +38,6 @@ abstract class ModelHttpService<SCol extends Serializable, SSingle extends Seria
             singleCastFunction ?? collectionCastFunction as JsonCastFunction<SSingle>;
 
   String makeRoute([Object? path]) => 'api/$route${path != null ? '/$path' : ''}';
-
-  Future<http.Response> makeRequest(HttpMethod method, Uri path, {Object? body}) async {
-    final req = http.Request(method.name, path)..body = body != null ? jsonEncode(body) : '';
-
-    return http.Client().send(await applyRequestMiddleware(req)).then(http.Response.fromStream);
-  }
 
   Future<List<SCol>> get(QueryBuilder queryBuilder) async {
     final response = await makeRequest(
@@ -97,32 +87,14 @@ abstract class ModelHttpService<SCol extends Serializable, SSingle extends Seria
   }
 
   Future<bool> delete(dynamic id) async {
-    final response = await makeRequest(HttpMethod.delete, Uri.http(baseRoute, makeRoute(id)))
-        .catchError((err) => http.Response(err.message, 503));
+    final response =
+        await makeRequest(HttpMethod.delete, Uri.http(baseRoute, makeRoute(id)))
+            .catchError((err) => http.Response(err.message, 503));
 
     return httpServiceController(response, (response) => true);
   }
 }
 
-Future<T> httpServiceController<T>(
-  http.Response response,
-  ControllerSuccessfulLogic<T> successLogic,
-) async {
-  final res = await applyResponseMiddleware(response);
-
-  if (successCodes(res)) {
-    return successLogic(res);
-  }
-
-  throw ResourceNotFetchedException(res.reasonPhrase);
-}
-
-enum HttpMethod {
-  get,
-  post,
-  put,
-  delete;
-}
 
 /*
   Concrete implementations
@@ -155,5 +127,6 @@ class ClientService extends ModelHttpService<Client, Category> {
 }
 
 class ReceiptService extends ModelHttpService<TableReceipt, Receipt> {
-  const ReceiptService() : super(route: 'receipts', collectionCastFunction: Receipt.fromJson);
+  const ReceiptService()
+      : super(route: 'receipts', collectionCastFunction: Receipt.fromJson);
 }

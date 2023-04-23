@@ -1,10 +1,10 @@
 import 'model.dart';
 
-abstract class SearchModel<M extends Model, K, V> extends Model {
+abstract class SearchModel<K> extends Model {
   @override
   final K primaryKey;
 
-  final V descriptiveField;
+  final String descriptiveField;
 
   const SearchModel(this.primaryKey, this.descriptiveField);
 }

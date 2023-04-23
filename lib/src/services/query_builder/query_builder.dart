@@ -41,23 +41,23 @@ class QueryBuilder {
     return queryParams;
   }
 
-  // Map<String, dynamic> get queryParams {
-  //   var queryParams = {
-  //     '_sort': sort.sortField,
-  //     '_order': sort.order.name,
-  //     //'_limit': '$paginationLimit',
-  //     //'_page': '$paginationPage',
-  //   };
-  //
-  //   for (var filter in _filters) {
-  //     var value = filter.value;
-  //
-  //     if (filter.value is DateTime) value = value.millisecondsSinceEpoch / 1000;
-  //     if (filter.value is Position) value = value.name;
-  //
-  //     queryParams[filter.fieldName] = '$value';
-  //   }
-  //
-  //   return queryParams;
-  // }
-}
+//   Map<String, dynamic> get queryParams {
+//     var queryParams = {
+//       '_sort': sort.sortField,
+//       '_order': sort.order.name,
+//       //'_limit': '$paginationLimit',
+//       //'_page': '$paginationPage',
+//     };
+//
+//     for (var filter in _filters) {
+//       var value = filter.value;
+//
+//       if (filter.value is DateTime) value = value.millisecondsSinceEpoch / 1000;
+//       if (filter.value is Position) value = value.name;
+//
+//       queryParams[filter.fieldName] = '$value';
+//     }
+//
+//     return queryParams;
+//   }
+// }
