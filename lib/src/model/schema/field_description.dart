@@ -6,9 +6,9 @@ import 'date_constraints.dart';
 import 'enum_constraints.dart';
 import 'extractors.dart';
 import 'field_type.dart';
+import 'validators.dart';
 
 typedef FieldGetter<R, O> = R Function(O);
-typedef FieldValidator = String? Function(String?);
 
 String? _noValidation(_) => null;
 
@@ -26,9 +26,9 @@ class FieldDescription<R, O> {
   final FieldValidator validator;
   final FieldType fieldType;
   final EnumConstraint? enumConstraint;
-  final ForeignKey? defaultForeignKey;
   final SerializableFieldEditor? serializableEditorBuilder;
   final DateConstraints? dateConstraints;
+  final ForeignKey? defaultForeignKey;
 
   const FieldDescription(
     this.fieldName,
@@ -39,23 +39,34 @@ class FieldDescription<R, O> {
     this.isEditable = true,
     this.validator = _noValidation,
     this.fieldType = FieldType.text,
-    this.defaultForeignKey,
     this.serializableEditorBuilder,
     this.dateConstraints,
-  })  : assert(fieldType != FieldType.constrainedToEnum || enumConstraint != null),
-        assert(fieldType != FieldType.foreignKey || defaultForeignKey != null),
-        assert(fieldType != FieldType.date || dateConstraints != null);
+    this.defaultForeignKey,
+  }) : assert(fieldType != FieldType.date || dateConstraints != null);
 
-  const FieldDescription.foreignKey(
+  const FieldDescription.stringForeignKey(
     this.fieldName,
     this.fieldGetter, {
-    required ForeignKey this.defaultForeignKey,
     required this.labelCaption,
+    required this.defaultForeignKey,
     this.fieldDisplayMode = FieldDisplayMode.inModelView,
     this.isEditable = true,
   })  : enumConstraint = null,
         validator = _noValidation,
-        fieldType = FieldType.foreignKey,
+        fieldType = FieldType.stringForeignKey,
+        serializableEditorBuilder = null,
+        dateConstraints = null;
+
+  const FieldDescription.intForeignKey(
+    this.fieldName,
+    this.fieldGetter, {
+    required this.labelCaption,
+    required this.defaultForeignKey,
+    this.fieldDisplayMode = FieldDisplayMode.inModelView,
+    this.isEditable = true,
+  })  : enumConstraint = null,
+        validator = _noValidation,
+        fieldType = FieldType.intForeignKey,
         serializableEditorBuilder = null,
         dateConstraints = null;
 
@@ -68,9 +79,9 @@ class FieldDescription<R, O> {
     this.isEditable = true,
   })  : validator = _noValidation,
         fieldType = FieldType.constrainedToEnum,
-        defaultForeignKey = null,
         serializableEditorBuilder = null,
-        dateConstraints = null;
+        dateConstraints = null,
+        defaultForeignKey = null;
 
   const FieldDescription.serializable(
     this.fieldName,
@@ -80,10 +91,10 @@ class FieldDescription<R, O> {
     this.fieldDisplayMode = FieldDisplayMode.everywhere,
   })  : fieldType = FieldType.serializable,
         isEditable = true,
-        defaultForeignKey = null,
         enumConstraint = null,
         validator = _noValidation,
-        dateConstraints = null;
+        dateConstraints = null,
+        defaultForeignKey = null;
 
   Symbol get symbol => Symbol(fieldName);
 
@@ -104,7 +115,8 @@ class FieldDescription<R, O> {
     return fieldType.presentation(value);
   }
 
-  bool get isOwnProperty => fieldType != FieldType.foreignKey;
+  bool get isOwnProperty =>
+      fieldType != FieldType.stringForeignKey && fieldType != FieldType.intForeignKey;
 
   @override
   bool operator ==(Object other) =>
@@ -119,9 +131,9 @@ class FieldDescription<R, O> {
           validator == other.validator &&
           fieldType == other.fieldType &&
           enumConstraint == other.enumConstraint &&
-          defaultForeignKey == other.defaultForeignKey &&
           serializableEditorBuilder == other.serializableEditorBuilder &&
-          dateConstraints == other.dateConstraints;
+          dateConstraints == other.dateConstraints &&
+          defaultForeignKey == other.defaultForeignKey;
 
   @override
   int get hashCode =>
@@ -133,9 +145,9 @@ class FieldDescription<R, O> {
       validator.hashCode ^
       fieldType.hashCode ^
       enumConstraint.hashCode ^
-      defaultForeignKey.hashCode ^
       serializableEditorBuilder.hashCode ^
-      dateConstraints.hashCode;
+      dateConstraints.hashCode ^
+      defaultForeignKey.hashCode;
 
   @override
   String toString() {

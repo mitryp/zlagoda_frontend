@@ -17,10 +17,10 @@ class ShortModelHttpService<SM extends SearchModel> {
       //: route = 'api/short';
       : route = 'api/$route/short';
 
-  Future<List<SM>> get(SortOption sortOption) async {
+  Future<List<SM>> get() async {
     final response = await makeRequest(
       HttpMethod.get,
-      Uri.http(baseRoute, route, QueryBuilder(sort: Sort(sortOption)).queryParams),
+      Uri.http(baseRoute, route),
     ).catchError((err) => http.Response(err.message, 503));
 
     return httpServiceController(response, (response) {

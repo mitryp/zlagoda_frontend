@@ -1,11 +1,13 @@
 import '../../typedefs.dart';
 import '../common_models/name.dart';
 import '../joined_models/joined_sale.dart';
+import '../model_reference.dart';
 import '../other_models/table_receipt.dart';
 import '../schema/date_constraints.dart';
 import '../schema/field_description.dart';
 import '../schema/field_type.dart';
 import '../schema/schema.dart';
+import 'client.dart';
 
 class Receipt extends TableReceipt {
   static final Schema<Receipt> schema = Schema(
@@ -22,10 +24,11 @@ class Receipt extends TableReceipt {
         (o) => o.cost,
         labelCaption: 'Загальна вартість',
       ),
-      FieldDescription<String?, Receipt>(
+      FieldDescription<String?, Receipt>.stringForeignKey(
         'clientId',
         (o) => o.clientId,
         labelCaption: 'Номер картки клієнта',
+        defaultForeignKey: foreignKey<Client>('clientId'),
       ),
       FieldDescription<Name?, Receipt>(
         'clientName',

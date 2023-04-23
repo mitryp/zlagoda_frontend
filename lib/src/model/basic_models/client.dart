@@ -9,6 +9,7 @@ import '../interfaces/model.dart';
 import '../schema/field_description.dart';
 import '../schema/field_type.dart';
 import '../schema/schema.dart';
+import '../schema/validators.dart';
 
 class Client extends Model with ConvertibleToRow<Client> {
   static final Schema<Client> schema = Schema(
@@ -18,6 +19,7 @@ class Client extends Model with ConvertibleToRow<Client> {
         'clientId',
         (o) => o.clientId,
         labelCaption: 'Номер картки покупця',
+        validator: hasLength(14),
       ),
       FieldDescription<Name, Client>(
         'clientName',
@@ -29,6 +31,7 @@ class Client extends Model with ConvertibleToRow<Client> {
         'phone',
         (o) => o.phone,
         labelCaption: 'Номер телефону',
+        validator: notEmpty,
       ),
       FieldDescription<Address?, Client>(
         'address',
@@ -41,6 +44,7 @@ class Client extends Model with ConvertibleToRow<Client> {
         (o) => o.discount,
         labelCaption: 'Знижка (%)',
         fieldType: FieldType.number,
+        validator: isInteger,
       ),
     ],
   );

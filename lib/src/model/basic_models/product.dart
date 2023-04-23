@@ -6,6 +6,7 @@ import '../interfaces/convertible_to_row.dart';
 import '../model_reference.dart';
 import '../schema/field_description.dart';
 import '../schema/schema.dart';
+import '../schema/validators.dart';
 import 'category.dart';
 import '../interfaces/model.dart';
 
@@ -17,29 +18,33 @@ class Product extends Model with ConvertibleToRow<Product> {
         'upc',
         (o) => o.upc,
         labelCaption: 'UPC',
+        validator: hasLength(12),
       ),
       FieldDescription<String, Product>(
         'productName',
         (o) => o.productName,
         labelCaption: 'Назва',
+        validator: notEmpty,
       ),
       FieldDescription<String, Product>(
         'manufacturer',
         (o) => o.manufacturer,
         labelCaption: 'Виробник',
+        validator: notEmpty,
       ),
       FieldDescription<String, Product>(
         'specs',
         (o) => o.specs,
         labelCaption: 'Характеристики',
         fieldDisplayMode: FieldDisplayMode.inModelView,
+        validator: notEmpty,
       ),
-      FieldDescription<int, Product>.foreignKey(
+      FieldDescription<int, Product>.intForeignKey(
         'categoryId',
         (o) => o.categoryId,
         labelCaption: 'Категорія',
-        fieldDisplayMode: FieldDisplayMode.whenEditing,
-        defaultForeignKey: foreignKey<Category>('categoryId', 1),
+        fieldDisplayMode: FieldDisplayMode.none,
+        defaultForeignKey: foreignKey<Category>('categoryId')
       ),
     ],
   );

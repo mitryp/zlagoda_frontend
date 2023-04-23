@@ -6,10 +6,11 @@ import '../../../../model/model_schema_factory.dart';
 import '../../../../model/schema/field_description.dart';
 import '../../../../model/schema/field_type.dart';
 import '../../../../model/schema/schema.dart';
+import '../../../../services/http/http_service_factory.dart';
+import '../../../../services/http/model_http_service.dart';
 import '../../../../utils/locales.dart';
 import '../../../pages/page_base.dart';
 import '../../misc/clickable_absorb_pointer.dart';
-import 'foreign_key_editor.dart';
 
 class ModelEditForm<M extends Model> extends StatefulWidget {
   final M? model;
@@ -23,8 +24,13 @@ class ModelEditForm<M extends Model> extends StatefulWidget {
 
 class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
   late final Schema<M> schema = makeModelSchema<M>(M);
+  late final ModelHttpService<dynamic, M> httpService =
+      makeModelHttpService<M>() as ModelHttpService<dynamic, M>;
   final Map<FieldDescription<dynamic, M>, TextEditingController> fieldsToControllers = {};
   final Map<FieldDescription<dynamic, M>, Serializable?> fieldsToSerializable = {};
+  late final GlobalKey<FormState> formKey = GlobalKey();
+
+  bool get isEditing => widget.model != null;
 
   @override
   void initState() {
@@ -44,7 +50,7 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
     }
 
     for (final field in schema.fields.where((e) => e.fieldType == FieldType.serializable)) {
-      fieldsToSerializable[field] = widget.model != null ? field.fieldGetter(widget.model!) : null;
+      fieldsToSerializable[field] = isEditing ? field.fieldGetter(widget.model!) : null;
     }
   }
 
@@ -55,7 +61,7 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
         title: Text('Редагування ${makeModelLocalizedName<M>()}'),
         titleTextStyle: const TextStyle(color: Colors.black),
         actions: [
-          buildDeleteButton(),
+          if (isEditing) buildDeleteButton(),
         ],
       ),
       body: SingleChildScrollView(
@@ -77,6 +83,7 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
 
   Widget buildForm() {
     return Form(
+      key: formKey,
       child: Column(
         children: [
           ...fieldsToControllers.entries
@@ -88,16 +95,6 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
               .map(buildForeignKeyEditor),
         ],
       ),
-    );
-  }
-
-  Widget buildSaveButton() {
-    return ElevatedButton.icon(
-      icon: const Icon(Icons.save),
-      onPressed: () {
-        print(generateJson());
-      },
-      label: const Text('Зберегти'),
     );
   }
 
@@ -122,6 +119,7 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
       controller: controller,
       keyboardType: field.fieldType.inputType,
       validator: field.validator,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       decoration: InputDecoration(
         label: Text(field.labelCaption),
       ),
@@ -200,17 +198,6 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
     );
   }
 
-  Widget buildDeleteButton() {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: IconButton(
-        // todo deletion button
-        icon: Icon(Icons.delete, color: Colors.red[800]),
-        onPressed: () {},
-      ),
-    );
-  }
-
   Widget buildForeignKeyEditor(
       MapEntry<FieldDescription<dynamic, M>, TextEditingController> entry) {
     final field = entry.key;
@@ -220,10 +207,53 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
     final connectedModel = widget.connectedModels
         ?.firstWhere((e) => e.runtimeType == field.defaultForeignKey!.modelType);
 
-    return ForeignKeyEditor(
-      initialForeignKey: foreignKey,
+    return foreignKey.makeEditor(
       updateCallback: (newForeignKey) => entry.value.text = '$newForeignKey',
       initiallyConnectedModel: connectedModel,
+    );
+  }
+
+  Widget buildSaveButton() {
+    return ElevatedButton.icon(
+      icon: Icon(isEditing ? Icons.save : Icons.add),
+      onPressed: () {
+        if (!(formKey.currentState?.validate() ?? true)) return;
+        if (isEditing)
+          _update();
+        else
+          _create();
+      },
+      label: Text(isEditing ? 'Зберегти' : 'Створити'),
+    );
+  }
+
+  Future<bool> _update() {
+    final newModel = generateEditedModel();
+    if (newModel == null) {
+      print('update model is incorrect');
+      return Future.value(false);
+    }
+
+    return httpService.update(newModel, newModel.primaryKey);
+  }
+
+  Future<bool> _create() {
+    final newModel = generateEditedModel();
+    if (newModel == null) {
+      print('create model is incorrect');
+      return Future.value(false);
+    }
+
+    return httpService.post(newModel);
+  }
+
+  Widget buildDeleteButton() {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: IconButton(
+        icon: Icon(Icons.delete, color: Colors.red[800]),
+        onPressed: () => httpService.delete(widget.model!.primaryKey).then(print),
+      ),
     );
   }
 
@@ -241,10 +271,13 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
       } else {
         value = field.fieldType.converter(controller.text);
       }
+
       if (value == '' && field.isNullable) value = null;
       json[field.fieldName] = value;
     }
 
     return json.map((key, value) => MapEntry(key, Schema.processValue(value)));
   }
+
+  M? generateEditedModel() => schema.fromJson(generateJson());
 }

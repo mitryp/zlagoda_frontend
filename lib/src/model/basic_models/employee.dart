@@ -12,6 +12,7 @@ import '../schema/enum_constraints.dart';
 import '../schema/field_description.dart';
 import '../schema/field_type.dart';
 import '../schema/schema.dart';
+import '../schema/validators.dart';
 
 enum Position implements Serializable {
   cashier('Касир'),
@@ -36,12 +37,14 @@ class Employee extends Model with ConvertibleToRow<Employee> {
         'employeeId',
         (o) => o.employeeId,
         labelCaption: 'Табельний номер',
+        validator: hasLength(10),
       ),
       FieldDescription<String, Employee>(
         'login',
         (o) => o.login,
         labelCaption: 'Логін',
         fieldDisplayMode: FieldDisplayMode.inModelView,
+        validator: notEmpty,
       ),
       FieldDescription<Name, Employee>.serializable(
         'employeeName',
@@ -61,6 +64,7 @@ class Employee extends Model with ConvertibleToRow<Employee> {
         labelCaption: 'Зарплатня',
         fieldType: FieldType.currency,
         fieldDisplayMode: FieldDisplayMode.inModelView,
+        validator: isDouble,
       ),
       FieldDescription<DateTime, Employee>(
         'workStartDate',
@@ -89,6 +93,7 @@ class Employee extends Model with ConvertibleToRow<Employee> {
         (o) => o.phone,
         labelCaption: 'Телефон',
         fieldDisplayMode: FieldDisplayMode.inModelView,
+        validator: notEmpty,
       ),
       FieldDescription<Address, Employee>.serializable(
         'address',

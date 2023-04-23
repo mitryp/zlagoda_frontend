@@ -6,6 +6,7 @@ import '../model/interfaces/serializable.dart';
 import '../services/http/http_service_factory.dart';
 import '../services/http/model_http_service.dart';
 import '../view/widgets/resources/collections/collection_view_factory.dart';
+import '../view/widgets/resources/models/model_edit_view.dart';
 import '../view/widgets/resources/models/model_table.dart';
 import '../view/widgets/resources/models/model_view.dart';
 
@@ -40,6 +41,12 @@ class AppNavigation {
         ),
       ),
     );
+  }
+
+  void openModelCreation<SSingle extends Model>() {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => ModelEditForm<SSingle>(),
+    ));
   }
 
   void toCollectionView<SCol extends ConvertibleToRow<SCol>>() {

@@ -7,23 +7,25 @@ import '../interfaces/model.dart';
 import '../schema/field_description.dart';
 import '../schema/field_type.dart';
 import '../schema/schema.dart';
+import '../schema/validators.dart';
 
 class Category extends Model with ConvertibleToRow<Category> {
   static final Schema<Category> schema = Schema(
     Category.new,
     [
-      FieldDescription<int, Category>(
+      FieldDescription<int?, Category>(
         'categoryId',
         (o) => o.categoryId,
         labelCaption: 'ID категорії',
+        fieldType: FieldType.number,
         isEditable: false,
-        fieldType: FieldType.auto,
         fieldDisplayMode: FieldDisplayMode.none,
       ),
       FieldDescription<String, Category>(
         'categoryName',
         (o) => o.categoryName,
         labelCaption: 'Категорія',
+        validator: notEmpty,
       ),
     ],
   );

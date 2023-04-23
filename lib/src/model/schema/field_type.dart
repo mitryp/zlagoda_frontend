@@ -11,7 +11,8 @@ enum FieldType<T> {
   currency<int>(_currencyConverter, _presentCurrency),
   date<DateTime>(_parseDate, _presentDate),
   constrainedToEnum<dynamic>(_never),
-  foreignKey<dynamic>(_never);
+  stringForeignKey<String>(_stringConverter),
+  intForeignKey<int>(int.parse);
 
   final TypeConverter<T> converter;
   final PresentationFunction<T> presentation;

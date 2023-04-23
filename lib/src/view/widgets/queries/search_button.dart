@@ -25,8 +25,7 @@ class SearchButton<K, SM extends SearchModel<K>> extends StatefulWidget {
   State<SearchButton> createState() => _SearchButtonState<K, SM>();
 }
 
-class _SearchButtonState<K, SM extends SearchModel<K>>
-    extends State<SearchButton> {
+class _SearchButtonState<K, SM extends SearchModel<K>> extends State<SearchButton> {
   late String caption = widget.searchCaption;
   String? selectedItem;
   bool _isLoading = false;
@@ -35,8 +34,7 @@ class _SearchButtonState<K, SM extends SearchModel<K>>
     if (_isLoading) return;
 
     setState(() => _isLoading = true);
-    final fetchedItems =
-        await makeShortModelHttpService<SM>().get(SortOption.categoryName);
+    final fetchedItems = await makeShortModelHttpService<SM>().get();
     setState(() => _isLoading = false);
 
     if (!context.mounted) return;
@@ -55,9 +53,8 @@ class _SearchButtonState<K, SM extends SearchModel<K>>
         widget.addFilter(Filter(widget.filterOption, selected.primaryKey));
       }
 
-      caption = selectedItem == null
-          ? widget.searchCaption
-          : '${widget.searchCaption}: $selectedItem';
+      caption =
+          selectedItem == null ? widget.searchCaption : '${widget.searchCaption}: $selectedItem';
     });
   }
 

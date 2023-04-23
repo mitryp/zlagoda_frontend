@@ -8,12 +8,13 @@ import '../../../../services/http/http_service_factory.dart';
 import '../../../../services/http/model_http_service.dart';
 import '../../../../services/query_builder/query_builder.dart';
 import '../../../../services/query_builder/sort.dart';
+import '../../../../typedefs.dart';
 import 'collection_view.dart';
 
 abstract class ModelCollectionView<SCol extends ConvertibleToRow<SCol>> extends StatefulWidget {
   final CsfDelegateConstructor searchFilterDelegate;
   final SortOption defaultSortField;
-  final VoidCallback onAddPressed;
+  final RedirectCallback onAddPressed;
 
   const ModelCollectionView({
     required this.defaultSortField,

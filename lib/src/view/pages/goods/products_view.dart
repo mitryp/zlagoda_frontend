@@ -5,23 +5,25 @@ import '../../../model/joined_models/product_with_category.dart';
 import '../../../model/search_models/short_category.dart';
 import '../../../services/query_builder/filter.dart';
 import '../../../services/query_builder/sort.dart';
+import '../../../utils/navigation.dart';
 import '../../widgets/queries/filters/checkbox_filter.dart';
-import '../../widgets/queries/filters/date_filter.dart';
 import '../../widgets/queries/filters/chips_filter.dart';
+import '../../widgets/queries/filters/date_filter.dart';
 import '../../widgets/queries/filters/search_filter.dart';
 import '../../widgets/queries/search_button.dart';
 import '../../widgets/queries/sort_block.dart';
 import '../../widgets/resources/collections/collection_view.dart';
 import '../../widgets/resources/collections/model_collection_view.dart';
 
-void _nothing() {}
+void _redirectToAddingModel(BuildContext context) =>
+    AppNavigation.of(context).openModelCreation<Product>();
 
 class ProductsView extends ModelCollectionView<ProductWithCategory> {
   const ProductsView({super.key})
       : super(
           defaultSortField: SortOption.productName,
           searchFilterDelegate: ProductsSearchFilters.new,
-          onAddPressed: _nothing,
+          onAddPressed: _redirectToAddingModel,
         );
 }
 

@@ -60,4 +60,4 @@ class QueryBuilder {
 //
 //     return queryParams;
 //   }
-// }
+}

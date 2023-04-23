@@ -8,6 +8,7 @@ import '../../../../services/http/model_http_service.dart';
 import '../../../../services/query_builder/filter.dart';
 import '../../../../services/query_builder/query_builder.dart';
 import '../../../../services/query_builder/sort.dart';
+import '../../../../typedefs.dart';
 import '../../../pages/page_base.dart';
 
 abstract class CollectionSearchFilterDelegate {
@@ -54,7 +55,7 @@ typedef CsfDelegateConstructor = CollectionSearchFilterDelegate Function({
  */
 
 class CollectionView<SCol extends ConvertibleToRow<SCol>> extends StatefulWidget {
-  final VoidCallback onAddPressed;
+  final RedirectCallback onAddPressed;
   final QueryBuilder queryBuilder;
   final CsfDelegateConstructor searchFilterDelegate;
 
@@ -128,7 +129,7 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>>
   }
 
   Widget buildAddButton() => ElevatedButton(
-        onPressed: widget.onAddPressed,
+        onPressed: () => widget.onAddPressed(context),
         child: const Text('Додати'),
       );
 }

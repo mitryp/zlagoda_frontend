@@ -43,7 +43,9 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
       return setState(() => exception = e);
     }
     connectedModelTables = widget.connectedTables ??
-        await Future.wait(model.foreignKeys.map((f) => f.tableGenerator.call()));
+        await Future.wait(model.foreignKeys
+            .where((fk) => fk.reference.isConnected)
+            .map((fk) => fk.tableGenerator()));
 
     if (!mounted) return;
     setState(() => isResourceLoaded = true);
@@ -119,7 +121,7 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
         icon: const Icon(Icons.edit),
         onPressed: () {
           Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => ModelEditForm(
+            builder: (context) => ModelEditForm<M>(
               model: model,
             ),
           ));

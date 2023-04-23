@@ -1,7 +1,4 @@
-//import 'package:flutter/material.dart';
-
 import '../../typedefs.dart';
-
 //import '../interfaces/convertible_to_row.dart';
 import '../interfaces/model.dart';
 import '../model_reference.dart';
@@ -14,14 +11,17 @@ class StoreProduct extends Model {
   static final Schema<StoreProduct> schema = Schema(
     StoreProduct.new,
     [
-      FieldDescription<int, StoreProduct>('productId', (o) => o.productId,
-          labelCaption: 'ID товару'),
-      FieldDescription<String, StoreProduct>.foreignKey(
+      FieldDescription<int, StoreProduct>(
+        'productId',
+        (o) => o.productId,
+        labelCaption: 'ID товару',
+      ),
+      FieldDescription<String, StoreProduct>.stringForeignKey(
         'upc',
         (o) => o.upc,
         labelCaption: 'UPC',
-        defaultForeignKey: foreignKey('upc', ''),
-      ), // todo default goods
+        defaultForeignKey: foreignKey<Product>('upc'),
+      ),
       FieldDescription<int, StoreProduct>(
         'price',
         (o) => o.price,
