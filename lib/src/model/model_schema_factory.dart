@@ -7,7 +7,6 @@ import 'basic_models/store_product.dart';
 import 'common_models/address.dart';
 import 'common_models/name.dart';
 import 'interfaces/serializable.dart';
-import 'other_models/search_product.dart';
 import 'schema/schema.dart';
 
 final _classesToSchemas = <Type, Schema>{
@@ -19,7 +18,7 @@ final _classesToSchemas = <Type, Schema>{
   StoreProduct: StoreProduct.schema,
   Name: Name.schema,
   Address: Address.schema,
-  SearchProduct: SearchProduct.schema,
+  //SearchProduct: SearchProduct.schema,
 };
 
 Schema<S> makeModelSchema<S extends Serializable>([Type? modelType]) {

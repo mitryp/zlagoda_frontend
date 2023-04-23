@@ -7,6 +7,7 @@ import '../../widgets/queries/filters/checkbox_filter.dart';
 import '../../widgets/queries/filters/date_filter.dart';
 import '../../widgets/queries/filters/chips_filter.dart';
 import '../../widgets/queries/filters/search_filter.dart';
+import '../../widgets/queries/search_button.dart';
 import '../../widgets/queries/sort_block.dart';
 import '../../widgets/resources/collections/collection_view.dart';
 import '../../widgets/resources/collections/model_collection_view.dart';
@@ -42,10 +43,10 @@ class ProductsSearchFilters extends CollectionSearchFilterDelegate {
           addFilter: addFilter,
           removeFilter: removeFilter),
       CheckboxFilter(
-          filterOption: FilterOption.isProm,
-          addFilter: addFilter,
-          removeFilter: removeFilter,
-          title: 'Тільки акційні товари',
+        filterOption: FilterOption.isProm,
+        addFilter: addFilter,
+        removeFilter: removeFilter,
+        title: 'Тільки акційні товари',
       )
     ];
   }
@@ -54,11 +55,11 @@ class ProductsSearchFilters extends CollectionSearchFilterDelegate {
   List<Widget> buildSearches(BuildContext context) {
     // TODO: implement buildSearches
     return [
-      SearchFilter(
-          filterOption: FilterOption.categoryName,
-          removeFilter: removeFilter,
-          addFilter: addFilter,
-          caption: 'Назва категорії...',
+      SearchButton(
+        filterOption: FilterOption.categoryName,
+        searchCaption: 'Пошук за категорією',
+        addFilter: addFilter,
+        removeFilter: removeFilter,
       ),
       SearchFilter(
         filterOption: FilterOption.productName,
