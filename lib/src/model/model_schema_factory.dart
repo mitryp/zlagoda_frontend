@@ -7,6 +7,7 @@ import 'basic_models/store_product.dart';
 import 'common_models/address.dart';
 import 'common_models/name.dart';
 import 'interfaces/serializable.dart';
+import 'joined_models/product_with_category.dart';
 import 'other_models/search_product.dart';
 import 'schema/schema.dart';
 
@@ -15,6 +16,7 @@ final _classesToSchemas = <Type, Schema>{
   Client: Client.schema,
   Employee: Employee.schema,
   Product: Product.schema,
+  ProductWithCategory: ProductWithCategory.schema,
   Receipt: Receipt.schema,
   StoreProduct: StoreProduct.schema,
   Name: Name.schema,

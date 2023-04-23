@@ -140,7 +140,7 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
           child: DropdownButtonFormField(
             items: items,
             value: int.parse(controller.text),
-            decoration: InputDecoration(label: Text(field.labelCaption ?? field.fieldName)),
+            decoration: InputDecoration(label: Text(field.labelCaption)),
             onChanged: (value) {
               if (value == null) return;
               setState(() => controller.text = value.toString());

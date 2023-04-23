@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../model/interfaces/convertible_to_row.dart';
+import '../../../../model/interfaces/serializable.dart';
 import '../../../../model/model_schema_factory.dart';
 import '../../../../model/schema/schema.dart';
 import '../../../../services/http/http_service_factory.dart';
@@ -9,7 +10,7 @@ import '../../../../services/query_builder/query_builder.dart';
 import '../../../../services/query_builder/sort.dart';
 import 'collection_view.dart';
 
-abstract class ModelCollectionView<R extends ConvertibleToRow<R>> extends StatefulWidget {
+abstract class ModelCollectionView<SCol extends ConvertibleToRow<SCol>> extends StatefulWidget {
   final CsfDelegateConstructor searchFilterDelegate;
   final SortOption defaultSortField;
   final VoidCallback onAddPressed;
@@ -22,19 +23,18 @@ abstract class ModelCollectionView<R extends ConvertibleToRow<R>> extends Statef
   });
 
   @override
-  State<ModelCollectionView<R>> createState() => _ModelCollectionViewState<R>();
+  State<ModelCollectionView<SCol>> createState() => _ModelCollectionViewState<SCol>();
 }
 
-class _ModelCollectionViewState<R extends ConvertibleToRow<R>>
-    extends State<ModelCollectionView<R>> {
+class _ModelCollectionViewState<SCol extends ConvertibleToRow<SCol>>
+    extends State<ModelCollectionView<SCol>> {
   late final queryBuilder = QueryBuilder(sort: Sort(widget.defaultSortField));
-  late final ModelHttpService<R> httpService = makeHttpService<R>();
 
-  Schema<R> get elementSchema => makeModelSchema<R>();
+  Schema<SCol> get elementSchema => makeModelSchema<SCol>();
 
   @override
   Widget build(BuildContext context) {
-    return CollectionView<R>(
+    return CollectionView<SCol>(
       searchFilterDelegate: widget.searchFilterDelegate,
       onAddPressed: widget.onAddPressed,
       queryBuilder: queryBuilder,

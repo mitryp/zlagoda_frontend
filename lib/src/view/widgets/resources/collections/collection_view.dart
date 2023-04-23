@@ -55,7 +55,7 @@ typedef CsfDelegateConstructor = CollectionSearchFilterDelegate Function({
     -> add button
  */
 
-class CollectionView<R extends ConvertibleToRow<R>> extends StatefulWidget {
+class CollectionView<SCol extends ConvertibleToRow<SCol>> extends StatefulWidget {
   final VoidCallback onAddPressed;
   final QueryBuilder queryBuilder;
   final CsfDelegateConstructor searchFilterDelegate;
@@ -68,11 +68,13 @@ class CollectionView<R extends ConvertibleToRow<R>> extends StatefulWidget {
   });
 
   @override
-  State<CollectionView<R>> createState() => _CollectionViewState<R>();
+  State<CollectionView<SCol>> createState() => _CollectionViewState<SCol>();
 }
 
-class _CollectionViewState<R extends ConvertibleToRow<R>> extends State<CollectionView<R>> {
-  late final ModelHttpService<R> httpService = makeHttpService<R>();
+class _CollectionViewState<SCol extends ConvertibleToRow<SCol>>
+    extends State<CollectionView<SCol>> {
+  late final ModelHttpService<SCol, dynamic> httpService =
+      makeHttpService<SCol>() as ModelHttpService<SCol, dynamic>;
   late CollectionSearchFilterDelegate searchFilterDelegate = widget.searchFilterDelegate(
     queryBuilder: widget.queryBuilder,
     updateCallback: fetchItems,
@@ -95,7 +97,7 @@ class _CollectionViewState<R extends ConvertibleToRow<R>> extends State<Collecti
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           buildSearchFilters(),
-          CollectionTable(
+          CollectionTable<SCol>(
             itemsSupplier: () => httpService.get(widget.queryBuilder),
             updateStream: updateStreamController.stream,
           ),
@@ -109,22 +111,20 @@ class _CollectionViewState<R extends ConvertibleToRow<R>> extends State<Collecti
     const divider = VerticalDivider();
 
     return Card(
-      child: Column(
-        children: [
-          Row(
-            children: [
-              searchFilterDelegate.buildSort(context),
-              divider,
-              ...searchFilterDelegate.buildFilters(context),
-            ],
-          ),
-          Row (
-            children: [
-              ...searchFilterDelegate.buildSearches(context),
-            ],
-          )
-        ]
-      ),
+      child: Column(children: [
+        Row(
+          children: [
+            searchFilterDelegate.buildSort(context),
+            divider,
+            ...searchFilterDelegate.buildFilters(context),
+          ],
+        ),
+        Row(
+          children: [
+            ...searchFilterDelegate.buildSearches(context),
+          ],
+        )
+      ]),
     );
   }
 
@@ -176,18 +176,17 @@ class _CollectionTableState<R extends ConvertibleToRow<R>> extends State<Collect
 
     return widget.itemsSupplier().then(
       (items) {
-        if (mounted) {
-          setState(() {
-            this.items = items;
-            isLoaded = true;
-          });
-        }
+        if (!mounted) return;
+        setState(() {
+          this.items = items;
+          isLoaded = true;
+        });
       },
-    ).catchError((err) {
-      if (mounted) {
-        setState(() => error = err);
-      }
-    });
+    );
+        // .catchError((err) {
+      // if (!mounted) return;
+      // setState(() => error = err);
+    // });
   }
 
   @override

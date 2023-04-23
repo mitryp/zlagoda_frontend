@@ -11,9 +11,9 @@ class ModelReference<M extends Model> {
 
   Type get modelType => M;
 
-  ModelHttpService<M> get httpService => makeHttpService<M>();
+  ModelHttpService get httpService => makeHttpService<M>();
 
-  Future<M> fetch() => httpService.singleById(primaryKeyValue).then((v) => v!);
+  Future<M> fetch() => httpService.singleById(primaryKeyValue).then((v) => v as M);
 }
 
 class ForeignKey<M extends Model> {

@@ -50,7 +50,8 @@ class SerializableEditorPopupState<S extends Serializable>
               ...fieldsToControllers.entries.map(buildFormField),
               Padding(
                 padding: const EdgeInsets.only(top: 24),
-                child: ElevatedButton(onPressed: popEditedSerializable, child: const Text('Зберегти')),
+                child:
+                    ElevatedButton(onPressed: popEditedSerializable, child: const Text('Зберегти')),
               ),
             ],
           ),
@@ -74,7 +75,10 @@ class SerializableEditorPopupState<S extends Serializable>
     if (!formKey.currentState!.validate()) return;
 
     final json = fieldsToControllers.map(
-      (key, value) => MapEntry(key.fieldName, value.text.trim()),
+      (key, value) {
+        final text = value.text.trim();
+        return MapEntry(key.fieldName, key.isNullable && text.isEmpty ? null : text);
+      },
     );
 
     final newSerializable = schema.fromJson(json);
@@ -89,7 +93,6 @@ Future<S?> showSerializableEditor<S extends Serializable>(
 ) {
   return showDialog<S>(
     context: context,
-    // barrierDismissible: false,
     useSafeArea: true,
     builder: (context) {
       return Dialog(

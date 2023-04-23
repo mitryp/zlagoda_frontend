@@ -23,19 +23,25 @@ enum FieldType<T> {
 
 _never(_) {}
 
-String _stringConverter(String string) => string.trim();
+String _stringConverter(string) => (string as String).trim();
 
-int _currencyConverter(String coins) => (double.parse(_stringConverter(coins)) * 100).toInt();
+int _currencyConverter(coins) => (double.parse(_stringConverter(coins as String)) * 100).toInt();
 
 String _toString(d) => d.toString();
 
-String _presentDate(date) => '${date.day}.${date.month}.${date.year}';
+String _presentDate(d) {
+  String padWithZeros(int i) => '$i'.padLeft(2, '0');
+  final date = d as DateTime;
+
+  return '${padWithZeros(date.day)}.${padWithZeros(date.month)}.${date.year}';
+}
+
+String _presentCurrency(coins) => ((coins as int) / 100).toStringAsFixed(2);
+
 DateTime _parseDate(String date) {
   final parts = date.split('.').map(int.parse).toList();
   return DateTime(parts[2], parts[1], parts[0]);
 }
-
-String _presentCurrency(int coins) => (coins / 100).toStringAsFixed(2);
 
 const _fieldTypesToInputTypes = <FieldType, TextInputType>{
   FieldType.number: TextInputType.number,

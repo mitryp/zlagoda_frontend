@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../model/basic_models/product.dart';
+import '../../../model/joined_models/product_with_category.dart';
 import '../../../services/query_builder/filter.dart';
 import '../../../services/query_builder/sort.dart';
 import '../../widgets/queries/filters/checkbox_filter.dart';
@@ -13,7 +14,7 @@ import '../../widgets/resources/collections/model_collection_view.dart';
 
 void _nothing() {}
 
-class ProductsView extends ModelCollectionView<Product> {
+class ProductsView extends ModelCollectionView<ProductWithCategory> {
   const ProductsView({super.key})
       : super(
           defaultSortField: SortOption.productName,

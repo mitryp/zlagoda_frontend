@@ -6,6 +6,7 @@ import '../model/interfaces/serializable.dart';
 import '../services/http/http_service_factory.dart';
 import '../services/http/model_http_service.dart';
 import '../view/widgets/resources/collections/collection_view_factory.dart';
+import '../view/widgets/resources/models/model_table.dart';
 import '../view/widgets/resources/models/model_view.dart';
 
 class AppNavigation {
@@ -13,20 +14,36 @@ class AppNavigation {
 
   const AppNavigation.of(this.context);
 
-  ModelHttpService<S> _serviceOf<S extends Serializable>() => makeHttpService<S>();
+  ModelHttpService<dynamic, S> _serviceOf<S extends Serializable>() =>
+      makeHttpService<S>() as ModelHttpService<dynamic, S>;
 
-  void toModelView<M extends Model>(dynamic primaryKey) {
-    final modelFuture = _serviceOf<M>().singleById(primaryKey).then((v) => v!);
+  void toModelView<SSingle extends Model>(dynamic primaryKey) {
+    assert(SSingle != Model);
+
+    final modelFuture = _serviceOf<SSingle>().singleById(primaryKey).then((v) => v!);
 
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => ModelView<M>(fetchFunction: () => modelFuture),
+        builder: (context) => ModelView<SSingle>(fetchFunction: () => modelFuture),
       ),
     );
   }
 
-  void toCollectionView<R extends ConvertibleToRow<R>>() {
-    final viewConstructor = makeCollectionViewConstructor<R>();
+  void openModelViewFor<SSingle extends Model>(SSingle model, [List<ModelTable>? connectedTables]) {
+    assert(SSingle != Model);
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ModelView<SSingle>(
+          fetchFunction: () => model,
+          connectedTables: connectedTables,
+        ),
+      ),
+    );
+  }
+
+  void toCollectionView<SCol extends ConvertibleToRow<SCol>>() {
+    final viewConstructor = makeCollectionViewConstructor<SCol>();
 
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) => viewConstructor()),

@@ -5,20 +5,19 @@ import '../../../../model/interfaces/convertible_to_row.dart';
 import '../../../pages/goods/products_view.dart';
 import 'model_collection_view.dart';
 
-typedef CollectionViewConstructor<R extends ConvertibleToRow<R>> = ModelCollectionView<R> Function({
-  Key? key,
-});
+typedef CollectionViewConstructor<SCol extends ConvertibleToRow<SCol>> = //
+    ModelCollectionView<SCol> Function({Key? key});
 
 const Map<Type, CollectionViewConstructor> _typesToCollectionViews = {
   Product: ProductsView.new,
 };
 
-CollectionViewConstructor<R> makeCollectionViewConstructor<R extends ConvertibleToRow<R>>() {
-  final collectionViewConstructor = _typesToCollectionViews[R];
+CollectionViewConstructor makeCollectionViewConstructor<SCol extends ConvertibleToRow<SCol>>() {
+  final collectionViewConstructor = _typesToCollectionViews[SCol];
 
   if (collectionViewConstructor == null) {
-    throw StateError('Could not find a CollectionView for type $R');
+    throw StateError('Could not find a CollectionView for type $SCol');
   }
 
-  return collectionViewConstructor as CollectionViewConstructor<R>;
+  return collectionViewConstructor;
 }

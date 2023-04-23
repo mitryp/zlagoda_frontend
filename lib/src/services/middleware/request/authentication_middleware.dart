@@ -14,8 +14,6 @@ class RequestAuthMiddleware extends RequestMiddleware {
     final token = await LoginManager.of(context).loginData.then((ld) => ld?.token);
     if (token == null) return r;
 
-    r.headers['Authorization'] = 'Bearer $token';
-    print('token set in headers by RequestAuthMiddleware: ${r.headers}');
-    return r;
+    return r..headers['Authorization'] = 'Bearer $token';
   }
 }

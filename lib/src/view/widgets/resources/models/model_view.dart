@@ -6,7 +6,6 @@ import '../../../../theme.dart';
 import '../../../../typedefs.dart';
 import '../../../../utils/exceptions.dart';
 import '../../../../utils/locales.dart';
-import '../../../../utils/navigation.dart';
 import '../../../pages/page_base.dart';
 import '../../permissions/authorizer.dart';
 import '../../text_link.dart';
@@ -15,8 +14,9 @@ import 'model_table.dart';
 
 class ModelView<M extends Model> extends StatefulWidget {
   final ResourceFetchFunction<M> fetchFunction;
+  final List<ModelTable>? connectedTables;
 
-  const ModelView({required this.fetchFunction, super.key});
+  const ModelView({required this.fetchFunction, this.connectedTables, super.key});
 
   @override
   State<ModelView<M>> createState() => _ModelViewState<M>();
@@ -31,11 +31,14 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
   @override
   void initState() {
     super.initState();
-    fetchResources().whenComplete(() => WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted || exception != null) return;
-          Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => ModelEditForm(model: model)));
-        })); // todo remove
+
+    fetchResources(); //
+        // .whenComplete(() => WidgetsBinding.instance.addPostFrameCallback((_) {
+        //       if (!mounted || exception != null) return;
+        //       Navigator.of(context).push(
+        //         MaterialPageRoute(builder: (context) => ModelEditForm(model: model)),
+        //       );
+        //     })); // todo remove
   }
 
   Future<void> fetchResources() async {
@@ -45,7 +48,8 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
       if (!mounted) return;
       return setState(() => exception = e);
     }
-    connectedModelTables = await Future.wait(model.foreignKeys.map((f) => f.tableGenerator.call()));
+    connectedModelTables = widget.connectedTables ??
+        await Future.wait(model.foreignKeys.map((f) => f.tableGenerator.call()));
 
     if (!mounted) return;
     setState(() => isResourceLoaded = true);

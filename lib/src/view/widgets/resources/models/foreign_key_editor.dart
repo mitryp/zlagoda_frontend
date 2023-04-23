@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../../../../model/interfaces/model.dart';
 import '../../../../model/model_reference.dart';
-import '../../../../model/other_models/search_model.dart';
-import '../../../../services/http/model_http_service.dart';
 import '../../../../theme.dart';
 
 typedef UpdateCallback<T> = void Function(T newForeignKey);
 
-class ForeignKeyEditor<M extends Model, SM extends SearchModel<M>> extends StatefulWidget {
+class ForeignKeyEditor<M extends Model> extends StatefulWidget {
   final ForeignKey<M> initialForeignKey;
   final M? initiallyConnectedModel;
   final UpdateCallback<dynamic> updateCallback;
@@ -24,13 +22,11 @@ class ForeignKeyEditor<M extends Model, SM extends SearchModel<M>> extends State
   State<ForeignKeyEditor> createState() => _ForeignKeyEditorState();
 }
 
-class _ForeignKeyEditorState<M extends Model, SM extends SearchModel<M>>
-    extends State<ForeignKeyEditor<M, SM>> {
+class _ForeignKeyEditorState<M extends Model>
+    extends State<ForeignKeyEditor<M>> {
   late dynamic value = widget.initialForeignKey.reference.primaryKeyValue;
   late M connectedModel;
   bool isLoaded = false;
-
-  ModelHttpService<M> get httpService => widget.initialForeignKey.reference.httpService;
 
   @override
   void initState() {

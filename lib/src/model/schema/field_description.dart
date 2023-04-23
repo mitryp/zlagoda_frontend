@@ -101,9 +101,7 @@ class FieldDescription<R, O> {
 
   String presentFieldOf(O object) {
     final value = fieldGetter(object);
-    return fieldType == FieldType.currency
-        ? ((value as int) / 100).toStringAsFixed(2)
-        : _typePresentations[value.runtimeType]?.call(value as dynamic) ?? value.toString();
+    return fieldType.presentation(value);
   }
 
   bool get isOwnProperty => fieldType != FieldType.foreignKey;
@@ -114,20 +112,30 @@ class FieldDescription<R, O> {
       other is FieldDescription &&
           runtimeType == other.runtimeType &&
           fieldName == other.fieldName &&
+          fieldGetter == other.fieldGetter &&
           labelCaption == other.labelCaption &&
           fieldDisplayMode == other.fieldDisplayMode &&
           isEditable == other.isEditable &&
+          validator == other.validator &&
           fieldType == other.fieldType &&
-          enumConstraint == other.enumConstraint;
+          enumConstraint == other.enumConstraint &&
+          defaultForeignKey == other.defaultForeignKey &&
+          serializableEditorBuilder == other.serializableEditorBuilder &&
+          dateConstraints == other.dateConstraints;
 
   @override
   int get hashCode =>
       fieldName.hashCode ^
+      fieldGetter.hashCode ^
       labelCaption.hashCode ^
       fieldDisplayMode.hashCode ^
       isEditable.hashCode ^
+      validator.hashCode ^
       fieldType.hashCode ^
-      enumConstraint.hashCode;
+      enumConstraint.hashCode ^
+      defaultForeignKey.hashCode ^
+      serializableEditorBuilder.hashCode ^
+      dateConstraints.hashCode;
 
   @override
   String toString() {
@@ -141,7 +149,3 @@ enum FieldDisplayMode {
   whenEditing,
   none;
 }
-
-final _typePresentations = {
-  DateTime: (DateTime dt) => '${dt.day}.${dt.month}.${dt.year}',
-};
