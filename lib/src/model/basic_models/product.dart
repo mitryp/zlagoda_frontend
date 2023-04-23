@@ -4,12 +4,12 @@ import '../../typedefs.dart';
 import '../../utils/navigation.dart';
 import '../interfaces/convertible_to_row.dart';
 import '../model_reference.dart';
-import '../other_models/search_product.dart';
 import '../schema/field_description.dart';
 import '../schema/schema.dart';
 import 'category.dart';
+import '../interfaces/model.dart';
 
-class Product extends SearchProduct with ConvertibleToRow<Product> {
+class Product extends Model with ConvertibleToRow<Product> {
   static final Schema<Product> schema = Schema(
     Product.new,
     [
@@ -44,13 +44,15 @@ class Product extends SearchProduct with ConvertibleToRow<Product> {
     ],
   );
 
+  final String upc;
+  final String productName;
   final String manufacturer;
   final String specs;
   final int categoryId;
 
   const Product({
-    required super.upc,
-    required super.productName,
+    required this.upc,
+    required this.productName,
     required this.manufacturer,
     required this.specs,
     required this.categoryId,

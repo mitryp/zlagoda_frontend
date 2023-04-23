@@ -22,8 +22,7 @@ class ForeignKeyEditor<M extends Model> extends StatefulWidget {
   State<ForeignKeyEditor> createState() => _ForeignKeyEditorState();
 }
 
-class _ForeignKeyEditorState<M extends Model>
-    extends State<ForeignKeyEditor<M>> {
+class _ForeignKeyEditorState<M extends Model> extends State<ForeignKeyEditor<M>> {
   late dynamic value = widget.initialForeignKey.reference.primaryKeyValue;
   late M connectedModel;
   bool isLoaded = false;

@@ -3,7 +3,7 @@ import 'filter.dart';
 import 'sort.dart';
 
 class QueryBuilder {
-  int paginationLimit = 10;
+  int paginationLimit = 0;
   int paginationPage = 1;
   final Set<Filter> _filters = {};
   Sort sort;
@@ -45,8 +45,8 @@ class QueryBuilder {
   //   var queryParams = {
   //     '_sort': sort.sortField,
   //     '_order': sort.order.name,
-  //     '_limit': '$paginationLimit',
-  //     '_page': '$paginationPage',
+  //     //'_limit': '$paginationLimit',
+  //     //'_page': '$paginationPage',
   //   };
   //
   //   for (var filter in _filters) {
