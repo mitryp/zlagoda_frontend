@@ -16,9 +16,8 @@ class ModelTable<M extends Model> extends StatelessWidget {
 
   Schema<M> get schema => makeModelSchema<M>(model.runtimeType);
 
-  void redirectToModelView(BuildContext context) {
-    AppNavigation.of(context).toModelView<M>(model.primaryKey);
-  }
+  void redirectToModelView(BuildContext context) =>
+      AppNavigation.of(context).openModelViewFor<M>(model);
 
   @override
   Widget build(BuildContext context) {

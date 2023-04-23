@@ -32,13 +32,7 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
   void initState() {
     super.initState();
 
-    fetchResources(); //
-        // .whenComplete(() => WidgetsBinding.instance.addPostFrameCallback((_) {
-        //       if (!mounted || exception != null) return;
-        //       Navigator.of(context).push(
-        //         MaterialPageRoute(builder: (context) => ModelEditForm(model: model)),
-        //       );
-        //     })); // todo remove
+    fetchResources();
   }
 
   Future<void> fetchResources() async {

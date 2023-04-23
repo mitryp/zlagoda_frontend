@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../../model/interfaces/convertible_to_row.dart';
-import '../../../../model/model_schema_factory.dart';
-import '../../../../model/schema/schema.dart';
 import '../../../../services/http/http_service_factory.dart';
 import '../../../../services/http/model_http_service.dart';
 import '../../../../services/query_builder/filter.dart';
@@ -179,11 +177,10 @@ class _CollectionTableState<R extends ConvertibleToRow<R>> extends State<Collect
           isLoaded = true;
         });
       },
-    );
-        // .catchError((err) {
-      // if (!mounted) return;
-      // setState(() => error = err);
-    // });
+    ).catchError((err) {
+      if (!mounted) return;
+      setState(() => error = err);
+    });
   }
 
   @override
