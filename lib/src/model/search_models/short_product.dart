@@ -9,22 +9,17 @@ class ShortProduct extends SearchModel {
       [
         FieldDescription<String, ShortProduct>(
           'upc',
-              (o) => o.upc,
-          labelCaption: 'UPC',
+              (o) => o.primaryKey,
+          labelCaption: 'Пошук за UPC',
         ),
         FieldDescription<String, ShortProduct>(
           'productName',
-              (o) => o.productName,
-          labelCaption: 'Назва',
+              (o) => o.descriptiveField,
+          labelCaption: 'Пошук за назвою товару',
         ),
       ]);
 
-      final String upc;
-      final String productName;
-
-      ShortProduct(
-      this.upc,
-      this.productName): super(upc, productName);
+      ShortProduct(upc, productName): super(upc, productName);
 
   static ShortProduct? fromJson(JsonMap json) => schema.fromJson(json);
 

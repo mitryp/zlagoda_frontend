@@ -33,21 +33,21 @@ class ProductsSearchFilters extends CollectionSearchFilterDelegate {
   List<Widget> buildFilters(BuildContext context) {
     // TODO: implement buildFilters
     return [
-      DateFilter(
-        addFilter: addFilter,
-        removeFilter: removeFilter,
-      ),
-      ChipsFilter(
-          filterOption: FilterOption.categoryName,
-          availableChoices: const ['Овочі', 'Фрукти'],
-          addFilter: addFilter,
-          removeFilter: removeFilter),
-      CheckboxFilter(
-        filterOption: FilterOption.isProm,
-        addFilter: addFilter,
-        removeFilter: removeFilter,
-        title: 'Тільки акційні товари',
-      )
+      // DateFilter(
+      //   addFilter: addFilter,
+      //   removeFilter: removeFilter,
+      // ),
+      // ChipsFilter(
+      //     filterOption: FilterOption.categoryName,
+      //     availableChoices: const ['Овочі', 'Фрукти'],
+      //     addFilter: addFilter,
+      //     removeFilter: removeFilter),
+      // CheckboxFilter(
+      //   filterOption: FilterOption.isProm,
+      //   addFilter: addFilter,
+      //   removeFilter: removeFilter,
+      //   title: 'Тільки акційні товари',
+      //)
     ];
   }
 
@@ -55,12 +55,12 @@ class ProductsSearchFilters extends CollectionSearchFilterDelegate {
   List<Widget> buildSearches(BuildContext context) {
     // TODO: implement buildSearches
     return [
-      SearchButton(
-        filterOption: FilterOption.categoryName,
-        searchCaption: 'Пошук за категорією',
-        addFilter: addFilter,
-        removeFilter: removeFilter,
-      ),
+      // SearchButton(
+      //   filterOption: FilterOption.categoryName,
+      //   searchCaption: 'Пошук за категорією',
+      //   addFilter: addFilter,
+      //   removeFilter: removeFilter,
+      // ),
       SearchFilter(
         filterOption: FilterOption.productName,
         removeFilter: removeFilter,
@@ -74,8 +74,8 @@ class ProductsSearchFilters extends CollectionSearchFilterDelegate {
   Widget buildSort(BuildContext context) {
     const sortOptions = [
       SortOption.productName,
-      //TODO remove
-      SortOption.manufacturer,
+      // //TODO remove
+      // SortOption.manufacturer,
     ];
 
     return SortBlock(
