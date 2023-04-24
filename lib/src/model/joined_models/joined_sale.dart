@@ -4,6 +4,7 @@ import '../interfaces/model.dart';
 import '../model_reference.dart';
 import '../schema/field_description.dart';
 import '../schema/schema.dart';
+import '../search_models/short_product.dart';
 
 class JoinedSale extends Model {
   static final Schema<JoinedSale> schema = Schema(
@@ -49,7 +50,7 @@ class JoinedSale extends Model {
       "don't call its primaryKey");
 
   @override
-  List<ForeignKey<Model>> get foreignKeys => [foreignKey<Product>('upc', upc)];
+  List<ForeignKey> get foreignKeys => [foreignKey<Product, ShortProduct>('upc', upc)];
 
   static JoinedSale? fromJson(JsonMap json) => schema.fromJson(json);
 

@@ -8,6 +8,7 @@ import '../schema/field_description.dart';
 import '../schema/field_type.dart';
 import '../schema/schema.dart';
 import '../schema/validators.dart';
+import '../search_models/short_category.dart';
 
 class Category extends Model with ConvertibleToRow<Category> {
   static final Schema<Category> schema = Schema(
@@ -52,4 +53,8 @@ class Category extends Model with ConvertibleToRow<Category> {
   @override
   void redirectToModelView(BuildContext context) =>
       AppNavigation.of(context).toModelView<Category>(primaryKey);
+
+  @override
+  ShortCategory toSearchModel() =>
+      ShortCategory(categoryId: categoryId, categoryName: categoryName);
 }

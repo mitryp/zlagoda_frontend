@@ -52,5 +52,5 @@ final mainTheme = ThemeData.light().copyWith(
     backgroundColor: Colors.transparent,
     elevation: 0,
     iconTheme: IconThemeData(color: Colors.black),
-  )
+  ),
 );

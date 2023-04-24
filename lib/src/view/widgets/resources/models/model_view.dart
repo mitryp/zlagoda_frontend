@@ -31,7 +31,6 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
   @override
   void initState() {
     super.initState();
-
     fetchResources();
   }
 
@@ -123,6 +122,7 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
           Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => ModelEditForm<M>(
               model: model,
+              connectedModels: connectedModelTables.map((t) => t.model).toList(),
             ),
           ));
         },

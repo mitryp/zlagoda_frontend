@@ -1,9 +1,13 @@
+import 'package:flutter/cupertino.dart';
+
 import '../services/http/http_service_factory.dart';
 import '../services/http/model_http_service.dart';
 import '../typedefs.dart';
+import '../view/widgets/queries/model_search_initiator.dart';
 import '../view/widgets/resources/models/foreign_key_editor.dart';
 import '../view/widgets/resources/models/model_table.dart';
 import 'interfaces/model.dart';
+import 'interfaces/search_model.dart';
 
 class ModelReference<M extends Model> {
   final dynamic primaryKeyValue;
@@ -22,7 +26,7 @@ class ModelReference<M extends Model> {
   }
 }
 
-class ForeignKey<M extends Model> {
+class ForeignKey<M extends Model, SM extends SearchModel> {
   final String foreignKeyName;
   final ModelReference<M> reference;
   final ModelTableGenerator<M> tableGenerator;
@@ -37,22 +41,29 @@ class ForeignKey<M extends Model> {
 
   Type get modelType => M;
 
-  ForeignKeyEditor<M> makeEditor({
+  ForeignKeyEditor<M, SM> makeEditor({
     required UpdateCallback<dynamic> updateCallback,
     M? initiallyConnectedModel,
   }) {
-    return ForeignKeyEditor<M>(
+    return ForeignKeyEditor<M, SM>(
       updateCallback: updateCallback,
       initialForeignKey: this,
       initiallyConnectedModel: initiallyConnectedModel,
     );
   }
+
+  ModelSearchInitiatorConstructor<dynamic, SM> get searchInitiator {
+    return ModelSearchInitiator<dynamic, SM>.new;
+  }
 }
 
-ForeignKey<M> foreignKey<M extends Model>(String foreignKeyName, [dynamic primaryKeyValue]) {
+ForeignKey<M, SM> foreignKey<M extends Model, SM extends SearchModel>(
+  String foreignKeyName, [
+  dynamic primaryKeyValue,
+]) {
   final ref = ModelReference<M>(primaryKeyValue);
 
-  return ForeignKey<M>(
+  return ForeignKey<M, SM>(
     foreignKeyName,
     reference: ref,
     tableGenerator: () => ref.fetch().then(ModelTable.new),
