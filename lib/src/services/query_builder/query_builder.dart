@@ -15,7 +15,8 @@ class QueryBuilder {
     _filters.add(filter);
   }
 
-  bool removeFilter(FilterOption filterField) => _filters.remove(Filter(filterField, ''));
+  void removeFilter(FilterOption filterOption) =>
+      _filters.removeWhere((e) => e.filterOption == filterOption);
 
   Set<Filter> get filters => _filters;
 
@@ -26,8 +27,7 @@ class QueryBuilder {
       'limit': '$paginationLimit',
     };
 
-    if(paginationLimit != 0)
-      queryParams['offset'] = '${paginationPage * paginationLimit}';
+    if (paginationLimit != 0) queryParams['offset'] = '${paginationPage * paginationLimit}';
 
     for (var filter in _filters) {
       var value = filter.value;
@@ -61,4 +61,3 @@ class QueryBuilder {
 //     return queryParams;
 //   }
 }
-

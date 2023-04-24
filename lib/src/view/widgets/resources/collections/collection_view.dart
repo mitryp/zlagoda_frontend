@@ -31,7 +31,6 @@ abstract class CollectionSearchFilterDelegate {
   }
 
   void removeFilter(FilterOption filterOption) {
-    print('removing');
     queryBuilder.removeFilter(filterOption);
     updateCallback();
   }

@@ -5,6 +5,8 @@ import '../../../../model/interfaces/search_model.dart';
 import '../../../../model/model_reference.dart';
 import '../../../../theme.dart';
 import '../../../../typedefs.dart';
+import '../../../../utils/locales.dart';
+import '../../queries/model_search_initiator.dart';
 
 class ForeignKeyEditor<M extends Model, SM extends ShortModel> extends StatefulWidget {
   final ForeignKey<M, SM> initialForeignKey;
@@ -64,6 +66,7 @@ class _ForeignKeyEditorState<M extends Model, SM extends ShortModel>
       cardChild = widget.initialForeignKey.searchInitiator(
         onUpdate: widget.updateCallback,
         selected: connectedModel?.toSearchModel() as SM?,
+        selectionBuilder: selectionBuilderWithPlaceholder(makeModelLocalizedName<M>()),
         container: ({required child, required onTap}) => InkWell(
           borderRadius: defaultBorderRadius,
           onTap: onTap,

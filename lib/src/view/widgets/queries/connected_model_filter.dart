@@ -34,11 +34,9 @@ class ConnectedModelFilter<K, SM extends ShortModel<K>> extends StatelessWidget 
       ),
       onUpdate: (newPrimaryKey) {
         if (newPrimaryKey == null) {
-          removeFilterByOption(filterOption);
+          return removeFilterByOption(filterOption);
         }
-        else {
-          addFilter(Filter(filterOption, newPrimaryKey));
-        }
+        addFilter(Filter(filterOption, newPrimaryKey));
       },
       searchHint: searchHint,
     );

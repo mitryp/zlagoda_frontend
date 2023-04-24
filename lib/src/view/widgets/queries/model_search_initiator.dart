@@ -5,8 +5,8 @@ import '../../../services/http/http_service_factory.dart';
 import '../../../typedefs.dart';
 import 'search_popup_delegate.dart';
 
-typedef SearchSelectionBuilder<SM extends ShortModel> = Widget Function(
-    BuildContext context, SM? selected);
+typedef SearchSelectionBuilder<SM extends ShortModel> = //
+    Widget Function(BuildContext context, SM? selected);
 
 typedef SingleChildTapDetector = Widget Function({
   required Widget child,
@@ -24,8 +24,17 @@ typedef ModelSearchInitiatorConstructor<K, SM extends ShortModel<K>> = //
         bool preserveSearchOnCancel,
         String searchHint});
 
-Widget defaultSelectionBuilder(BuildContext context, ShortModel? selected) =>
-    Text(selected != null ? selected.descriptiveAttr : 'Вибрати');
+SearchSelectionBuilder<SM> selectionBuilderWithPlaceholder<K, SM extends ShortModel<K>>(
+        String placeholder) =>
+    (context, selected) => defaultSelectionBuilder(context, selected, placeholder: placeholder);
+
+Widget defaultSelectionBuilder(
+  BuildContext context,
+  ShortModel? selected, {
+  String placeholder = 'Вибрати',
+}) {
+  return Text(selected != null ? selected.descriptiveAttr : placeholder);
+}
 
 Widget defaultProgressIndicatorBuilder(BuildContext context) =>
     const FittedBox(child: CircularProgressIndicator());
