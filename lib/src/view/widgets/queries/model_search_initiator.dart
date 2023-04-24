@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../model/interfaces/search_model.dart';
 import '../../../services/http/http_service_factory.dart';
 import '../../../typedefs.dart';
-import '../resources/models/foreign_key_editor.dart';
 import 'search_popup_delegate.dart';
 
 typedef SearchSelectionBuilder<SM extends ShortModel> = Widget Function(
@@ -21,7 +20,9 @@ typedef ModelSearchInitiatorConstructor<K, SM extends ShortModel<K>> = //
         WidgetBuilder progressIndicatorBuilder,
         SearchSelectionBuilder<SM> selectionBuilder,
         SingleChildTapDetector container,
-        Key? key});
+        Key? key,
+        bool preserveSearchOnCancel,
+        String searchHint});
 
 Widget defaultSelectionBuilder(BuildContext context, ShortModel? selected) =>
     Text(selected != null ? selected.descriptiveAttr : 'Вибрати');
@@ -36,6 +37,7 @@ class ModelSearchInitiator<K, SM extends ShortModel<K>> extends StatefulWidget {
   final SingleChildTapDetector container;
   final SM? selected;
   final bool preserveSearchOnCancel;
+  final String? searchHint;
 
   const ModelSearchInitiator({
     required this.onUpdate,
@@ -44,6 +46,7 @@ class ModelSearchInitiator<K, SM extends ShortModel<K>> extends StatefulWidget {
     this.selectionBuilder = defaultSelectionBuilder,
     this.container = InkWell.new,
     this.preserveSearchOnCancel = true,
+    this.searchHint,
     super.key,
   });
 
@@ -87,7 +90,7 @@ class _ModelSearchInitiatorState<K, SM extends ShortModel<K>>
 
     var selection = await showSearch(
       context: context,
-      delegate: SearchPopupDelegate<SM>(options),
+      delegate: SearchPopupDelegate<SM>(options, widget.searchHint),
     );
 
     if (widget.preserveSearchOnCancel) {

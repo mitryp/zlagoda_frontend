@@ -7,7 +7,7 @@ import '../../services/query_builder/filter.dart';
 import '../../services/query_builder/sort.dart';
 import '../../utils/navigation.dart';
 import '../widgets/queries/filters/date_filter.dart';
-import '../widgets/queries/search_button.dart';
+import '../widgets/queries/connected_model_filter.dart';
 import '../widgets/queries/sort_block.dart';
 import '../widgets/resources/collections/collection_view.dart';
 import '../widgets/resources/collections/model_collection_view.dart';
@@ -33,20 +33,23 @@ class ReceiptsSearchFilters extends CollectionSearchFilterDelegate {
   @override
   List<Widget> buildFilters(BuildContext context) {
     return [
-      DateFilter(addFilter: addFilter, removeFilter: removeFilter),
+      DateFilter(
+        addFilter: addFilter,
+        removeFilter: removeFilter,
+      ),
+      ConnectedModelFilter<String, ShortEmployee>(
+        filterOption: FilterOption.employeeName,
+        addFilter: addFilter,
+        removeFilterByOption: removeFilter,
+        caption: 'Всі працівники',
+        searchHint: 'Пошук працівників за табельним номером або ПІБ...',
+      ),
     ];
   }
 
   @override
   List<Widget> buildSearches(BuildContext context) {
-    return [
-      SearchButton<String, ShortEmployee>(
-        filterOption: FilterOption.employeeName,
-        searchCaption: 'ПІБ, табельний номер касира...',
-        addFilter: addFilter,
-        removeFilter: removeFilter,
-      ),
-    ];
+    return [];
   }
 
   @override

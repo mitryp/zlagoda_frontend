@@ -36,7 +36,7 @@ class ClientsSearchFilters extends CollectionSearchFilterDelegate {
   List<Widget> buildSearches(BuildContext context) {
     return [
       SearchFilter(
-        filterOption: FilterOption.discount,
+        filterOption: FilterOption.clientSurname,
         removeFilter: removeFilter,
         addFilter: addFilter,
         caption: 'Прізвище клієнта...',
