@@ -48,11 +48,8 @@ class Category extends Model with ConvertibleToRow<Category> {
   JsonMap toJson() => schema.toJson(this);
 
   @override
-  String toString() => 'Категорія "$categoryName"';
-
-  @override
   void redirectToModelView(BuildContext context) =>
-      AppNavigation.of(context).toModelView<Category>(primaryKey);
+      AppNavigation.of(context).openModelViewFor<Category>(this);
 
   @override
   ShortCategory toSearchModel() =>

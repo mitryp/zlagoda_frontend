@@ -5,6 +5,7 @@ import '../../view/widgets/resources/serializable_editor_popup.dart';
 import '../interfaces/serializable.dart';
 import '../schema/field_description.dart';
 import '../schema/schema.dart';
+import '../schema/validators.dart';
 
 class Name implements Serializable {
   final String firstName;
@@ -18,6 +19,7 @@ class Name implements Serializable {
         'firstName',
         (o) => o.firstName,
         labelCaption: 'Ім\'я',
+        validator: notEmpty,
       ),
       FieldDescription<String?, Name>(
         'middleName',
@@ -28,6 +30,7 @@ class Name implements Serializable {
         'lastName',
         (o) => o.lastName,
         labelCaption: 'Прізвище',
+        validator: notEmpty,
       ),
     ],
   );

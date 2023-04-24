@@ -45,13 +45,16 @@ class SerializableEditorPopupState<S extends Serializable>
       child: SingleChildScrollView(
         child: Form(
           key: formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           child: Column(
             children: [
               ...fieldsToControllers.entries.map(buildFormField),
               Padding(
                 padding: const EdgeInsets.only(top: 24),
-                child:
-                    ElevatedButton(onPressed: popEditedSerializable, child: const Text('Зберегти')),
+                child: ElevatedButton(
+                  onPressed: popEditedSerializable,
+                  child: const Text('Зберегти'),
+                ),
               ),
             ],
           ),
