@@ -7,8 +7,6 @@ import '../schema/field_description.dart';
 import '../schema/schema.dart';
 import 'serializable.dart';
 
-String toHryvnas(int coins) => '${coins ~/ 100}.${coins % 100} грн.';
-
 mixin ConvertibleToRow<R extends ConvertibleToRow<R>> on Serializable {
   /// The row should redirect to the individual model page in onSelectedChanged.
   ///

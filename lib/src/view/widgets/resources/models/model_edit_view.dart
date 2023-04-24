@@ -167,6 +167,7 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
         });
       },
       child: TextFormField(
+        readOnly: true,
         decoration: InputDecoration(label: Text(field.labelCaption)),
         controller: controller,
       ),
@@ -192,6 +193,7 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
         });
       },
       child: TextFormField(
+        readOnly: true,
         decoration: InputDecoration(label: Text(field.labelCaption)),
         controller: controller,
       ),

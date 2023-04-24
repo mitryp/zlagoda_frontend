@@ -5,6 +5,7 @@ import '../../view/widgets/resources/serializable_editor_popup.dart';
 import '../interfaces/serializable.dart';
 import '../schema/field_description.dart';
 import '../schema/schema.dart';
+import '../schema/validators.dart';
 
 class Address implements Serializable {
   static final Schema<Address> schema = Schema(
@@ -14,16 +15,19 @@ class Address implements Serializable {
         'city',
         (o) => o.city,
         labelCaption: 'Місто',
+        validator: notEmpty,
       ),
       FieldDescription<String, Address>(
         'street',
         (o) => o.street,
         labelCaption: 'Вулиця',
+        validator: notEmpty,
       ),
       FieldDescription<String, Address>(
         'index',
         (o) => o.index,
         labelCaption: 'Поштовий індекс',
+        validator: notEmpty,
       ),
     ],
   );

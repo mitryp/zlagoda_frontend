@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../typedefs.dart';
+import '../../utils/coins_to_currency.dart';
 import '../../utils/navigation.dart';
 import '../basic_models/receipt.dart';
 import '../common_models/name.dart';
