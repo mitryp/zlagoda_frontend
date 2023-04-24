@@ -114,6 +114,7 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>>
       child: Column(children: [
         Row(
           children: [
+            const Text('Сортувати за: '),
             searchFilterDelegate.buildSort(context),
             divider,
             ...searchFilterDelegate.buildFilters(context),

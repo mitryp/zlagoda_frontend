@@ -6,6 +6,7 @@ import '../../model/basic_models/receipt.dart';
 import '../../model/basic_models/store_product.dart';
 import '../../model/interfaces/search_model.dart';
 import '../../model/interfaces/serializable.dart';
+import '../../model/joined_models/joined_store_product.dart';
 import '../../model/joined_models/product_with_category.dart';
 import '../../model/other_models/table_receipt.dart';
 import '../../model/search_models/short_category.dart';
@@ -17,6 +18,7 @@ ModelHttpService makeModelHttpService<S extends Serializable>() {
   const classesToConstructors = <Type, Constructor<ModelHttpService>>{
     Employee: EmployeeService.new,
     StoreProduct: StoreProductService.new,
+    JoinedStoreProduct: StoreProductService.new,
     Product: ProductService.new,
     ProductWithCategory: ProductService.new,
     Client: ClientService.new,

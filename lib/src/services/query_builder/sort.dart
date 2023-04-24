@@ -27,7 +27,6 @@ enum SortOption {
   categoryName(Order.asc, 'За назвою категорії'),
   productName(Order.asc, 'За назвою товару'),
   quantity(Order.desc, 'За кількістю'),
-  manufacturer(Order.asc, 'За виробником'),//TODO remove
   date(Order.desc, 'За датою');
 
   final Order defaultOrder;

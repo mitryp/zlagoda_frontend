@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 
+import 'categories_view.dart';
 import 'products_view.dart';
+import 'store_products_view.dart';
 
 Widget buildProductsView(BuildContext context) => const ProductsView();
+Widget buildStoreProductsView(BuildContext context) => const StoreProductsView();
+Widget buildCategoriesView(BuildContext context) => const CategoriesView();
 
 enum GoodsTab {
   products('Товари', builder: buildProductsView),
-  storeProducts('Товари в магазині', builder: buildProductsView),
-  categories('Категорії', builder: buildProductsView);
+  storeProducts('Товари в магазині', builder: buildStoreProductsView),
+  categories('Категорії', builder: buildCategoriesView);
 
   final String tabName;
   final WidgetBuilder builder;

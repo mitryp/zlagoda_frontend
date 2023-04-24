@@ -23,6 +23,7 @@ enum FilterOption<T> {
   dateMin<DateTime>(),
   dateMax<DateTime>(),
   employeeSurname<String>(),
+  employeeName<String>(),
   position<Position>(),
   clientSurname<String>(),
   discount<int>(),

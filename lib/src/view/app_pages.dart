@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'pages/clients_view.dart';
+import 'pages/employees_view.dart';
 import 'pages/goods/goods_tab_view.dart';
+import 'pages/receipts_view.dart';
 
 enum AppPage {
   goods(Icons.list, label: 'Товари'),
@@ -20,7 +23,7 @@ enum AppPage {
 
 final pagesToWidgets = <AppPage, WidgetBuilder>{
   AppPage.goods: (_) => const GoodsTabView(),
-  AppPage.receipts: (_) => Text('receipts'),
-  AppPage.clients: (_) => Text('clients'),
-  AppPage.employees: (_) => Text('employees'),
+  AppPage.receipts: (_) => const ReceiptsView(),
+  AppPage.clients: (_) => const ClientsView(),
+  AppPage.employees: (_) => const EmployeesView(),
 };

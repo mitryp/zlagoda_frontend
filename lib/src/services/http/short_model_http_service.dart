@@ -3,8 +3,6 @@ import 'package:http/http.dart' as http;
 import '../../model/interfaces/search_model.dart';
 import '../../model/search_models/short_category.dart';
 import '../../utils/json_decode.dart';
-import '../query_builder/query_builder.dart';
-import '../query_builder/sort.dart';
 import 'http_service_helper.dart';
 
 class ShortModelHttpService<SM extends SearchModel> {

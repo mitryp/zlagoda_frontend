@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import '../../../../services/query_builder/filter.dart';
 import 'types.dart';
 
-class SearchFilter extends StatefulWidget {
+class SearchFilter<K> extends StatefulWidget {
   final String caption;
   final AddFilter addFilter;
   final RemoveFilter removeFilter;
-  final FilterOption<String> filterOption;
+  final FilterOption<K> filterOption;
 
   const SearchFilter({
     required this.caption,

@@ -7,6 +7,7 @@ import '../../model/basic_models/product.dart';
 import '../../model/basic_models/receipt.dart';
 import '../../model/basic_models/store_product.dart';
 import '../../model/interfaces/serializable.dart';
+import '../../model/joined_models/joined_store_product.dart';
 import '../../model/joined_models/product_with_category.dart';
 import '../../model/other_models/table_receipt.dart';
 import '../../typedefs.dart';
@@ -22,7 +23,8 @@ typedef ControllerSuccessfulLogic<T> = T Function(http.Response response);
 /// Implementation - Verkhohliad Kateryna
 /// [SCol] - the type of the recourse when the whole collection is fetched by GET collection
 /// [SSingle] - the type of the single row fetched by GET single
-abstract class ModelHttpService<SCol extends Serializable, SSingle extends Serializable> {
+abstract class ModelHttpService<SCol extends Serializable,
+    SSingle extends Serializable> {
   static const String baseRoute = 'localhost:5000';
 
   final String route;
@@ -34,17 +36,19 @@ abstract class ModelHttpService<SCol extends Serializable, SSingle extends Seria
     required this.collectionCastFunction,
     JsonCastFunction<SSingle>? singleCastFunction,
   })  : assert(SCol == SSingle || singleCastFunction != null),
-        singleCastFunction =
-            singleCastFunction ?? collectionCastFunction as JsonCastFunction<SSingle>;
+        singleCastFunction = singleCastFunction ??
+            collectionCastFunction as JsonCastFunction<SSingle>;
 
-  String makeRoute([Object? path]) => 'api/$route${path != null ? '/$path' : ''}';
+  String makeRoute([Object? path]) =>
+      'api/$route${path != null ? '/$path' : ''}';
 
   Future<List<SCol>> get(QueryBuilder queryBuilder) async {
     final response = await makeRequest(
       HttpMethod.get,
       Uri.http(baseRoute, makeRoute(), queryBuilder.queryParams),
     ).catchError(
-      (err) => http.Response(err is http.ClientException ? err.message : 'Unknown $err', 503),
+      (err) => http.Response(
+          err is http.ClientException ? err.message : 'Unknown $err', 503),
     );
 
     return httpServiceController(response, (response) {
@@ -57,12 +61,14 @@ abstract class ModelHttpService<SCol extends Serializable, SSingle extends Seria
   }
 
   Future<SSingle?> singleById(dynamic id) async {
-    final response = await makeRequest(HttpMethod.get, Uri.http(baseRoute, makeRoute(id)))
-        .catchError((err) => http.Response('$err', 503));
+    final response =
+        await makeRequest(HttpMethod.get, Uri.http(baseRoute, makeRoute(id)))
+            .catchError((err) => http.Response('$err', 503));
 
     return httpServiceController(
       response,
-      (response) => singleCastFunction(decodeResponseBody<Map<String, dynamic>>(response)),
+      (response) => singleCastFunction(
+          decodeResponseBody<Map<String, dynamic>>(response)),
     );
   }
 
@@ -95,18 +101,23 @@ abstract class ModelHttpService<SCol extends Serializable, SSingle extends Seria
   }
 }
 
-
 /*
   Concrete implementations
  */
 
 class EmployeeService extends ModelHttpService<Employee, Employee> {
-  const EmployeeService() : super(route: 'employees', collectionCastFunction: Employee.fromJson);
+  const EmployeeService()
+      : super(route: 'employees', collectionCastFunction: Employee.fromJson);
 }
 
-class StoreProductService extends ModelHttpService<StoreProduct, StoreProduct> {
+class StoreProductService
+    extends ModelHttpService<JoinedStoreProduct, StoreProduct> {
   const StoreProductService()
-      : super(route: 'store_products', collectionCastFunction: StoreProduct.fromJSON);
+      : super(
+          route: 'store_products',
+          collectionCastFunction: JoinedStoreProduct.fromJson,
+          singleCastFunction: StoreProduct.fromJSON,
+        );
 }
 
 class ProductService extends ModelHttpService<ProductWithCategory, Product> {
@@ -119,14 +130,26 @@ class ProductService extends ModelHttpService<ProductWithCategory, Product> {
 }
 
 class CategoryService extends ModelHttpService<Category, Category> {
-  const CategoryService() : super(route: 'categories', collectionCastFunction: Category.fromJson);
+  const CategoryService()
+      : super(
+          route: 'categories',
+          collectionCastFunction: Category.fromJson,
+        );
 }
 
-class ClientService extends ModelHttpService<Client, Category> {
-  const ClientService() : super(route: 'clients', collectionCastFunction: Client.fromJson);
+class ClientService extends ModelHttpService<Client, Client> {
+  const ClientService()
+      : super(
+          route: 'clients',
+          collectionCastFunction: Client.fromJson,
+        );
 }
 
 class ReceiptService extends ModelHttpService<TableReceipt, Receipt> {
   const ReceiptService()
-      : super(route: 'receipts', collectionCastFunction: Receipt.fromJson);
+      : super(
+          route: 'receipts',
+          collectionCastFunction: TableReceipt.fromJson,
+          singleCastFunction: Receipt.fromJson,
+        );
 }

@@ -14,8 +14,10 @@ abstract class _ProductWithCategory implements Serializable {
   const _ProductWithCategory();
 }
 
-class ProductWithCategory extends _ProductWithCategory with ConvertibleToRow<ProductWithCategory> {
-  static final Schema<ProductWithCategory> schema = Schema(ProductWithCategory.new, [
+class ProductWithCategory extends _ProductWithCategory
+    with ConvertibleToRow<ProductWithCategory> {
+  static final Schema<ProductWithCategory> schema =
+      Schema(ProductWithCategory.new, [
     FieldDescription<Product, ProductWithCategory>(
       'product',
       (o) => o.product,
@@ -43,15 +45,19 @@ class ProductWithCategory extends _ProductWithCategory with ConvertibleToRow<Pro
   }
 
   @override
-  JsonMap toJson() => {...Product.schema.toJson(product), ...Category.schema.toJson(category)};
+  JsonMap toJson() =>
+      {...Product.schema.toJson(product), ...Category.schema.toJson(category)};
 
   @override
-  void redirectToModelView(BuildContext context) =>
-      AppNavigation.of(context).openModelViewFor(product, [ModelTable<Category>(category)]);
+  void redirectToModelView(BuildContext context) => AppNavigation.of(context)
+      .openModelViewFor<Product>(product, [ModelTable<Category>(category)]);
 
   @override
   DataRow buildRow(BuildContext context) => DataRow(
-        cells: [...product.buildRow(context).cells, ...category.buildRow(context).cells],
+        cells: [
+          ...product.buildRow(context).cells,
+          ...category.buildRow(context).cells
+        ],
         onSelectChanged: (_) => redirectToModelView(context),
       );
 }

@@ -7,7 +7,7 @@ class ChipsFilter<V> extends StatefulWidget {
   final AddFilter addFilter;
   final RemoveFilter removeFilter;
   final FilterOption<V> filterOption;
-  final List<V> availableChoices;
+  final Map<V, String> availableChoices;
 
   const ChipsFilter({
     required this.filterOption,
@@ -22,12 +22,12 @@ class ChipsFilter<V> extends StatefulWidget {
 }
 
 class _ChipsFilterState<V> extends State<ChipsFilter<V>> {
-  late final List<V> _options = [...widget.availableChoices];
+  late final List<V> _options = [...widget.availableChoices.keys];
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      children: widget.availableChoices
+      children: widget.availableChoices.keys
           .map((option) => buildFilterChip(option))
           .toList(),
     );
@@ -47,7 +47,7 @@ class _ChipsFilterState<V> extends State<ChipsFilter<V>> {
         _options.remove(option);
 
         if(_options.isEmpty) {
-          _options.addAll(widget.availableChoices);
+          _options.addAll(widget.availableChoices.keys);
           widget.removeFilter(widget.filterOption);
 
           return;
@@ -62,7 +62,7 @@ class _ChipsFilterState<V> extends State<ChipsFilter<V>> {
 
   Widget buildFilterChip(V option) {
     return FilterChip(
-      label: Text(option.toString()),
+      label: Text(widget.availableChoices[option]!),
       selected: _options.contains(option),
       onSelected: (bool value) => _handleChoice(value, option),
     );

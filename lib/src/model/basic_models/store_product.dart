@@ -1,19 +1,17 @@
 import '../../typedefs.dart';
-//import '../interfaces/convertible_to_row.dart';
 import '../interfaces/model.dart';
 import '../model_reference.dart';
 import '../schema/field_description.dart';
 import '../schema/schema.dart';
 import 'product.dart';
 
-//class StoreProduct extends Model with ConvertibleToRow {
 class StoreProduct extends Model {
   static final Schema<StoreProduct> schema = Schema(
     StoreProduct.new,
     [
       FieldDescription<int, StoreProduct>(
-        'productId',
-        (o) => o.productId,
+        'storeProductId',
+        (o) => o.storeProductId,
         labelCaption: 'ID товару',
       ),
       FieldDescription<String, StoreProduct>.stringForeignKey(
@@ -32,48 +30,38 @@ class StoreProduct extends Model {
         (o) => o.quantity,
         labelCaption: 'Кількість',
       ),
-      FieldDescription<bool, StoreProduct>(
-        'isProm',
-        (o) => o.isProm,
-        labelCaption: 'Акційний',
+      FieldDescription<int?, StoreProduct>(
+        'baseProduct',
+            (o) => o.baseStoreProductId,
+        labelCaption: 'ID базового товару у магазині',
       ),
     ],
   );
 
-  final int productId;
+  final int storeProductId;
   final String upc;
   final int price;
   final int quantity;
-  final bool isProm;
+  final int? baseStoreProductId;
 
   const StoreProduct({
-    required this.productId,
+    required this.storeProductId,
     required this.upc,
     required this.price,
     required this.quantity,
-    required this.isProm,
+    this.baseStoreProductId
   });
 
   static StoreProduct? fromJSON(JsonMap json) => schema.fromJson(json);
 
+  bool get isProm => baseStoreProductId != null;
+
   @override
-  get primaryKey => productId;
+  get primaryKey => storeProductId;
 
   @override
   JsonMap toJson() => schema.toJson(this);
 
   @override
   List<ForeignKey<Model>> get foreignKeys => [foreignKey<Product>('upc', upc)];
-
-// @override
-// DataRow buildRow(BuildContext context) {
-//   // todo is prom
-//   final cellsText = [
-//     productId.toString(),
-//     price.toString(),
-//     quantity.toString(),
-//   ];
-//
-//   return buildRowFromFields(context, cellsText);
-// }
 }

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../joined_models/joined_store_product.dart';
 import '../joined_models/product_with_category.dart';
 import '../model_schema_factory.dart';
 import '../schema/field_description.dart';
 import '../schema/schema.dart';
 import 'serializable.dart';
+
+String toHryvnas(int coins) => '${coins / 100}.${coins % 100} грн.';
 
 mixin ConvertibleToRow<R extends ConvertibleToRow<R>> on Serializable {
   /// The row should redirect to the individual model page in onSelectedChanged.
@@ -21,6 +24,7 @@ mixin ConvertibleToRow<R extends ConvertibleToRow<R>> on Serializable {
 ///
 const _columnNamesOverride = <Type, List<String>>{
   ProductWithCategory: ['UPC', 'Назва', 'Виробник', 'Категорія'],
+  JoinedStoreProduct: ['UPC', 'Назва', 'Виробник', 'Ціна', 'Кількість', 'Вартість', 'Акційність'],
 };
 
 /// Returns the column names of the [R] table.
