@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../services/query_builder/filter.dart';
+import '../../utils/helping_functions.dart';
 import 'types.dart';
 
 class ChipsFilter<V> extends StatefulWidget {
@@ -26,11 +27,11 @@ class _ChipsFilterState<V> extends State<ChipsFilter<V>> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: widget.availableChoices.keys
-          .map((option) => buildFilterChip(option))
-          .toList(),
-    );
+    final filterChips = widget.availableChoices.keys
+        .map((option) => buildFilterChip(option))
+        .toList();
+
+    return Row(children: makeSeparated(filterChips));
   }
 
   void _handleChoice(bool value, V option) {
@@ -46,7 +47,7 @@ class _ChipsFilterState<V> extends State<ChipsFilter<V>> {
       } else {
         _options.remove(option);
 
-        if(_options.isEmpty) {
+        if (_options.isEmpty) {
           _options.addAll(widget.availableChoices.keys);
           widget.removeFilter(widget.filterOption);
 

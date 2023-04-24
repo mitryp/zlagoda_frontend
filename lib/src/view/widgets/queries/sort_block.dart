@@ -61,7 +61,7 @@ class _SortBlockState extends State<SortBlock> {
         selectedSortFields[i] = i == index;
       }
 
-      updateSort(Sort(widget.sortOptions[index]));
+      updateSort(Sort(widget.sortOptions[index], currentSort.order));
     });
   }
 

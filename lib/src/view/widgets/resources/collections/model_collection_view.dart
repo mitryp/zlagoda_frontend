@@ -39,28 +39,3 @@ class _ModelCollectionViewState<SCol extends ConvertibleToRow<SCol>>
     );
   }
 }
-
-class CSFDelegate extends CollectionSearchFilterDelegate {
-  const CSFDelegate({
-    required super.queryBuilder,
-    required super.updateCallback,
-  });
-
-  @override
-  List<Widget> buildFilters(BuildContext context) {
-    // TODO: implement buildFilters
-    return [];
-  }
-
-  @override
-  List<Widget> buildSearches(BuildContext context) {
-    // TODO: implement buildSearches
-    return [];
-  }
-
-  @override
-  Widget buildSort(BuildContext context) {
-    // TODO: implement buildSort
-    throw const SizedBox();
-  }
-}

@@ -10,6 +10,7 @@ import '../../../../services/query_builder/query_builder.dart';
 import '../../../../services/query_builder/sort.dart';
 import '../../../../typedefs.dart';
 import '../../../pages/page_base.dart';
+import '../../utils/helping_functions.dart';
 
 abstract class CollectionSearchFilterDelegate {
   final VoidCallback updateCallback;
@@ -108,20 +109,33 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>>
   }
 
   Widget buildSearchFilters() {
-    const divider = VerticalDivider(thickness: 1,color: Colors.black);
+    const horizontalPadding = 16.0;
+
+    const divider = SizedBox(
+      height: 25,
+      child: VerticalDivider(
+        color: Colors.grey,
+        thickness: 1,
+        width: horizontalPadding * 2,
+      ),
+    );
+
+    final sort = searchFilterDelegate.buildSort(context);
+    final filters = searchFilterDelegate.buildFilters(context);
+    final searches = searchFilterDelegate.buildSearches(context);
 
     return Card(
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
           child: Flex(
             direction: Axis.horizontal,
             mainAxisSize: MainAxisSize.min,
             children: [
-              searchFilterDelegate.buildSort(context),
-              divider,
-              ...searchFilterDelegate.buildFilters(context),
-              divider,
-              ...searchFilterDelegate.buildSearches(context),
+              sort,
+              filters.isEmpty ? const SizedBox() : divider,
+              ...filters,
+              searches.isEmpty ? const SizedBox() : divider,
+              ...makeSeparated(searches),
             ],
           ),
         ));
