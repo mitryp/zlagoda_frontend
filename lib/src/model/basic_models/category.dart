@@ -31,7 +31,7 @@ class Category extends Model with ConvertibleToRow<Category> {
     ],
   );
 
-  final int categoryId;
+  final int? categoryId;
   final String categoryName;
 
   const Category({
@@ -56,5 +56,5 @@ class Category extends Model with ConvertibleToRow<Category> {
 
   @override
   ShortCategory toSearchModel() =>
-      ShortCategory(categoryId: categoryId, categoryName: categoryName);
+      ShortCategory(categoryId: categoryId!, categoryName: categoryName);
 }
