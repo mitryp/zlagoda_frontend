@@ -62,22 +62,6 @@ class _ForeignKeyEditorState<M extends Model, SM extends SearchModel>
         child: CircularProgressIndicator(),
       );
     } else {
-      // cardChild = InkWell(
-      //   onTap: () {}, // todo
-      //   borderRadius: defaultBorderRadius,
-      //   child: Row(
-      //     children: [
-      //       Padding(
-      //         padding: const EdgeInsets.all(16),
-      //         child: FittedBox(
-      //           child: Text(
-      //             connectedModel != null ? '$connectedModel' : makeModelLocalizedName<M>(),
-      //           ),
-      //         ),
-      //       ),
-      //     ],
-      //   ),
-      // );
       cardChild = widget.initialForeignKey.searchInitiator(
         onUpdate: widget.updateCallback,
         selected: connectedModel?.toSearchModel() as SM?,
