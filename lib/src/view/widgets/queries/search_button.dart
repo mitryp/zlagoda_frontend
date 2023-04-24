@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import '../../../model/interfaces/search_model.dart';
 import '../../../services/http/http_service_factory.dart';
 import '../../../services/query_builder/filter.dart';
-import '../../../services/query_builder/sort.dart';
+import '../../../typedefs.dart';
 import 'filters/types.dart';
+import 'model_search_initiator.dart';
 import 'search_popup_delegate.dart';
 
 class SearchButton<K, SM extends ShortModel<K>> extends StatefulWidget {
@@ -25,8 +26,7 @@ class SearchButton<K, SM extends ShortModel<K>> extends StatefulWidget {
   State<SearchButton> createState() => _SearchButtonState<K, SM>();
 }
 
-class _SearchButtonState<K, SM extends ShortModel<K>>
-    extends State<SearchButton> {
+class _SearchButtonState<K, SM extends ShortModel<K>> extends State<SearchButton> {
   late String caption = widget.searchCaption;
   String? selectedItem;
   bool _isLoading = false;
@@ -41,9 +41,10 @@ class _SearchButtonState<K, SM extends ShortModel<K>>
     if (!context.mounted) return;
 
     final selected = await showSearch(
-        context: context,
-        delegate: SearchPopupDelegate<SM>(fetchedItems, widget.searchCaption),
-        query: selectedItem?.toString() ?? '');
+      context: context,
+      delegate: SearchPopupDelegate<SM>(fetchedItems, widget.searchCaption),
+      query: selectedItem?.toString() ?? '',
+    );
 
     setState(() {
       if (selected == null) {
@@ -54,9 +55,8 @@ class _SearchButtonState<K, SM extends ShortModel<K>>
         widget.addFilter(Filter(widget.filterOption, selected.primaryKey));
       }
 
-      caption = selectedItem == null
-          ? widget.searchCaption
-          : '${widget.searchCaption}: $selectedItem';
+      caption =
+          selectedItem == null ? widget.searchCaption : '${widget.searchCaption}: $selectedItem';
     });
   }
 
@@ -70,6 +70,43 @@ class _SearchButtonState<K, SM extends ShortModel<K>>
               strokeWidth: 3,
             )
           : Text(caption),
+    );
+  }
+}
+
+class ConnectedModelFilter<K, SM extends ShortModel<K>> extends StatelessWidget {
+  final FilterOption<K> filterOption;
+  final String caption;
+  final UpdateCallback<Filter<K>> addFilter;
+  final UpdateCallback<FilterOption> removeFilterByOption;
+
+  const ConnectedModelFilter({
+    required this.filterOption,
+    required this.caption,
+    required this.addFilter,
+    required this.removeFilterByOption,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ModelSearchInitiator<K, SM>(
+      preserveSearchOnCancel: false,
+      selectionBuilder: (context, selected) {
+        return Text(selected != null ? selected.descriptiveAttr : caption);
+      },
+      container: ({required child, required onTap}) => ElevatedButton(
+        onPressed: onTap,
+        child: child,
+      ),
+      onUpdate: (newPrimaryKey) {
+        if (newPrimaryKey == null) {
+          removeFilterByOption(filterOption);
+        }
+        else {
+          addFilter(Filter(filterOption, newPrimaryKey));
+        }
+      },
     );
   }
 }

@@ -18,6 +18,7 @@ typedef ModelTableGenerator<M extends Model> = Future<ModelTable<M>> Function();
 typedef Constructor<T> = T Function();
 typedef VoidWidgetConstructor<T extends Widget> = T Function({Key? key});
 typedef RedirectCallback = void Function(BuildContext context);
+typedef UpdateCallback<T> = void Function(T newValue);
 
 typedef ExactWidgetBuilder<W extends Widget> = W Function(BuildContext context);
 

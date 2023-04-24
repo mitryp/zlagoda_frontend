@@ -38,12 +38,18 @@ class ProductsSearchFilters extends CollectionSearchFilterDelegate {
   @override
   List<Widget> buildSearches(BuildContext context) {
     return [
-      SearchButton<int, ShortCategory>(
+      ConnectedModelFilter<int, ShortCategory>(
         filterOption: FilterOption.categoryId,
-        searchCaption: 'Назва категорії...',
+        caption: 'Всі категорії',
         addFilter: addFilter,
-        removeFilter: removeFilter,
+        removeFilterByOption: removeFilter,
       ),
+      // SearchButton<int, ShortCategory>(
+      //   filterOption: FilterOption.categoryId,
+      //   searchCaption: 'Назва категорії...',
+      //   addFilter: addFilter,
+      //   removeFilter: removeFilter,
+      // ),
       SearchFilter(
         filterOption: FilterOption.productName,
         removeFilter: removeFilter,

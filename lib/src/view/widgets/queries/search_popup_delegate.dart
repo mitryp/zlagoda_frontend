@@ -19,9 +19,9 @@ class SearchPopupDelegate<SM extends ShortModel> extends SearchDelegate<SM?> {
         ),
         IconButton(
           onPressed: () {
-            if (query.isEmpty)
+            if (query.isEmpty) {
               close(context, null);
-            else {
+            } else {
               query = '';
               result = null;
             }

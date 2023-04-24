@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../model/interfaces/search_model.dart';
 import '../../../services/http/http_service_factory.dart';
+import '../../../typedefs.dart';
 import '../resources/models/foreign_key_editor.dart';
 import 'search_popup_delegate.dart';
 
@@ -34,6 +35,7 @@ class ModelSearchInitiator<K, SM extends ShortModel<K>> extends StatefulWidget {
   final SearchSelectionBuilder<SM> selectionBuilder;
   final SingleChildTapDetector container;
   final SM? selected;
+  final bool preserveSearchOnCancel;
 
   const ModelSearchInitiator({
     required this.onUpdate,
@@ -41,6 +43,7 @@ class ModelSearchInitiator<K, SM extends ShortModel<K>> extends StatefulWidget {
     this.progressIndicatorBuilder = defaultProgressIndicatorBuilder,
     this.selectionBuilder = defaultSelectionBuilder,
     this.container = InkWell.new,
+    this.preserveSearchOnCancel = true,
     super.key,
   });
 
@@ -82,10 +85,15 @@ class _ModelSearchInitiatorState<K, SM extends ShortModel<K>>
     if (!isLoaded) await fetchOptions();
     if (!mounted) return;
 
-    final selection = await showSearch(
+    var selection = await showSearch(
       context: context,
       delegate: SearchPopupDelegate<SM>(options),
-    ) ?? this.selection;
+    );
+
+    if (widget.preserveSearchOnCancel) {
+      selection ??= this.selection;
+    }
+
     if (!mounted) return;
     setState(() => this.selection = selection);
     widget.onUpdate(selection?.primaryKey);

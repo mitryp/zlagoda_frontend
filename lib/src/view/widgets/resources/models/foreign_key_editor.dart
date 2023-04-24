@@ -4,8 +4,7 @@ import '../../../../model/interfaces/model.dart';
 import '../../../../model/interfaces/search_model.dart';
 import '../../../../model/model_reference.dart';
 import '../../../../theme.dart';
-
-typedef UpdateCallback<T> = void Function(T newForeignKey);
+import '../../../../typedefs.dart';
 
 class ForeignKeyEditor<M extends Model, SM extends ShortModel> extends StatefulWidget {
   final ForeignKey<M, SM> initialForeignKey;

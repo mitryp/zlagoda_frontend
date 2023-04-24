@@ -19,7 +19,7 @@ class Client extends Model with ConvertibleToRow<Client> {
         'clientId',
         (o) => o.clientId,
         labelCaption: 'Номер картки покупця',
-        validator: hasLength(14),
+        validator: hasLength(13),
       ),
       FieldDescription<Name, Client>.serializable(
         'clientName',
