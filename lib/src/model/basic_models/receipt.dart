@@ -32,11 +32,11 @@ class Receipt extends TableReceipt {
         defaultForeignKey:
             foreignKey<Client, SearchModel>('clientId'), // todo replace with the actual short model
       ),
-      FieldDescription<Name?, Receipt>(
+      FieldDescription<Name?, Receipt>.serializable(
         'clientName',
         (o) => o.clientName,
         labelCaption: "Ім'я клієнта",
-        fieldType: FieldType.serializable,
+        serializableEditorBuilder: nameEditorBuilder,
       ),
       FieldDescription<DateTime, Receipt>(
         'date',
@@ -51,11 +51,11 @@ class Receipt extends TableReceipt {
         labelCaption: 'Податок',
         fieldType: FieldType.number,
       ),
-      FieldDescription<Name, Receipt>(
+      FieldDescription<Name, Receipt>.serializable(
         'employeeName',
         (o) => o.employeeName,
         labelCaption: "Ім'я касира",
-        fieldType: FieldType.serializable,
+        serializableEditorBuilder: nameEditorBuilder
       ),
       FieldDescription<String, Receipt>(
         'employeeId',

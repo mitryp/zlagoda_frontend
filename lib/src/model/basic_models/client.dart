@@ -21,11 +21,11 @@ class Client extends Model with ConvertibleToRow<Client> {
         labelCaption: 'Номер картки покупця',
         validator: hasLength(14),
       ),
-      FieldDescription<Name, Client>(
+      FieldDescription<Name, Client>.serializable(
         'clientName',
         (o) => o.clientName,
         labelCaption: "Ім'я клієнта",
-        fieldType: FieldType.serializable,
+        serializableEditorBuilder: nameEditorBuilder,
       ),
       FieldDescription<String, Client>(
         'phone',
@@ -33,11 +33,11 @@ class Client extends Model with ConvertibleToRow<Client> {
         labelCaption: 'Номер телефону',
         validator: notEmpty,
       ),
-      FieldDescription<Address?, Client>(
+      FieldDescription<Address?, Client>.serializable(
         'address',
         (o) => o.address,
         labelCaption: 'Адреса',
-        fieldType: FieldType.serializable,
+        serializableEditorBuilder: addressEditorBuilder,
       ),
       FieldDescription<int, Client>(
         'discount',
