@@ -4,11 +4,16 @@ import '../common_models/address.dart';
 import '../common_models/name.dart';
 import '../joined_models/joined_sale.dart';
 
+typedef NullableName = Name?;
+typedef NullableAddress = Address?;
+
 Extractor<T> makeExtractor<T>() {
   final typesToExtractors = {
     DateTime: DateTimeExtractor.new,
     Address: AddressExtractor.new,
+    NullableAddress: AddressExtractor.new,
     Name: NameExtractor.new,
+    NullableName: NameExtractor.new,
     JoinedSale: JoinedSaleExtractor.new,
     Position: PositionExtractor.new,
     List<JoinedSale>: () => ListExtractor<JoinedSale>(),

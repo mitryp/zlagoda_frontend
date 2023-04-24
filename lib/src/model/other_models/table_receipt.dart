@@ -26,17 +26,17 @@ class TableReceipt extends Model with ConvertibleToRow<TableReceipt>{
         (o) => o.cost,
         labelCaption: 'Вартість',
       ),
-      FieldDescription<Name?, TableReceipt>(
+      FieldDescription<Name?, Receipt>.serializable(
         'clientName',
-        (o) => o.clientName,
+            (o) => o.clientName,
         labelCaption: "Ім'я клієнта",
-        fieldType: FieldType.serializable,
+        serializableEditorBuilder: nameEditorBuilder,
       ),
-      FieldDescription<Name, TableReceipt>(
-        'employeeName',
-        (o) => o.employeeName,
-        labelCaption: "Ім'я працівника",
-        fieldType: FieldType.serializable,
+      FieldDescription<Name, Receipt>.serializable(
+          'employeeName',
+              (o) => o.employeeName,
+          labelCaption: "Ім'я касира",
+          serializableEditorBuilder: nameEditorBuilder
       ),
     ],
   );
