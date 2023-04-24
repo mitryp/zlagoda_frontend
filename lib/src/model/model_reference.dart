@@ -26,7 +26,7 @@ class ModelReference<M extends Model> {
   }
 }
 
-class ForeignKey<M extends Model, SM extends SearchModel> {
+class ForeignKey<M extends Model, SM extends ShortModel> {
   final String foreignKeyName;
   final ModelReference<M> reference;
   final ModelTableGenerator<M> tableGenerator;
@@ -57,7 +57,7 @@ class ForeignKey<M extends Model, SM extends SearchModel> {
   }
 }
 
-ForeignKey<M, SM> foreignKey<M extends Model, SM extends SearchModel>(
+ForeignKey<M, SM> foreignKey<M extends Model, SM extends ShortModel>(
   String foreignKeyName, [
   dynamic primaryKeyValue,
 ]) {

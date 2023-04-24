@@ -7,7 +7,7 @@ import '../../../services/query_builder/sort.dart';
 import 'filters/types.dart';
 import 'search_popup_delegate.dart';
 
-class SearchButton<K, SM extends SearchModel<K>> extends StatefulWidget {
+class SearchButton<K, SM extends ShortModel<K>> extends StatefulWidget {
   final FilterOption<K> filterOption;
   final String searchCaption;
   final AddFilter addFilter;
@@ -25,7 +25,7 @@ class SearchButton<K, SM extends SearchModel<K>> extends StatefulWidget {
   State<SearchButton> createState() => _SearchButtonState<K, SM>();
 }
 
-class _SearchButtonState<K, SM extends SearchModel<K>>
+class _SearchButtonState<K, SM extends ShortModel<K>>
     extends State<SearchButton> {
   late String caption = widget.searchCaption;
   String? selectedItem;

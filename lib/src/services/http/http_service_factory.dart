@@ -10,24 +10,25 @@ import '../../model/joined_models/joined_store_product.dart';
 import '../../model/joined_models/product_with_category.dart';
 import '../../model/other_models/table_receipt.dart';
 import '../../model/search_models/short_category.dart';
+import '../../model/search_models/short_product.dart';
 import '../../typedefs.dart';
 import 'model_http_service.dart';
 import 'short_model_http_service.dart';
 
-ModelHttpService makeModelHttpService<S extends Serializable>() {
-  const classesToConstructors = <Type, Constructor<ModelHttpService>>{
-    Employee: EmployeeService.new,
-    StoreProduct: StoreProductService.new,
-    JoinedStoreProduct: StoreProductService.new,
-    Product: ProductService.new,
-    ProductWithCategory: ProductService.new,
-    Client: ClientService.new,
-    Receipt: ReceiptService.new,
-    TableReceipt: ReceiptService.new,
-    Category: CategoryService.new
-  };
+const _classesToServiceConstructors = <Type, Constructor<ModelHttpService>>{
+  Employee: EmployeeService.new,
+  StoreProduct: StoreProductService.new,
+  JoinedStoreProduct: StoreProductService.new,
+  Product: ProductService.new,
+  ProductWithCategory: ProductService.new,
+  Client: ClientService.new,
+  Receipt: ReceiptService.new,
+  TableReceipt: ReceiptService.new,
+  Category: CategoryService.new
+};
 
-  final serviceConstructor = classesToConstructors[S];
+ModelHttpService makeModelHttpService<S extends Serializable>() {
+  final serviceConstructor = _classesToServiceConstructors[S];
 
   if (serviceConstructor == null) {
     throw StateError('No ResourceHttpService found for type $S');
@@ -36,12 +37,13 @@ ModelHttpService makeModelHttpService<S extends Serializable>() {
   return serviceConstructor();
 }
 
-ShortModelHttpService<SM> makeShortModelHttpService<SM extends SearchModel>() {
-  const classesToConstructors = <Type, Constructor<ShortModelHttpService>>{
-    ShortCategory: ShortCategoryService.new
-  };
+const _classesToShortServiceConstructors = <Type, Constructor<ShortModelHttpService>>{
+  ShortCategory: ShortCategoryService.new,
+  ShortProduct: ShortProductService.new,
+};
 
-  final serviceConstructor = classesToConstructors[SM];
+ShortModelHttpService<SM> makeShortModelHttpService<SM extends ShortModel>() {
+  final serviceConstructor = _classesToShortServiceConstructors[SM];
 
   if (serviceConstructor == null) {
     throw StateError('No ResourceHttpService found for type $SM');
@@ -49,5 +51,3 @@ ShortModelHttpService<SM> makeShortModelHttpService<SM extends SearchModel>() {
 
   return serviceConstructor() as ShortModelHttpService<SM>;
 }
-
-

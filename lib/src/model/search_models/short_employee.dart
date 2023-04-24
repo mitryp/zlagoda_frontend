@@ -3,7 +3,7 @@ import '../interfaces/search_model.dart';
 import '../schema/field_description.dart';
 import '../schema/schema.dart';
 
-class ShortEmployee extends SearchModel<String> {
+class ShortEmployee extends ShortModel<String> {
   static final Schema<ShortEmployee> schema = Schema(ShortEmployee.new, [
     FieldDescription<String, ShortEmployee>(
       'primaryKey',

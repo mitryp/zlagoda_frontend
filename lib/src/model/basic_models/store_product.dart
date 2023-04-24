@@ -1,9 +1,11 @@
 import '../../typedefs.dart';
-
 import '../interfaces/model.dart';
+import '../interfaces/search_model.dart';
 import '../model_reference.dart';
 import '../schema/field_description.dart';
+import '../schema/field_type.dart';
 import '../schema/schema.dart';
+import '../schema/validators.dart';
 import '../search_models/short_product.dart';
 import 'product.dart';
 
@@ -15,6 +17,8 @@ class StoreProduct extends Model {
         'storeProductId',
         (o) => o.storeProductId,
         labelCaption: 'ID товару',
+        isEditable: false,
+        fieldDisplayMode: FieldDisplayMode.none,
       ),
       FieldDescription<String, StoreProduct>.stringForeignKey(
         'upc',
@@ -26,16 +30,21 @@ class StoreProduct extends Model {
         'price',
         (o) => o.price,
         labelCaption: 'Ціна',
+        fieldType: FieldType.currency,
       ),
       FieldDescription<int, StoreProduct>(
         'quantity',
         (o) => o.quantity,
         labelCaption: 'Кількість',
+        fieldType: FieldType.number,
+        validator: isInteger,
       ),
-      FieldDescription<int?, StoreProduct>(
+      FieldDescription<int?, StoreProduct>.intForeignKey(
         'baseProduct',
-            (o) => o.baseStoreProductId,
+        (o) => o.baseStoreProductId,
         labelCaption: 'ID базового товару у магазині',
+        isEditable: false,
+        defaultForeignKey: foreignKey<StoreProduct, ShortModel>('baseProduct'),
       ),
     ],
   );
@@ -51,7 +60,7 @@ class StoreProduct extends Model {
     required this.upc,
     required this.price,
     required this.quantity,
-    this.baseStoreProductId
+    this.baseStoreProductId,
   });
 
   static StoreProduct? fromJSON(JsonMap json) => schema.fromJson(json);
@@ -64,5 +73,9 @@ class StoreProduct extends Model {
   @override
   JsonMap toJson() => schema.toJson(this);
 
-  List<ForeignKey> get foreignKeys => [foreignKey<Product, ShortProduct>('upc', upc)];
+  @override
+  List<ForeignKey> get foreignKeys => [
+        foreignKey<Product, ShortProduct>('upc', upc),
+        foreignKey<StoreProduct, ShortModel>('baseProduct', baseStoreProductId),
+      ];
 }

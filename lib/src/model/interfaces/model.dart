@@ -9,6 +9,6 @@ abstract class Model implements Serializable {
 
   List<ForeignKey> get foreignKeys => [];
 
-  SearchModel toSearchModel() =>
+  ShortModel toSearchModel() =>
       throw UnimplementedError('Model $runtimeType does not support search');
 }

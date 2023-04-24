@@ -30,7 +30,7 @@ class Receipt extends TableReceipt {
         (o) => o.clientId,
         labelCaption: 'Номер картки клієнта',
         defaultForeignKey:
-            foreignKey<Client, SearchModel>('clientId'), // todo replace with the actual short model
+            foreignKey<Client, ShortModel>('clientId'), // todo replace with the actual short model
       ),
       FieldDescription<Name?, Receipt>.serializable(
         'clientName',

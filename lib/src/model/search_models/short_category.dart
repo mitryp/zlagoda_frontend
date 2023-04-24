@@ -4,7 +4,7 @@ import '../interfaces/search_model.dart';
 import '../schema/field_description.dart';
 import '../schema/schema.dart';
 
-class ShortCategory extends SearchModel<int> {
+class ShortCategory extends ShortModel<int> {
   static final Schema<ShortCategory> schema = Schema(ShortCategory.new, [
     FieldDescription<int, ShortCategory>(
       'primaryKey',

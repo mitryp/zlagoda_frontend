@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../model/interfaces/search_model.dart';
 
-class SearchPopupDelegate<SM extends SearchModel> extends SearchDelegate<SM?> {
+class SearchPopupDelegate<SM extends ShortModel> extends SearchDelegate<SM?> {
   final List<SM> initialOptions;
   SM? result;
 

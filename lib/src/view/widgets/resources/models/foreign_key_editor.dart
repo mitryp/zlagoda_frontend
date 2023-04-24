@@ -7,7 +7,7 @@ import '../../../../theme.dart';
 
 typedef UpdateCallback<T> = void Function(T newForeignKey);
 
-class ForeignKeyEditor<M extends Model, SM extends SearchModel> extends StatefulWidget {
+class ForeignKeyEditor<M extends Model, SM extends ShortModel> extends StatefulWidget {
   final ForeignKey<M, SM> initialForeignKey;
   final M? initiallyConnectedModel;
   final UpdateCallback<dynamic> updateCallback;
@@ -23,7 +23,7 @@ class ForeignKeyEditor<M extends Model, SM extends SearchModel> extends Stateful
   State<ForeignKeyEditor<M, SM>> createState() => _ForeignKeyEditorState<M, SM>();
 }
 
-class _ForeignKeyEditorState<M extends Model, SM extends SearchModel>
+class _ForeignKeyEditorState<M extends Model, SM extends ShortModel>
     extends State<ForeignKeyEditor<M, SM>> {
   M? connectedModel;
   bool isLoaded = false;

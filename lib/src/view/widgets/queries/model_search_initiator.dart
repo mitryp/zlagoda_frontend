@@ -5,7 +5,7 @@ import '../../../services/http/http_service_factory.dart';
 import '../resources/models/foreign_key_editor.dart';
 import 'search_popup_delegate.dart';
 
-typedef SearchSelectionBuilder<SM extends SearchModel> = Widget Function(
+typedef SearchSelectionBuilder<SM extends ShortModel> = Widget Function(
     BuildContext context, SM? selected);
 
 typedef SingleChildTapDetector = Widget Function({
@@ -13,7 +13,7 @@ typedef SingleChildTapDetector = Widget Function({
   required VoidCallback onTap,
 });
 
-typedef ModelSearchInitiatorConstructor<K, SM extends SearchModel<K>> = //
+typedef ModelSearchInitiatorConstructor<K, SM extends ShortModel<K>> = //
     ModelSearchInitiator<K, SM> Function(
         {required UpdateCallback<K?> onUpdate,
         SM? selected,
@@ -22,13 +22,13 @@ typedef ModelSearchInitiatorConstructor<K, SM extends SearchModel<K>> = //
         SingleChildTapDetector container,
         Key? key});
 
-Widget defaultSelectionBuilder(BuildContext context, SearchModel? selected) =>
+Widget defaultSelectionBuilder(BuildContext context, ShortModel? selected) =>
     Text(selected != null ? selected.descriptiveAttr : 'Вибрати');
 
 Widget defaultProgressIndicatorBuilder(BuildContext context) =>
     const FittedBox(child: CircularProgressIndicator());
 
-class ModelSearchInitiator<K, SM extends SearchModel<K>> extends StatefulWidget {
+class ModelSearchInitiator<K, SM extends ShortModel<K>> extends StatefulWidget {
   final UpdateCallback<K?> onUpdate;
   final WidgetBuilder progressIndicatorBuilder;
   final SearchSelectionBuilder<SM> selectionBuilder;
@@ -48,7 +48,7 @@ class ModelSearchInitiator<K, SM extends SearchModel<K>> extends StatefulWidget 
   State<ModelSearchInitiator<K, SM>> createState() => _ModelSearchInitiatorState<K, SM>();
 }
 
-class _ModelSearchInitiatorState<K, SM extends SearchModel<K>>
+class _ModelSearchInitiatorState<K, SM extends ShortModel<K>>
     extends State<ModelSearchInitiator<K, SM>> {
   late final httpService = makeShortModelHttpService<SM>();
   late final List<SM> options;
