@@ -93,7 +93,7 @@ class Employee extends Model with ConvertibleToRow<Employee> {
         (o) => o.phone,
         labelCaption: 'Телефон',
         fieldDisplayMode: FieldDisplayMode.inModelView,
-        validator: notEmpty,
+        validator: isPhoneNumber,
       ),
       FieldDescription<Address, Employee>.serializable(
         'address',

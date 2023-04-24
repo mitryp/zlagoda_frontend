@@ -28,7 +28,7 @@ T? extractInlineFrom<T>(JsonMap json, String field) {
   try {
     return json[field];
   } catch (e) {
-    print('Error when extracting ${field} from json: $e');
+    print('Error when extracting $field from json: $e');
 
     return null;
   }
