@@ -46,7 +46,6 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
             ? field.fieldGetter(model).index.toString()
             : field.presentFieldOf(model);
       }
-
       fieldsToControllers[field] = TextEditingController(text: presentation);
     }
 
@@ -138,7 +137,7 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
         Expanded(
           child: DropdownButtonFormField(
             items: items,
-            value: int.parse(controller.text),
+            value: int.tryParse(controller.text) ?? 0,
             decoration: InputDecoration(label: Text(field.labelCaption)),
             onChanged: (value) {
               if (value == null) return;
@@ -209,7 +208,10 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
         ?.firstWhere((e) => e.runtimeType == field.defaultForeignKey!.modelType);
 
     return foreignKey.makeEditor(
-      updateCallback: (newForeignKey) => entry.value.text = '$newForeignKey',
+      updateCallback: (newForeignKey) {
+        print('updated foreign key: $newForeignKey');
+        entry.value.text = '$newForeignKey';
+      },
       initiallyConnectedModel: connectedModel,
     );
   }
@@ -281,14 +283,26 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
       } else if (field.fieldType == FieldType.serializable) {
         value = fieldsToSerializable[field]!;
       } else {
-        value = field.fieldType.converter(controller.text);
+        try {
+          value = field.fieldType.converter(controller.text);
+        } on FormatException catch (e) {
+          print('caught exception $e');
+          value = null;
+        }
       }
 
-      if (value == '' && field.isNullable) value = null;
       json[field.fieldName] = value;
     }
 
-    return json.map((key, value) => MapEntry(key, Schema.processValue(value)));
+    final map = json.map((key, value) {
+      var processedValue = Schema.processValue(value);
+      if (processedValue is Map && processedValue.values.every((e) => e is String && e.isEmpty))
+        processedValue = null;
+
+      return MapEntry(key, processedValue);
+    });
+    print(map);
+    return map;
   }
 
   M? generateEditedModel() => schema.fromJson(generateJson());

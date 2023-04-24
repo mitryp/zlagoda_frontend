@@ -86,7 +86,8 @@ class _ModelSearchInitiatorState<K, SM extends SearchModel<K>>
       context: context,
       delegate: SearchPopupDelegate<SM>(options),
     ) ?? this.selection;
-    _setStateIfNotMounted(() => this.selection = selection);
+    if (!mounted) return;
+    setState(() => this.selection = selection);
     widget.onUpdate(selection?.primaryKey);
   }
 

@@ -38,7 +38,7 @@ class Address implements Serializable {
     required this.index,
   });
 
-  String get fullAddress => '$city, $street, $index';
+  String get fullAddress => [city, street, index].where((e) => e.isNotEmpty).join(', ');
 
   @override
   String toString() => fullAddress;
