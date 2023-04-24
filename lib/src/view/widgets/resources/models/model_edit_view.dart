@@ -9,6 +9,7 @@ import '../../../../model/schema/schema.dart';
 import '../../../../services/http/http_service_factory.dart';
 import '../../../../services/http/model_http_service.dart';
 import '../../../../utils/locales.dart';
+import '../../../dialogs/confirmation_dialog.dart';
 import '../../../pages/page_base.dart';
 import '../../misc/clickable_absorb_pointer.dart';
 
@@ -252,7 +253,18 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
       padding: const EdgeInsets.only(right: 8),
       child: IconButton(
         icon: Icon(Icons.delete, color: Colors.red[800]),
-        onPressed: () => httpService.delete(widget.model!.primaryKey).then(print),
+        onPressed: () async {
+          final res = await showConfirmationDialog(
+            context: context,
+            builder: (context) {
+              return const ConfirmationDialog.message('Ви точно хочете видалити цей ресурс?');
+            },
+          );
+
+          if (res && mounted) {
+            httpService.delete(widget.model!.primaryKey).then(Navigator.of(context).pop);
+          }
+        },
       ),
     );
   }
