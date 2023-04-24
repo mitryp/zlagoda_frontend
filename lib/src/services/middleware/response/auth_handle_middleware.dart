@@ -13,6 +13,7 @@ class AuthHandleMiddleware extends ResponseMiddleware {
   @override
   Response processFiltered(Response r) {
     WidgetsBinding.instance.addPersistentFrameCallback((_) {
+      if (!context.mounted) return;
       LoginManager.of(context).clearLoginData();
       Navigator.maybeOf(context)?.pushReplacementNamed('/login');
     });

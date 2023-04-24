@@ -91,7 +91,7 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
               .map(buildOwnFormField),
           const SizedBox(height: 10),
           ...fieldsToControllers.entries
-              .where((e) => !e.key.isOwnProperty)
+              .where((e) => !e.key.isOwnProperty && e.key.isEditable)
               .map(buildForeignKeyEditor),
         ],
       ),
@@ -296,15 +296,13 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
       json[field.fieldName] = value;
     }
 
-    final map = json.map((key, value) {
+    return json.map((key, value) {
       var processedValue = Schema.processValue(value);
       if (processedValue is Map && processedValue.values.every((e) => e is String && e.isEmpty))
         processedValue = null;
 
       return MapEntry(key, processedValue);
     });
-    print(map);
-    return map;
   }
 
   M? generateEditedModel() => schema.fromJson(generateJson());
