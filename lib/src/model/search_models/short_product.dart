@@ -1,5 +1,4 @@
 import '../../typedefs.dart';
-import '../basic_models/product.dart';
 import '../interfaces/search_model.dart';
 import '../schema/field_description.dart';
 import '../schema/schema.dart';
@@ -7,22 +6,26 @@ import '../schema/schema.dart';
 class ShortProduct extends SearchModel<String> {
   static final Schema<ShortProduct> schema = Schema(ShortProduct.new, [
     FieldDescription<String, ShortProduct>(
-      'upc',
+      'primaryKey',
       (o) => o.primaryKey,
-      labelCaption: 'Пошук за UPC',
+      labelCaption: '',
     ),
     FieldDescription<String, ShortProduct>(
-      'productName',
-      (o) => o.descriptiveField,
-      labelCaption: 'Пошук за назвою товару',
+      'descriptiveAttr',
+      (o) => o.descriptiveAttr,
+      labelCaption: 'Пошук за UPC, назвою товару або виробником',
     ),
   ]);
 
-  ShortProduct({required String upc, required String productName})
-      : super(upc, productName);
+  ShortProduct({required super.primaryKey, required super.descriptiveAttr});
 
   static ShortProduct? fromJson(JsonMap json) => schema.fromJson(json);
 
   @override
   JsonMap toJson() => schema.toJson(this);
+
+  @override
+  String toString() {
+    return '$primaryKey $descriptiveAttr';
+  }
 }

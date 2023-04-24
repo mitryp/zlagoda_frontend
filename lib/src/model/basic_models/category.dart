@@ -56,5 +56,5 @@ class Category extends Model with ConvertibleToRow<Category> {
 
   @override
   ShortCategory toSearchModel() =>
-      ShortCategory(categoryId: categoryId!, categoryName: categoryName);
+      ShortCategory(primaryKey: categoryId!, descriptiveAttr: categoryName);
 }

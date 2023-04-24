@@ -25,7 +25,8 @@ class SearchButton<K, SM extends SearchModel<K>> extends StatefulWidget {
   State<SearchButton> createState() => _SearchButtonState<K, SM>();
 }
 
-class _SearchButtonState<K, SM extends SearchModel<K>> extends State<SearchButton> {
+class _SearchButtonState<K, SM extends SearchModel<K>>
+    extends State<SearchButton> {
   late String caption = widget.searchCaption;
   String? selectedItem;
   bool _isLoading = false;
@@ -49,12 +50,13 @@ class _SearchButtonState<K, SM extends SearchModel<K>> extends State<SearchButto
         selectedItem = null;
         widget.removeFilter(widget.filterOption);
       } else {
-        selectedItem = selected.descriptiveField;
+        selectedItem = selected.descriptiveAttr;
         widget.addFilter(Filter(widget.filterOption, selected.primaryKey));
       }
 
-      caption =
-          selectedItem == null ? widget.searchCaption : '${widget.searchCaption}: $selectedItem';
+      caption = selectedItem == null
+          ? widget.searchCaption
+          : '${widget.searchCaption}: $selectedItem';
     });
   }
 

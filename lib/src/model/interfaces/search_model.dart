@@ -4,8 +4,8 @@ abstract class SearchModel<K> extends Model {
   @override
   final K primaryKey;
 
-  final String descriptiveField;
+  final String descriptiveAttr;
 
-  const SearchModel(this.primaryKey, this.descriptiveField);
+  const SearchModel({required this.primaryKey, required this.descriptiveAttr});
 }
 

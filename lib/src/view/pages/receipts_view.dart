@@ -42,7 +42,7 @@ class ReceiptsSearchFilters extends CollectionSearchFilterDelegate {
     return [
       SearchButton<String, ShortEmployee>(
         filterOption: FilterOption.employeeName,
-        searchCaption: 'ПІБ касира...',
+        searchCaption: 'ПІБ, табельний номер касира...',
         addFilter: addFilter,
         removeFilter: removeFilter,
       ),

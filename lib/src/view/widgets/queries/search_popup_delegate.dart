@@ -6,10 +6,10 @@ import '../../../model/interfaces/search_model.dart';
 
 class SearchPopupDelegate<SM extends SearchModel> extends SearchDelegate<SM?> {
   final List<SM> initialOptions;
-  final String? searchHint;
   SM? result;
 
-  SearchPopupDelegate(this.initialOptions, [this.searchHint = 'Пошук']);
+  SearchPopupDelegate(this.initialOptions, [searchHint = 'Пошук'])
+      : super(searchFieldLabel: searchHint);
 
   @override
   List<Widget>? buildActions(BuildContext context) => [
@@ -42,7 +42,7 @@ class SearchPopupDelegate<SM extends SearchModel> extends SearchDelegate<SM?> {
   @override
   Widget buildSuggestions(BuildContext context) {
     List<SM> suggestions = initialOptions.where((option) {
-      final suggestion = option.descriptiveField.toLowerCase();
+      final suggestion = option.toString().toLowerCase();
       final input = query.toLowerCase();
 
       return suggestion.contains(input);
@@ -56,9 +56,9 @@ class SearchPopupDelegate<SM extends SearchModel> extends SearchDelegate<SM?> {
           final suggestion = suggestions[index];
 
           return ListTile(
-              title: Text(suggestion.descriptiveField),
+              title: Text(suggestion.toString()),
               onTap: () {
-                query = suggestion.descriptiveField;
+                query = suggestion.toString();
                 result = suggestion;
                 close(context, result);
               });

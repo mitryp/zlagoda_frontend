@@ -23,7 +23,7 @@ typedef ModelSearchInitiatorConstructor<K, SM extends SearchModel<K>> = //
         Key? key});
 
 Widget defaultSelectionBuilder(BuildContext context, SearchModel? selected) =>
-    Text(selected != null ? selected.descriptiveField : 'Вибрати');
+    Text(selected != null ? selected.descriptiveAttr : 'Вибрати');
 
 Widget defaultProgressIndicatorBuilder(BuildContext context) =>
     const FittedBox(child: CircularProgressIndicator());
