@@ -1,4 +1,13 @@
-enum Order { asc, desc }
+import 'package:flutter/material.dart';
+
+enum Order {
+  asc(Icons.arrow_downward),
+  desc(Icons.arrow_upward);
+
+  final IconData icon;
+
+  const Order(this.icon);
+}
 
 class Sort {
   late final SortOption sortOption;
@@ -13,9 +22,7 @@ class Sort {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is Sort &&
-              runtimeType == other.runtimeType &&
-              sortField == other.sortField;
+      other is Sort && runtimeType == other.runtimeType && sortField == other.sortField;
 
   @override
   int get hashCode => sortOption.hashCode ^ order.hashCode;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../services/query_builder/sort.dart';
+import '../../../theme.dart';
 
 typedef SetSort = void Function(Sort);
 
@@ -19,8 +20,12 @@ class SortBlock extends StatefulWidget {
   @override
   State<SortBlock> createState() => _SortBlockState();
 
-  List<Widget> get sortTextWidgets =>
-      sortOptions.map((sortOption) => Text(sortOption.caption)).toList();
+  List<Widget> get sortTextWidgets => sortOptions
+      .map((sortOption) => Padding(
+            padding: defaultButtonStyle.padding!.resolve({})! ~/ 2,
+            child: Text(sortOption.caption),
+          ))
+      .toList();
 }
 
 class _SortBlockState extends State<SortBlock> {
@@ -42,8 +47,7 @@ class _SortBlockState extends State<SortBlock> {
   void _toggleSortOrder() {
     setState(() {
       final sortOption = currentSort.sortOption;
-      final newSortOrder =
-          currentSort.order == Order.asc ? Order.desc : Order.asc;
+      final newSortOrder = currentSort.order == Order.asc ? Order.desc : Order.asc;
 
       updateSort(Sort(sortOption, newSortOrder));
     });
@@ -62,40 +66,20 @@ class _SortBlockState extends State<SortBlock> {
   }
 
   Widget buildSortFieldButton() {
-    final List<bool> selectedSortFields = widget.sortOptions
-        .map((field) => field == currentSort.sortOption)
-        .toList();
+    final List<bool> selectedSortFields =
+        widget.sortOptions.map((field) => field == currentSort.sortOption).toList();
 
     return ToggleButtons(
       direction: Axis.horizontal,
       onPressed: (int index) => _changeSortField(index, selectedSortFields),
-      borderRadius: const BorderRadius.all(Radius.circular(8)),
-      selectedBorderColor: Colors.red[700],
-      // TODO
-      selectedColor: Colors.white,
-      // TODO
-      fillColor: Colors.red[200],
-      // TODO
-      color: Colors.red[400],
-      // TODO
-      constraints: const BoxConstraints(
-        minHeight: 40.0,
-        minWidth: 80.0,
-      ),
       isSelected: selectedSortFields,
       children: widget.sortTextWidgets,
     );
   }
 
-  Widget buildDirectionButton() {
-    const icons = {
-      Order.asc: Icon(Icons.arrow_upward_rounded),
-      Order.desc: Icon(Icons.arrow_downward_rounded),
-    };
-
-    return ElevatedButton(
-      onPressed: () => _toggleSortOrder(),
-      child: icons[currentSort.order],
-    );
-  }
+  Widget buildDirectionButton() => IconButton(
+        onPressed: () => _toggleSortOrder(),
+        icon: Icon(currentSort.order.icon),
+        splashRadius: 20,
+      );
 }

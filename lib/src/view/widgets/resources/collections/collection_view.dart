@@ -54,8 +54,7 @@ typedef CsfDelegateConstructor = CollectionSearchFilterDelegate Function({
     -> add button
  */
 
-class CollectionView<SCol extends ConvertibleToRow<SCol>>
-    extends StatefulWidget {
+class CollectionView<SCol extends ConvertibleToRow<SCol>> extends StatefulWidget {
   final RedirectCallback onAddPressed;
   final QueryBuilder queryBuilder;
   final CsfDelegateConstructor searchFilterDelegate;
@@ -76,8 +75,7 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>>
   late final ModelHttpService<SCol, dynamic> httpService =
       makeModelHttpService<SCol>() as ModelHttpService<SCol, dynamic>;
 
-  late CollectionSearchFilterDelegate searchFilterDelegate =
-      widget.searchFilterDelegate(
+  late CollectionSearchFilterDelegate searchFilterDelegate = widget.searchFilterDelegate(
     queryBuilder: widget.queryBuilder,
     updateCallback: fetchItems,
   );
@@ -110,20 +108,23 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>>
   }
 
   Widget buildSearchFilters() {
-    const divider = VerticalDivider();
+    const divider = VerticalDivider(thickness: 1,color: Colors.black);
 
     return Card(
-        child: Flex(
-      direction: Axis.horizontal,
-      children: [
-        const Text('Сортувати за: '),
-        searchFilterDelegate.buildSort(context),
-        divider,
-        ...searchFilterDelegate.buildFilters(context),
-        divider,
-        ...searchFilterDelegate.buildSearches(context),
-      ],
-    ));
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          child: Flex(
+            direction: Axis.horizontal,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              searchFilterDelegate.buildSort(context),
+              divider,
+              ...searchFilterDelegate.buildFilters(context),
+              divider,
+              ...searchFilterDelegate.buildSearches(context),
+            ],
+          ),
+        ));
   }
 
   Widget buildAddButton() => ElevatedButton(
@@ -136,15 +137,13 @@ class CollectionTable<R extends ConvertibleToRow<R>> extends StatefulWidget {
   final Future<List<R>> Function() itemsSupplier;
   final Stream<void> updateStream;
 
-  const CollectionTable(
-      {required this.itemsSupplier, required this.updateStream, super.key});
+  const CollectionTable({required this.itemsSupplier, required this.updateStream, super.key});
 
   @override
   State<CollectionTable<R>> createState() => _CollectionTableState<R>();
 }
 
-class _CollectionTableState<R extends ConvertibleToRow<R>>
-    extends State<CollectionTable<R>> {
+class _CollectionTableState<R extends ConvertibleToRow<R>> extends State<CollectionTable<R>> {
   late final StreamSubscription<void> updateSubscription;
   late List<R> items;
   bool isLoaded = false;
@@ -201,8 +200,7 @@ class _CollectionTableState<R extends ConvertibleToRow<R>>
 
     return DataTable(
       showCheckboxColumn: false,
-      columns:
-          columnNames.map((name) => DataColumn(label: Text(name))).toList(),
+      columns: columnNames.map((name) => DataColumn(label: Text(name))).toList(),
       rows: items.map((m) => m.buildRow(context)).toList(),
     );
   }

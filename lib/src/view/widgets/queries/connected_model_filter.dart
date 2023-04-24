@@ -28,7 +28,7 @@ class ConnectedModelFilter<K, SM extends ShortModel<K>> extends StatelessWidget 
       selectionBuilder: (context, selected) {
         return Text(selected != null ? selected.descriptiveAttr : caption);
       },
-      container: ({required child, required onTap}) => ElevatedButton(
+      container: ({required child, required onTap}) => OutlinedButton(
         onPressed: onTap,
         child: child,
       ),
