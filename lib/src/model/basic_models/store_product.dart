@@ -1,8 +1,10 @@
 import '../../typedefs.dart';
+
 import '../interfaces/model.dart';
 import '../model_reference.dart';
 import '../schema/field_description.dart';
 import '../schema/schema.dart';
+import '../search_models/short_product.dart';
 import 'product.dart';
 
 class StoreProduct extends Model {
@@ -18,7 +20,7 @@ class StoreProduct extends Model {
         'upc',
         (o) => o.upc,
         labelCaption: 'UPC',
-        defaultForeignKey: foreignKey<Product>('upc'),
+        defaultForeignKey: foreignKey<Product, ShortProduct>('upc'),
       ),
       FieldDescription<int, StoreProduct>(
         'price',
@@ -62,6 +64,5 @@ class StoreProduct extends Model {
   @override
   JsonMap toJson() => schema.toJson(this);
 
-  @override
-  List<ForeignKey<Model>> get foreignKeys => [foreignKey<Product>('upc', upc)];
+  List<ForeignKey> get foreignKeys => [foreignKey<Product, ShortProduct>('upc', upc)];
 }

@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import '../../typedefs.dart';
 import '../../utils/navigation.dart';
 import '../interfaces/convertible_to_row.dart';
+import '../interfaces/model.dart';
 import '../model_reference.dart';
 import '../schema/field_description.dart';
 import '../schema/schema.dart';
 import '../schema/validators.dart';
+import '../search_models/short_category.dart';
 import 'category.dart';
-import '../interfaces/model.dart';
 
 class Product extends Model with ConvertibleToRow<Product> {
   static final Schema<Product> schema = Schema(
@@ -44,7 +45,7 @@ class Product extends Model with ConvertibleToRow<Product> {
         (o) => o.categoryId,
         labelCaption: 'Категорія',
         fieldDisplayMode: FieldDisplayMode.none,
-        defaultForeignKey: foreignKey<Category>('categoryId')
+        defaultForeignKey: foreignKey<Category, ShortCategory>('categoryId'),
       ),
     ],
   );
@@ -72,7 +73,8 @@ class Product extends Model with ConvertibleToRow<Product> {
   get primaryKey => upc;
 
   @override
-  List<ForeignKey> get foreignKeys => [foreignKey<Category>('categoryId', categoryId)];
+  List<ForeignKey> get foreignKeys =>
+      [foreignKey<Category, ShortCategory>('categoryId', categoryId)];
 
   @override
   void redirectToModelView(BuildContext context) =>

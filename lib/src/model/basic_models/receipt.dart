@@ -1,5 +1,6 @@
 import '../../typedefs.dart';
 import '../common_models/name.dart';
+import '../interfaces/search_model.dart';
 import '../joined_models/joined_sale.dart';
 import '../model_reference.dart';
 import '../other_models/table_receipt.dart';
@@ -28,7 +29,8 @@ class Receipt extends TableReceipt {
         'clientId',
         (o) => o.clientId,
         labelCaption: 'Номер картки клієнта',
-        defaultForeignKey: foreignKey<Client>('clientId'),
+        defaultForeignKey:
+            foreignKey<Client, SearchModel>('clientId'), // todo replace with the actual short model
       ),
       FieldDescription<Name?, Receipt>(
         'clientName',

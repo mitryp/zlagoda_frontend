@@ -19,6 +19,8 @@ typedef Constructor<T> = T Function();
 typedef VoidWidgetConstructor<T extends Widget> = T Function({Key? key});
 typedef RedirectCallback = void Function(BuildContext context);
 
+typedef ExactWidgetBuilder<W extends Widget> = W Function(BuildContext context);
+
 // Row or Column
 typedef FlexContainerType = Function({
   List<Widget> children,

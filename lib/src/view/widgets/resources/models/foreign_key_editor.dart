@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 import '../../../../model/interfaces/model.dart';
+import '../../../../model/interfaces/search_model.dart';
 import '../../../../model/model_reference.dart';
 import '../../../../theme.dart';
-import '../../../../utils/locales.dart';
 
 typedef UpdateCallback<T> = void Function(T newForeignKey);
 
-class ForeignKeyEditor<M extends Model> extends StatefulWidget {
-  final ForeignKey<M> initialForeignKey;
+class ForeignKeyEditor<M extends Model, SM extends SearchModel> extends StatefulWidget {
+  final ForeignKey<M, SM> initialForeignKey;
   final M? initiallyConnectedModel;
   final UpdateCallback<dynamic> updateCallback;
 
@@ -20,10 +20,11 @@ class ForeignKeyEditor<M extends Model> extends StatefulWidget {
   });
 
   @override
-  State<ForeignKeyEditor<M>> createState() => _ForeignKeyEditorState<M>();
+  State<ForeignKeyEditor<M, SM>> createState() => _ForeignKeyEditorState<M, SM>();
 }
 
-class _ForeignKeyEditorState<M extends Model> extends State<ForeignKeyEditor<M>> {
+class _ForeignKeyEditorState<M extends Model, SM extends SearchModel>
+    extends State<ForeignKeyEditor<M, SM>> {
   M? connectedModel;
   bool isLoaded = false;
 
@@ -61,20 +62,36 @@ class _ForeignKeyEditorState<M extends Model> extends State<ForeignKeyEditor<M>>
         child: CircularProgressIndicator(),
       );
     } else {
-      cardChild = InkWell(
-        onTap: () {}, // todo
-        borderRadius: defaultBorderRadius,
-        child: Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: FittedBox(
-                child: Text(
-                  connectedModel != null ? '$connectedModel' : makeModelLocalizedName<M>(),
-                ),
-              ),
-            ),
-          ],
+      // cardChild = InkWell(
+      //   onTap: () {}, // todo
+      //   borderRadius: defaultBorderRadius,
+      //   child: Row(
+      //     children: [
+      //       Padding(
+      //         padding: const EdgeInsets.all(16),
+      //         child: FittedBox(
+      //           child: Text(
+      //             connectedModel != null ? '$connectedModel' : makeModelLocalizedName<M>(),
+      //           ),
+      //         ),
+      //       ),
+      //     ],
+      //   ),
+      // );
+      cardChild = widget.initialForeignKey.searchInitiator(
+        onUpdate: widget.updateCallback,
+        selected: connectedModel?.toSearchModel() as SM?,
+        container: ({required child, required onTap}) => InkWell(
+          borderRadius: defaultBorderRadius,
+          onTap: onTap,
+          child: Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: child,
+              )
+            ],
+          ),
         ),
       );
     }
