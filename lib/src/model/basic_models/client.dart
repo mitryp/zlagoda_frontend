@@ -31,7 +31,7 @@ class Client extends Model with ConvertibleToRow<Client> {
         'phone',
         (o) => o.phone,
         labelCaption: 'Номер телефону',
-        validator: notEmpty,
+        validator: isPhoneNumber,
       ),
       FieldDescription<Address?, Client>.serializable(
         'address',

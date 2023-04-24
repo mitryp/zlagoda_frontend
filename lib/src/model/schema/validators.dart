@@ -21,6 +21,18 @@ FieldValidator get isInteger => all([notEmpty, _integerValidator]);
 
 FieldValidator get isDouble => all([notEmpty, _doubleValidator]);
 
+FieldValidator get isPhoneNumber => all([
+      startsWith('+'),
+      hasLength(13),
+      (s) => isInteger(s!.replaceFirst('+', '')),
+    ]);
+
+FieldValidator startsWith(String pattern) =>
+    all([notEmpty, (s) => _startsWithValidator(s, pattern)]);
+
+String? _startsWithValidator(String? s, String pattern) =>
+    !s!.startsWith(pattern) ? 'Стрічка повинна починатися з "$pattern"' : null;
+
 String? _exactLengthValidator(String? s, int length) =>
     s!.length != length ? 'Довжина поля повинна складати $length символів' : null;
 
