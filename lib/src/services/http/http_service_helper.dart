@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 
 import '../../model/interfaces/serializable.dart';
@@ -18,9 +19,9 @@ enum HttpMethod {
 }
 
 Future<T> httpServiceController<T>(
-    http.Response response,
-    ControllerSuccessfulLogic<T> successLogic,
-    ) async {
+  http.Response response,
+  ControllerSuccessfulLogic<T> successLogic,
+) async {
   final res = await applyResponseMiddleware(response);
 
   if (successCodes(res)) {
@@ -30,9 +31,10 @@ Future<T> httpServiceController<T>(
   throw ResourceNotFetchedException(res.reasonPhrase);
 }
 
-
 Future<http.Response> makeRequest(HttpMethod method, Uri path, {Object? body}) async {
-  final req = http.Request(method.name, path)..body = body != null ? jsonEncode(body) : '';
+  final req = http.Request(method.name, path)
+    ..body = body != null ? jsonEncode(body) : ''
+    ..headers['Content-Type'] = 'application/json; charset=utf-8';
 
   return http.Client().send(await applyRequestMiddleware(req)).then(http.Response.fromStream);
 }
