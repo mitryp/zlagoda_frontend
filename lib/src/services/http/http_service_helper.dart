@@ -37,7 +37,7 @@ Future<T> httpServiceController<T>(
 }
 
 Future<http.Response> makeRequest(HttpMethod method, Uri path, {Object? body}) async {
-  final req = http.Request(method.name, path)
+  final req = http.Request(method.name.toUpperCase(), path)
     ..body = body != null ? jsonEncode(body) : ''
     ..headers['Content-Type'] = 'application/json; charset=utf-8';
 

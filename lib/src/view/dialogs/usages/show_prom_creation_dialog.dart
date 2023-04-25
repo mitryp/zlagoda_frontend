@@ -23,7 +23,7 @@ Future<ValueStatusWrapper<StoreProduct>?> showPromCreationDialog(
                 baseStoreProductId: model.baseStoreProductId!,
                 quantity: quantity,
               ),
-              true);
+              controlTotalQuantity: true);
         },
         caption: 'Додати',
         message:
@@ -36,7 +36,7 @@ Future<ValueStatusWrapper<StoreProduct>?> showPromCreationDialog(
                 baseStoreProductId: model.baseStoreProductId!,
                 quantity: quantity,
               ),
-              false);
+              controlTotalQuantity: false);
         },
         caption: 'Встановити',
         color: secondary,

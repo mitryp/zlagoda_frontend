@@ -21,7 +21,7 @@ Future<PromStoreProduct?> post(PromStoreProduct row) async {
 }
 
 Future<PromStoreProduct?> update(
-    PromStoreProduct row, bool controlTotalQuantity) async {
+    PromStoreProduct row, {required bool controlTotalQuantity}) async {
   final response = await makeRequest(
     HttpMethod.patch,
     Uri.http(baseRoute, makeRoute(row.baseStoreProductId)),
