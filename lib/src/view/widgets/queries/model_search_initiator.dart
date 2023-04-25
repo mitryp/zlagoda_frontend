@@ -94,7 +94,7 @@ class _ModelSearchInitiatorState<K, SM extends ShortModel<K>>
 
   Future<void> processTap() async {
     if (isLoading) return;
-    if (!isLoaded) await fetchOptions();
+    if (!isLoaded) return await fetchOptions();
     if (!mounted) return;
 
     var selection = await showSearch(
@@ -120,6 +120,7 @@ class _ModelSearchInitiatorState<K, SM extends ShortModel<K>>
           isLoaded = true;
           isLoading = false;
         });
+        processTap();
       },
     ).catchError(
       (err) {
