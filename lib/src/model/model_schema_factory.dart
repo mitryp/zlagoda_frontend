@@ -11,8 +11,9 @@ import 'joined_models/joined_store_product.dart';
 import 'joined_models/product_with_category.dart';
 import 'other_models/table_receipt.dart';
 import 'schema/schema.dart';
-import 'search_models/short_category.dart';
 import 'search_models/short_cashier.dart';
+import 'search_models/short_category.dart';
+import 'search_models/short_client.dart';
 import 'search_models/short_product.dart';
 
 final _classesToSchemas = <Type, Schema>{
@@ -32,6 +33,7 @@ final _classesToSchemas = <Type, Schema>{
   ShortCategory: ShortCategory.schema,
   ShortProduct: StoreProduct.schema,
   ShortCashier: ShortCashier.schema,
+  ShortClient: ShortClient.schema,
 };
 
 Schema<S> makeModelSchema<S extends Serializable>([Type? modelType]) {

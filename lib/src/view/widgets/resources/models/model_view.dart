@@ -45,6 +45,7 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
       try {
         model = await widget.fetchFunction();
       } on ResourceNotFetchedException catch (e) {
+        print(e);
         if (!mounted) return;
         return setState(() => exception = e);
       }

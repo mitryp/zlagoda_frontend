@@ -1,6 +1,5 @@
 import '../../typedefs.dart';
 import '../common_models/name.dart';
-import '../interfaces/search_model.dart';
 import '../joined_models/joined_sale.dart';
 import '../model_reference.dart';
 import '../other_models/table_receipt.dart';
@@ -8,7 +7,10 @@ import '../schema/date_constraints.dart';
 import '../schema/field_description.dart';
 import '../schema/field_type.dart';
 import '../schema/schema.dart';
+import '../search_models/short_cashier.dart';
+import '../search_models/short_client.dart';
 import 'client.dart';
+import 'employee.dart';
 
 class Receipt extends TableReceipt {
   static final Schema<Receipt> schema = Schema(
@@ -29,8 +31,7 @@ class Receipt extends TableReceipt {
         'clientId',
         (o) => o.clientId,
         labelCaption: 'Номер картки клієнта',
-        defaultForeignKey:
-            foreignKey<Client, ShortModel>('clientId'), // todo replace with the actual short model
+        defaultForeignKey: foreignKey<Client, ShortClient>('clientId'),
       ),
       FieldDescription<Name?, Receipt>.serializable(
         'clientName',
@@ -51,16 +52,13 @@ class Receipt extends TableReceipt {
         labelCaption: 'Податок',
         fieldType: FieldType.number,
       ),
-      FieldDescription<Name, Receipt>.serializable(
-        'employeeName',
-        (o) => o.employeeName,
-        labelCaption: "Ім'я касира",
-        serializableEditorBuilder: nameEditorBuilder
-      ),
-      FieldDescription<String, Receipt>(
+      FieldDescription<Name, Receipt>.serializable('employeeName', (o) => o.employeeName,
+          labelCaption: "Ім'я касира", serializableEditorBuilder: nameEditorBuilder),
+      FieldDescription<String, Receipt>.stringForeignKey(
         'employeeId',
         (o) => o.employeeId,
         labelCaption: 'Табельний номер працівника',
+        defaultForeignKey: foreignKey<Employee, ShortCashier>('employeeId'),
       ),
       FieldDescription<List<JoinedSale>, Receipt>(
         'sales',
