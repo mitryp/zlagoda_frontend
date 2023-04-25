@@ -34,15 +34,18 @@ class FieldDescription<R, O> {
     this.fieldName,
     this.fieldGetter, {
     required this.labelCaption,
-    this.enumConstraint,
     this.fieldDisplayMode = FieldDisplayMode.everywhere,
     this.isEditable = true,
     this.validator = _noValidation,
     this.fieldType = FieldType.text,
-    this.serializableEditorBuilder,
     this.dateConstraints,
-    this.defaultForeignKey,
-  }) : assert(fieldType != FieldType.date || dateConstraints != null);
+  })  : enumConstraint = null,
+        defaultForeignKey = null,
+        serializableEditorBuilder = null,
+        assert(fieldType != FieldType.constrainedToEnum),
+        assert(fieldType != FieldType.serializable),
+        assert(fieldType != FieldType.intForeignKey && fieldType != FieldType.stringForeignKey),
+        assert(fieldType != FieldType.date || dateConstraints != null);
 
   const FieldDescription.stringForeignKey(
     this.fieldName,
@@ -112,6 +115,7 @@ class FieldDescription<R, O> {
 
   String presentFieldOf(O object) {
     final value = fieldGetter(object);
+    if (value == null) return '';
     return fieldType.presentation(value);
   }
 

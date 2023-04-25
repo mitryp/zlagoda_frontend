@@ -21,11 +21,11 @@ class User implements Serializable {
         (o) => o.login,
         labelCaption: 'Логін',
       ),
-      FieldDescription<Name, User>(
+      FieldDescription<Name, User>.serializable(
         'name',
         (o) => o.name,
         labelCaption: "Ім'я",
-        fieldType: FieldType.serializable,
+        serializableEditorBuilder: (context, serializable) async => serializable!,
       ),
       FieldDescription<Position, User>.enumType(
         'role',

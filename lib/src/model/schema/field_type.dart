@@ -6,12 +6,13 @@ typedef PresentationFunction<T> = String Function(T);
 enum FieldType<T> {
   auto<dynamic>(_never),
   serializable<dynamic>(_never),
+  constrainedToEnum<dynamic>(_never),
   text<String>(_stringConverter),
   number<int>(int.parse),
   currency<int>(_currencyConverter, _presentCurrency),
   date<DateTime>(_dateConverter, _presentDate),
   boolean<bool>(_boolConverter, _presentBool),
-  constrainedToEnum<dynamic>(_never),
+  password<String>(_stringConverter),
   stringForeignKey<String>(_stringConverter),
   intForeignKey<int>(int.parse);
 

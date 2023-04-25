@@ -103,11 +103,17 @@ class Employee extends Model with ConvertibleToRow<Employee> {
         serializableEditorBuilder: addressEditorBuilder,
         fieldDisplayMode: FieldDisplayMode.inModelView,
       ),
+      FieldDescription<String?, Employee>(
+        'password',
+        (o) => o.password,
+        labelCaption: 'Пароль',
+        fieldType: FieldType.password,
+        fieldDisplayMode: FieldDisplayMode.whenEditing,
+      )
     ],
   );
 
   final String employeeId;
-  final String login;
   final Name employeeName;
   final Position position;
   final int salary;
@@ -116,9 +122,11 @@ class Employee extends Model with ConvertibleToRow<Employee> {
   final String phone;
   final Address address;
 
+  final String login;
+  final String? password;
+
   const Employee({
     required this.employeeId,
-    required this.login,
     required this.employeeName,
     required this.position,
     required this.salary,
@@ -126,6 +134,8 @@ class Employee extends Model with ConvertibleToRow<Employee> {
     required this.birthDate,
     required this.phone,
     required this.address,
+    required this.login,
+    this.password,
   });
 
   static Employee? fromJson(JsonMap json) => schema.fromJson(json);
