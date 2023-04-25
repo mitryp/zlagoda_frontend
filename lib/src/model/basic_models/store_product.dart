@@ -45,6 +45,7 @@ class StoreProduct extends Model {
         (o) => o.baseStoreProductId,
         labelCaption: 'ID базового товару у магазині',
         isEditable: false,
+        fieldDisplayMode: FieldDisplayMode.none,
         defaultForeignKey: foreignKey<StoreProduct, ShortModel>('baseStoreProductId'),
       ),
     ],
