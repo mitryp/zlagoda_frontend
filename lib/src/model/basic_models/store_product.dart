@@ -41,23 +41,23 @@ class StoreProduct extends Model {
         validator: isInteger,
       ),
       FieldDescription<int?, StoreProduct>.intForeignKey(
-        'baseProduct',
+        'baseStoreProductId',
         (o) => o.baseStoreProductId,
         labelCaption: 'ID базового товару у магазині',
         isEditable: false,
-        defaultForeignKey: foreignKey<StoreProduct, ShortModel>('baseProduct'),
+        defaultForeignKey: foreignKey<StoreProduct, ShortModel>('baseStoreProductId'),
       ),
     ],
   );
 
-  final int storeProductId;
+  final int? storeProductId;
   final String upc;
   final int price;
   final int quantity;
   final int? baseStoreProductId;
 
   const StoreProduct({
-    required this.storeProductId,
+    this.storeProductId,
     required this.upc,
     required this.price,
     required this.quantity,
@@ -77,6 +77,6 @@ class StoreProduct extends Model {
   @override
   List<ForeignKey> get foreignKeys => [
         foreignKey<Product, ShortProduct>('upc', upc),
-        foreignKey<StoreProduct, ShortModel>('baseProduct', baseStoreProductId),
+        foreignKey<StoreProduct, ShortModel>('baseProductId', baseStoreProductId),
       ];
 }

@@ -7,8 +7,10 @@ import '../../utils/value_status.dart';
 import '../basic_models/store_product.dart';
 import '../interfaces/convertible_to_row.dart';
 import '../interfaces/serializable.dart';
+import '../model_reference.dart';
 import '../schema/field_description.dart';
 import '../schema/schema.dart';
+import '../search_models/short_product.dart';
 
 abstract class _JoinedStoreProduct implements Serializable {
   const _JoinedStoreProduct();
@@ -49,11 +51,12 @@ class JoinedStoreProduct extends _JoinedStoreProduct with ConvertibleToRow<Joine
         (o) => o.quantity,
         labelCaption: 'Кількість',
       ),
-      FieldDescription<int?, JoinedStoreProduct>(
-        'baseProduct',
+      FieldDescription<int?, JoinedStoreProduct>.intForeignKey(
+        'baseStoreProductId',
         (o) => o.baseStoreProductId,
         labelCaption: 'ID базового товару у магазині',
         fieldDisplayMode: FieldDisplayMode.none,
+        defaultForeignKey: foreignKey<StoreProduct, ShortProduct>('baseStoreProductId'),
       ),
     ],
   );
