@@ -11,6 +11,7 @@ import '../schema/field_description.dart';
 import '../schema/field_type.dart';
 import '../schema/schema.dart';
 import '../schema/validators.dart';
+import '../search_models/short_client.dart';
 
 class Client extends Model with ConvertibleToRow<Client> {
   static final Schema<Client> schema = Schema(
@@ -75,4 +76,8 @@ class Client extends Model with ConvertibleToRow<Client> {
   @override
   Future<ValueStatusWrapper> redirectToModelView(BuildContext context) =>
       AppNavigation.of(context).toModelView<Client>(primaryKey);
+
+  @override
+  ShortClient toSearchModel() =>
+      ShortClient(primaryKey: clientId, descriptiveAttr: '$clientId ${clientName.fullName}');
 }

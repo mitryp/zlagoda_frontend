@@ -22,7 +22,8 @@ class AppNavigation {
   Future<ValueStatusWrapper<SSingle>> toModelView<SSingle extends Model>(dynamic primaryKey) {
     assert(SSingle != Model);
 
-    final modelFuture = _serviceOf<SSingle>().singleById(primaryKey).then((v) => v!);
+    final modelFuture =
+        _serviceOf<SSingle>().singleById(primaryKey).then((v) => v!);
 
     return Navigator.of(context)
         .push<ValueStatusWrapper<SSingle>>(
@@ -34,9 +35,7 @@ class AppNavigation {
   }
 
   Future<ValueStatusWrapper<SSingle>> openModelViewFor<SSingle extends Model>(
-    SSingle model, [
-    List<ModelTable>? connectedTables,
-  ]) {
+    SSingle model, {List<ModelTable>? connectedTables, List<WidgetBuilder>? additionalButtonsBuilders}) {
     assert(SSingle != Model);
 
     return Navigator.of(context)
@@ -45,6 +44,7 @@ class AppNavigation {
             builder: (context) => ModelView<SSingle>(
               fetchFunction: () => model,
               connectedTables: connectedTables,
+              additionalButtonsBuilders: additionalButtonsBuilders,
             ),
           ),
         )

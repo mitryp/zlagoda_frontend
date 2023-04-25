@@ -29,8 +29,10 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
   late final Schema<M> schema = makeModelSchema<M>(M);
   late final ModelHttpService<dynamic, M> httpService =
       makeModelHttpService<M>() as ModelHttpService<dynamic, M>;
-  final Map<FieldDescription<dynamic, M>, TextEditingController> fieldsToControllers = {};
-  final Map<FieldDescription<dynamic, M>, Serializable?> fieldsToSerializable = {};
+  final Map<FieldDescription<dynamic, M>, TextEditingController>
+      fieldsToControllers = {};
+  final Map<FieldDescription<dynamic, M>, Serializable?> fieldsToSerializable =
+      {};
   late final GlobalKey<FormState> formKey = GlobalKey();
 
   bool get isEditing => widget.model != null;
@@ -53,8 +55,10 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
       fieldsToControllers[field] = TextEditingController(text: presentation);
     }
 
-    for (final field in schema.fields.where((e) => e.fieldType == FieldType.serializable)) {
-      fieldsToSerializable[field] = isEditing ? field.fieldGetter(widget.model!) : null;
+    for (final field
+        in schema.fields.where((e) => e.fieldType == FieldType.serializable)) {
+      fieldsToSerializable[field] =
+          isEditing ? field.fieldGetter(widget.model!) : null;
     }
   }
 
@@ -62,7 +66,7 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Редагування ${makeModelLocalizedName<M>()}'),
+        title: Text('${isEditing ? 'Редагування' : 'Створення'} ${makeModelLocalizedName<M>()}'),
         titleTextStyle: const TextStyle(color: Colors.black),
         actions: [
           if (isEditing) buildDeleteButton(),
@@ -102,7 +106,8 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
     );
   }
 
-  Widget buildOwnFormField(MapEntry<FieldDescription<dynamic, M>, TextEditingController> entry) {
+  Widget buildOwnFormField(
+      MapEntry<FieldDescription<dynamic, M>, TextEditingController> entry) {
     final field = entry.key;
     final controller = entry.value;
 
@@ -134,8 +139,8 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
     );
   }
 
-  Widget buildEnumConstrainedField(
-      FieldDescription<dynamic, dynamic> field, TextEditingController controller) {
+  Widget buildEnumConstrainedField(FieldDescription<dynamic, dynamic> field,
+      TextEditingController controller) {
     final items = field.enumConstraint!.values
         .map((e) => DropdownMenuItem(value: e.index, child: Text('$e')))
         .toList();
@@ -157,7 +162,8 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
     );
   }
 
-  Widget buildDateField(FieldDescription<dynamic, M> field, TextEditingController controller) {
+  Widget buildDateField(
+      FieldDescription<dynamic, M> field, TextEditingController controller) {
     return ClickableAbsorbPointer(
       cursor: SystemMouseCursors.text,
       onTap: () async {
@@ -211,11 +217,11 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
   Widget buildForeignKeyEditor(
       MapEntry<FieldDescription<dynamic, M>, TextEditingController> entry) {
     final field = entry.key;
-    final foreignKey =
-        widget.model?.foreignKeys.firstWhere((key) => key.foreignKeyName == field.fieldName) ??
-            field.defaultForeignKey!;
-    final connectedModel = widget.connectedModels
-        ?.firstWhere((e) => e.runtimeType == field.defaultForeignKey!.modelType);
+    final foreignKey = widget.model?.foreignKeys
+            .firstWhere((key) => key.foreignKeyName == field.fieldName) ??
+        field.defaultForeignKey!;
+    final connectedModel = widget.connectedModels?.firstWhere(
+        (e) => e.runtimeType == field.defaultForeignKey!.modelType);
 
     return foreignKey.makeEditor(
       updateCallback: (newForeignKey) {
@@ -306,7 +312,6 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
         try {
           value = field.fieldType.converter(controller.text);
         } on FormatException catch (e) {
-          print('caught exception $e');
           value = null;
         }
       }
@@ -320,7 +325,8 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
 
     return json.map((key, value) {
       var processedValue = Schema.processValue(value);
-      if (processedValue is Map && processedValue.values.every((e) => e is String && e.isEmpty))
+      if (processedValue is Map &&
+          processedValue.values.every((e) => e is String && e.isEmpty))
         processedValue = null;
 
       return MapEntry(key, processedValue);

@@ -9,8 +9,6 @@ import '../../utils/json_decode.dart';
 import 'http_service_helper.dart';
 
 class ShortModelHttpService<SM extends ShortModel> {
-  static const String baseRoute = 'localhost:5000';
-
   final String route;
   final JsonCastFunction<SM> castFunction;
 

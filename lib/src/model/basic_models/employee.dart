@@ -14,6 +14,7 @@ import '../schema/field_description.dart';
 import '../schema/field_type.dart';
 import '../schema/schema.dart';
 import '../schema/validators.dart';
+import '../search_models/short_cashier.dart';
 
 enum Position implements Serializable {
   cashier('Касир'),
@@ -149,4 +150,8 @@ class Employee extends Model with ConvertibleToRow<Employee> {
   @override
   Future<ValueStatusWrapper> redirectToModelView(BuildContext context) =>
       AppNavigation.of(context).toModelView<Employee>(primaryKey);
+
+  @override
+  ShortCashier toSearchModel() =>
+      ShortCashier(primaryKey: employeeId, descriptiveAttr: '$employeeId ${employeeName.fullName}');
 }

@@ -1,22 +1,30 @@
 import 'package:flutter/material.dart';
 
+import '../../services/http/prom_store_product_services.dart';
+import '../../theme.dart';
 import '../../typedefs.dart';
 import '../../utils/coins_to_currency.dart';
 import '../../utils/navigation.dart';
 import '../../utils/value_status.dart';
+import '../../view/dialogs/confirmation_dialog.dart';
+import '../../view/dialogs/contents/prom_store_product_creation_dialog_content.dart';
+import '../../view/dialogs/creation_dialog.dart';
 import '../basic_models/store_product.dart';
 import '../interfaces/convertible_to_row.dart';
 import '../interfaces/serializable.dart';
 import '../model_reference.dart';
+import '../other_models/prom_store_product.dart';
 import '../schema/field_description.dart';
 import '../schema/schema.dart';
+import '../schema/validators.dart';
 import '../search_models/short_product.dart';
 
 abstract class _JoinedStoreProduct implements Serializable {
   const _JoinedStoreProduct();
 }
 
-class JoinedStoreProduct extends _JoinedStoreProduct with ConvertibleToRow<JoinedStoreProduct> {
+class JoinedStoreProduct extends _JoinedStoreProduct
+    with ConvertibleToRow<JoinedStoreProduct> {
   static final Schema<JoinedStoreProduct> schema = Schema(
     JoinedStoreProduct.new,
     [
@@ -56,7 +64,8 @@ class JoinedStoreProduct extends _JoinedStoreProduct with ConvertibleToRow<Joine
         (o) => o.baseStoreProductId,
         labelCaption: 'ID базового товару у магазині',
         fieldDisplayMode: FieldDisplayMode.none,
-        defaultForeignKey: foreignKey<StoreProduct, ShortProduct>('baseStoreProductId'),
+        defaultForeignKey:
+            foreignKey<StoreProduct, ShortProduct>('baseStoreProductId'),
       ),
     ],
   );
@@ -86,6 +95,55 @@ class JoinedStoreProduct extends _JoinedStoreProduct with ConvertibleToRow<Joine
   @override
   JsonMap toJson() => schema.toJson(this);
 
+  void _onEditDiscountProduct(BuildContext context) {
+    showCreationDialog(
+      context: context,
+      inputBuilder: (textController) => PromStoreProductTextField(
+          controller: textController, validator: isNonNegativeInteger),
+      buttonProps: [
+        ButtonProps(
+          fetchCallback: (quantity) => update(PromStoreProduct(
+            baseStoreProductId: baseStoreProductId!,
+            quantity: quantity,
+          ), true),
+          caption: 'Створити акцію на неакційні товари',
+        ),
+        ButtonProps(
+          fetchCallback: (quantity) => update(PromStoreProduct(
+            baseStoreProductId: baseStoreProductId!,
+            quantity: quantity,
+          ), false),
+          caption: 'Змінити кількість акційних товарів',
+          color: secondary,
+        ),
+      ],
+    );
+  }
+
+  void _onAddDiscountProduct(BuildContext context) {
+    showCreationDialog(
+      context: context,
+      inputBuilder: (textController) => PromStoreProductTextField(
+          controller: textController, validator: isPositiveInteger),
+      buttonProps: [
+        ButtonProps(
+          fetchCallback: (quantity) => post(PromStoreProduct(
+            baseStoreProductId: storeProductId,
+            quantity: quantity,
+          )),
+          caption: 'Створити нову акцію',
+        )
+      ],
+    );
+  }
+
+  Widget _addDiscountProductButton(BuildContext context) {
+    return ElevatedButton.icon(
+        label: const Text('Додати акційний товар'),
+        icon: const Icon(Icons.add),
+        onPressed: () => _onEditDiscountProduct(context));
+  }
+
   @override
   Future<ValueStatusWrapper> redirectToModelView(BuildContext context) async {
     StoreProduct? storeProduct = StoreProduct.fromJSON(toJson());
@@ -95,11 +153,16 @@ class JoinedStoreProduct extends _JoinedStoreProduct with ConvertibleToRow<Joine
       return ValueStatusWrapper.notChanged();
     }
 
-    return AppNavigation.of(context).openModelViewFor<StoreProduct>(storeProduct);
+    return AppNavigation.of(context).openModelViewFor<StoreProduct>(
+      storeProduct,
+      additionalButtonsBuilders:
+          isProm ? null : [(context) => _addDiscountProductButton(context)],
+    );
   }
 
   @override
-  DataRow buildRow(BuildContext context, UpdateCallback<ValueChangeStatus> updateCallback) {
+  DataRow buildRow(
+      BuildContext context, UpdateCallback<ValueChangeStatus> updateCallback) {
     final cells = [
       upc,
       productName,
@@ -107,13 +170,13 @@ class JoinedStoreProduct extends _JoinedStoreProduct with ConvertibleToRow<Joine
       toHryvnas(price),
       quantity.toString(),
       toHryvnas(price * quantity),
-      isProm.toString(), // TODO somehow visualize it
+      isProm ? 'Так' : 'Ні',
     ];
 
     return DataRow(
       cells: cells.map((cell) => DataCell(Text(cell))).toList(),
-      onSelectChanged: (_) async =>
-          updateCallback(await redirectToModelView(context).then((v) => v.status)),
+      onSelectChanged: (_) async => updateCallback(
+          await redirectToModelView(context).then((v) => v.status)),
     );
   }
 }

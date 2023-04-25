@@ -16,11 +16,10 @@ class Receipt extends TableReceipt {
   static final Schema<Receipt> schema = Schema(
     Receipt.new,
     [
-      FieldDescription<int, Receipt>(
+      FieldDescription<int?, Receipt>(
         'receiptId',
         (o) => o.receiptId,
         labelCaption: 'Номер чеку',
-        fieldType: FieldType.number,
       ),
       FieldDescription<int, Receipt>(
         'cost',
@@ -80,7 +79,7 @@ class Receipt extends TableReceipt {
   final List<JoinedSale> sales;
 
   const Receipt({
-    required super.receiptId,
+    super.receiptId,
     required super.cost,
     super.clientName,
     required super.employeeName,

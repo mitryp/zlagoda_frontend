@@ -39,7 +39,7 @@ class StoreProduct extends Model {
         (o) => o.quantity,
         labelCaption: 'Кількість',
         fieldType: FieldType.number,
-        validator: isInteger,
+        validator: isNonNegativeInteger,
       ),
       FieldDescription<int?, StoreProduct>.intForeignKey(
         'baseStoreProductId',
@@ -85,7 +85,7 @@ class StoreProduct extends Model {
   @override
   List<ForeignKey> get foreignKeys => [
         foreignKey<Product, ShortProduct>('upc', upc),
-        foreignKey<StoreProduct, ShortModel>('baseProductId', baseStoreProductId),
+        foreignKey<StoreProduct, ShortModel>('baseStoreProductId', baseStoreProductId),
       ];
 
   @override
