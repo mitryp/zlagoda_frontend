@@ -47,6 +47,7 @@ class ModelSearchInitiator<K, SM extends ShortModel<K>> extends StatefulWidget {
   final SM? selected;
   final bool preserveSearchOnCancel;
   final String? searchHint;
+  final List<SM>? externalOptions;
 
   const ModelSearchInitiator({
     required this.onUpdate,
@@ -56,6 +57,7 @@ class ModelSearchInitiator<K, SM extends ShortModel<K>> extends StatefulWidget {
     this.container = InkWell.new,
     this.preserveSearchOnCancel = true,
     this.searchHint,
+    this.externalOptions,
     super.key,
   });
 
@@ -111,25 +113,32 @@ class _ModelSearchInitiatorState<K, SM extends ShortModel<K>>
     widget.onUpdate(selection?.primaryKey);
   }
 
-  Future<void> fetchOptions() {
+  Future<void> fetchOptions() async {
+    if (widget.externalOptions != null) {
+      return setOptions(widget.externalOptions!);
+    }
+
     return httpService.get().then(
       (options) {
-        if (!mounted) return;
-        _setStateIfNotMounted(() {
-          this.options = options;
-          isLoaded = true;
-          isLoading = false;
-        });
+        setOptions(options);
         processTap();
       },
     ).catchError(
       (err) {
-        _setStateIfNotMounted(() => this.error = err);
+        _setStateIfMounted(() => this.error = err);
       },
     );
   }
 
-  void _setStateIfNotMounted(VoidCallback fn) {
+  void setOptions(List<SM> options) {
+    _setStateIfMounted(() {
+      this.options = options;
+      isLoaded = true;
+      isLoading = false;
+    });
+  }
+
+  void _setStateIfMounted(VoidCallback fn) {
     if (!mounted) return;
     setState(fn);
   }
