@@ -45,7 +45,7 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
       String? presentation;
       if (model != null) {
         presentation = field.fieldType == FieldType.constrainedToEnum
-            ? field.fieldGetter(model).index.toString()
+            ? field.fieldGetter(model)?.index.toString() ?? '0'
             : field.presentFieldOf(model);
       }
 
@@ -298,7 +298,7 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
 
       dynamic value;
       if (field.fieldType == FieldType.constrainedToEnum) {
-        value = field.enumConstraint!.values[int.parse(controller.text)];
+        value = field.enumConstraint!.values[int.tryParse(controller.text) ?? 0];
       } else if (field.fieldType == FieldType.serializable) {
         value = fieldsToSerializable[field]!;
       } else {
