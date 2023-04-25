@@ -50,7 +50,6 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
             ? field.fieldGetter(model)?.index.toString() ?? '0'
             : field.presentFieldOf(model);
       }
-      print('field $field, presentation $presentation');
 
       fieldsToControllers[field] = TextEditingController(text: presentation);
     }

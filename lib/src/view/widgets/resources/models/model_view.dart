@@ -168,11 +168,9 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
         connectedModels: connectedModelTables.map((t) => t.model).toList());
     final status = valueStatus.status;
 
-    print('new status: $status');
     if (!mounted || status == ValueChangeStatus.notChanged) return;
     changeStatus = valueStatus;
     if (status == ValueChangeStatus.deleted || status == ValueChangeStatus.created) {
-      print('popping ${valueStatus.status}');
       return Navigator.of(context).pop(valueStatus);
     }
     model = valueStatus.value!;
