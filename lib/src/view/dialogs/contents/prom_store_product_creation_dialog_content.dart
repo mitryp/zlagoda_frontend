@@ -20,10 +20,10 @@ class _PromStoreProductTextFieldState extends State<PromStoreProductTextField> {
   @override
   Widget build(BuildContext context) {
       return TextFormField(
-        decoration: const InputDecoration(label: Text('Кількість акційного товару')),
+        decoration: const InputDecoration(label: Text('Кількість акційних товарів')),
         controller: widget.controller,
         validator: widget.validator,
-        autovalidateMode: AutovalidateMode.always,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
       );
   }
 }
