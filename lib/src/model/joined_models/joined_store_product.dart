@@ -95,38 +95,13 @@ class JoinedStoreProduct extends _JoinedStoreProduct
   @override
   JsonMap toJson() => schema.toJson(this);
 
-  void _onEditDiscountProduct(BuildContext context) {
-    showCreationDialog(
-      context: context,
-      inputBuilder: (textController) => PromStoreProductTextField(
-          controller: textController, validator: isNonNegativeInteger),
-      buttonProps: [
-        ButtonProps(
-          fetchCallback: (quantity) => update(PromStoreProduct(
-            baseStoreProductId: baseStoreProductId!,
-            quantity: quantity,
-          ), true),
-          caption: 'Створити акцію на неакційні товари',
-        ),
-        ButtonProps(
-          fetchCallback: (quantity) => update(PromStoreProduct(
-            baseStoreProductId: baseStoreProductId!,
-            quantity: quantity,
-          ), false),
-          caption: 'Змінити кількість акційних товарів',
-          color: secondary,
-        ),
-      ],
-    );
-  }
-
   void _onAddDiscountProduct(BuildContext context) {
     showCreationDialog(
       context: context,
       inputBuilder: (textController) => PromStoreProductTextField(
           controller: textController, validator: isPositiveInteger),
       buttonProps: [
-        ButtonProps(
+        ButtonProps<PromStoreProduct>(
           fetchCallback: (quantity) => post(PromStoreProduct(
             baseStoreProductId: storeProductId,
             quantity: quantity,
@@ -141,7 +116,7 @@ class JoinedStoreProduct extends _JoinedStoreProduct
     return ElevatedButton.icon(
         label: const Text('Додати акційний товар'),
         icon: const Icon(Icons.add),
-        onPressed: () => _onEditDiscountProduct(context));
+        onPressed: () => _onAddDiscountProduct(context));
   }
 
   @override
