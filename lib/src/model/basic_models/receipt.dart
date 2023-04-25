@@ -52,13 +52,17 @@ class Receipt extends TableReceipt {
         labelCaption: 'Податок',
         fieldType: FieldType.number,
       ),
-      FieldDescription<Name, Receipt>.serializable('employeeName', (o) => o.employeeName,
-          labelCaption: "Ім'я касира", serializableEditorBuilder: nameEditorBuilder),
       FieldDescription<String, Receipt>.stringForeignKey(
         'employeeId',
         (o) => o.employeeId,
         labelCaption: 'Табельний номер працівника',
         defaultForeignKey: foreignKey<Employee, ShortCashier>('employeeId'),
+      ),
+      FieldDescription<Name, Receipt>.serializable(
+        'employeeName',
+        (o) => o.employeeName,
+        labelCaption: "Ім'я касира",
+        serializableEditorBuilder: nameEditorBuilder,
       ),
       FieldDescription<List<JoinedSale>, Receipt>(
         'sales',
@@ -91,7 +95,4 @@ class Receipt extends TableReceipt {
 
   @override
   JsonMap toJson() => schema.toJson(this);
-
-  @override
-  get primaryKey => receiptId;
 }

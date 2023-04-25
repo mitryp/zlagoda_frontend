@@ -16,10 +16,13 @@ class TableReceipt extends Model with ConvertibleToRow<TableReceipt> {
   static final Schema<TableReceipt> schema = Schema(
     TableReceipt.new,
     [
-      FieldDescription<int, TableReceipt>('receiptId', (o) => o.receiptId,
-          labelCaption: 'Номер чеку',
-          fieldType: FieldType.number,
-          fieldDisplayMode: FieldDisplayMode.none),
+      FieldDescription<int, TableReceipt>(
+        'receiptId',
+        (o) => o.receiptId,
+        labelCaption: 'Номер чеку',
+        fieldType: FieldType.number,
+        fieldDisplayMode: FieldDisplayMode.none,
+      ),
       FieldDescription<int, TableReceipt>(
         'cost',
         (o) => o.cost,
@@ -31,8 +34,12 @@ class TableReceipt extends Model with ConvertibleToRow<TableReceipt> {
         labelCaption: "Ім'я клієнта",
         serializableEditorBuilder: nameEditorBuilder,
       ),
-      FieldDescription<Name, Receipt>.serializable('employeeName', (o) => o.employeeName,
-          labelCaption: "Ім'я касира", serializableEditorBuilder: nameEditorBuilder),
+      FieldDescription<Name, Receipt>.serializable(
+        'employeeName',
+        (o) => o.employeeName,
+        labelCaption: "Ім'я касира",
+        serializableEditorBuilder: nameEditorBuilder,
+      ),
     ],
   );
 

@@ -1,8 +1,11 @@
 import '../../typedefs.dart';
 import '../basic_models/product.dart';
+import '../basic_models/store_product.dart';
 import '../interfaces/model.dart';
+import '../interfaces/search_model.dart';
 import '../model_reference.dart';
 import '../schema/field_description.dart';
+import '../schema/field_type.dart';
 import '../schema/schema.dart';
 import '../search_models/short_product.dart';
 
@@ -30,19 +33,35 @@ class JoinedSale extends Model {
         (o) => o.quantity,
         labelCaption: 'Кількість',
       ),
+      FieldDescription<int, JoinedSale>.intForeignKey(
+        'storeProductId',
+        (o) => o.storeProductId,
+        labelCaption: 'Товар в магазині',
+        defaultForeignKey: foreignKey<StoreProduct, ShortModel>('storeProductId'),
+      ),
+      FieldDescription<bool, JoinedSale>(
+        'isProm',
+        (o) => o.isProm,
+        labelCaption: 'Акційність',
+        fieldType: FieldType.boolean,
+      )
     ],
   );
 
-  final String productName;
-  final String upc;
+  final int storeProductId;
   final int price;
   final int quantity;
+  final String productName;
+  final String upc;
+  final bool isProm;
 
   const JoinedSale({
-    required this.productName,
-    required this.upc,
+    required this.storeProductId,
     required this.price,
     required this.quantity,
+    required this.productName,
+    required this.upc,
+    required this.isProm,
   });
 
   @override
