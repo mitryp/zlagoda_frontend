@@ -16,10 +16,12 @@ class TableReceipt extends Model with ConvertibleToRow<TableReceipt> {
   static final Schema<TableReceipt> schema = Schema(
     TableReceipt.new,
     [
-      FieldDescription<int, TableReceipt>('receiptId', (o) => o.receiptId,
-          labelCaption: 'Номер чеку',
-          fieldType: FieldType.number,
-          fieldDisplayMode: FieldDisplayMode.none),
+      FieldDescription<int?, TableReceipt>(
+        'receiptId',
+        (o) => o.receiptId,
+        labelCaption: 'Номер чеку',
+        fieldDisplayMode: FieldDisplayMode.none
+      ),
       FieldDescription<int, TableReceipt>(
         'cost',
         (o) => o.cost,
@@ -36,13 +38,13 @@ class TableReceipt extends Model with ConvertibleToRow<TableReceipt> {
     ],
   );
 
-  final int receiptId;
+  final int? receiptId;
   final int cost;
   final Name? clientName;
   final Name employeeName;
 
   const TableReceipt({
-    required this.receiptId,
+    this.receiptId,
     required this.cost,
     this.clientName,
     required this.employeeName,

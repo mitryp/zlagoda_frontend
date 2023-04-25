@@ -48,7 +48,8 @@ class ProductWithCategory extends _ProductWithCategory with ConvertibleToRow<Pro
 
   @override
   Future<ValueStatusWrapper> redirectToModelView(BuildContext context) => AppNavigation.of(context)
-      .openModelViewFor<Product>(product, [ModelTable<Category>(category)]);
+      .openModelViewFor<Product>(product, connectedTables: [ModelTable<Category>(category)]);
+
 
   @override
   DataRow buildRow(BuildContext context, UpdateCallback<ValueChangeStatus> updateCallback) =>

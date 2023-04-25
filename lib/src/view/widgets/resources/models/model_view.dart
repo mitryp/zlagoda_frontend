@@ -11,13 +11,20 @@ import '../../../../utils/value_status.dart';
 import '../../../pages/page_base.dart';
 import '../../permissions/authorizer.dart';
 import '../../text_link.dart';
+import '../../utils/helping_functions.dart';
 import 'model_table.dart';
 
 class ModelView<M extends Model> extends StatefulWidget {
   final ResourceFetchFunction<M> fetchFunction;
   final List<ModelTable>? connectedTables;
+  final List<WidgetBuilder>? additionalButtonsBuilders;
 
-  const ModelView({required this.fetchFunction, this.connectedTables, super.key});
+  const ModelView({
+    required this.fetchFunction,
+    this.connectedTables,
+    this.additionalButtonsBuilders,
+    super.key,
+  });
 
   @override
   State<ModelView<M>> createState() => _ModelViewState<M>();
@@ -97,12 +104,21 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
             ],
           ),
         ),
-        floatingActionButton: buildEditButton(),
+        floatingActionButton: widget.additionalButtonsBuilders != null
+            ? Flex(
+            direction: Axis.horizontal,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: makeSeparated([
+              ...widget.additionalButtonsBuilders!.map((builder) => builder(context)),
+              buildEditButton(),
+            ]))
+            : buildEditButton(),
       ),
     );
   }
 
-  Widget buildLoadingPlaceholder() => const Center(child: CircularProgressIndicator());
+  Widget buildLoadingPlaceholder() =>
+      const Center(child: CircularProgressIndicator());
 
   Widget buildErrorMessage() {
     return Center(

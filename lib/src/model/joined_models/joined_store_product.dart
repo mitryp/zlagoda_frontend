@@ -4,59 +4,63 @@ import '../../typedefs.dart';
 import '../../utils/coins_to_currency.dart';
 import '../../utils/navigation.dart';
 import '../../utils/value_status.dart';
+import '../../view/dialogs/confirmation_dialog.dart';
 import '../basic_models/store_product.dart';
 import '../interfaces/convertible_to_row.dart';
 import '../interfaces/serializable.dart';
 import '../model_reference.dart';
 import '../schema/field_description.dart';
 import '../schema/schema.dart';
+import '../schema/validators.dart';
 import '../search_models/short_product.dart';
 
 abstract class _JoinedStoreProduct implements Serializable {
   const _JoinedStoreProduct();
 }
 
-class JoinedStoreProduct extends _JoinedStoreProduct with ConvertibleToRow<JoinedStoreProduct> {
+class JoinedStoreProduct extends _JoinedStoreProduct
+    with ConvertibleToRow<JoinedStoreProduct> {
   static final Schema<JoinedStoreProduct> schema = Schema(
     JoinedStoreProduct.new,
     [
       FieldDescription<int, JoinedStoreProduct>(
         'storeProductId',
-        (o) => o.storeProductId,
+            (o) => o.storeProductId,
         labelCaption: 'ID товару',
         fieldDisplayMode: FieldDisplayMode.none,
       ),
       FieldDescription<String, JoinedStoreProduct>(
         'upc',
-        (o) => o.upc,
+            (o) => o.upc,
         labelCaption: 'UPC',
       ), // todo default goods
       FieldDescription<String, JoinedStoreProduct>(
         'productName',
-        (o) => o.productName,
+            (o) => o.productName,
         labelCaption: 'Назва',
       ),
       FieldDescription<String, JoinedStoreProduct>(
         'manufacturer',
-        (o) => o.manufacturer,
+            (o) => o.manufacturer,
         labelCaption: 'Виробник',
       ),
       FieldDescription<int, JoinedStoreProduct>(
         'price',
-        (o) => o.price,
+            (o) => o.price,
         labelCaption: 'Ціна',
       ),
       FieldDescription<int, JoinedStoreProduct>(
         'quantity',
-        (o) => o.quantity,
+            (o) => o.quantity,
         labelCaption: 'Кількість',
       ),
       FieldDescription<int?, JoinedStoreProduct>.intForeignKey(
         'baseStoreProductId',
-        (o) => o.baseStoreProductId,
+            (o) => o.baseStoreProductId,
         labelCaption: 'ID базового товару у магазині',
         fieldDisplayMode: FieldDisplayMode.none,
-        defaultForeignKey: foreignKey<StoreProduct, ShortProduct>('baseStoreProductId'),
+        defaultForeignKey:
+        foreignKey<StoreProduct, ShortProduct>('baseStoreProductId'),
       ),
     ],
   );
@@ -86,6 +90,25 @@ class JoinedStoreProduct extends _JoinedStoreProduct with ConvertibleToRow<Joine
   @override
   JsonMap toJson() => schema.toJson(this);
 
+  void _showNewPromProductPopup(BuildContext context) {
+    showConfirmationDialog(context: context, builder: (context) =>
+        ConfirmationDialog(
+          content: TextFormField(
+            decoration: const InputDecoration(
+                label: Text('Кількість акційного товару')),
+            controller: TextEditingController(),
+            validator: isInteger,
+          ),
+        ));
+  }
+
+  Widget _addDiscountProductButton(BuildContext context) {
+    return ElevatedButton.icon(
+        label: const Text('Додати акційний товар'),
+        icon: const Icon(Icons.add),
+        onPressed: () => _showNewPromProductPopup(context));
+  }
+
   @override
   Future<ValueStatusWrapper> redirectToModelView(BuildContext context) async {
     StoreProduct? storeProduct = StoreProduct.fromJSON(toJson());
@@ -95,11 +118,16 @@ class JoinedStoreProduct extends _JoinedStoreProduct with ConvertibleToRow<Joine
       return ValueStatusWrapper.notChanged();
     }
 
-    return AppNavigation.of(context).openModelViewFor<StoreProduct>(storeProduct);
+    return AppNavigation.of(context).openModelViewFor<StoreProduct>(
+      storeProduct,
+      additionalButtonsBuilders:
+      isProm ? null : [(context) => _addDiscountProductButton(context)],
+    );
   }
 
   @override
-  DataRow buildRow(BuildContext context, UpdateCallback<ValueChangeStatus> updateCallback) {
+  DataRow buildRow(BuildContext context,
+      UpdateCallback<ValueChangeStatus> updateCallback) {
     final cells = [
       upc,
       productName,
@@ -107,13 +135,14 @@ class JoinedStoreProduct extends _JoinedStoreProduct with ConvertibleToRow<Joine
       toHryvnas(price),
       quantity.toString(),
       toHryvnas(price * quantity),
-      isProm.toString(), // TODO somehow visualize it
+      isProm ? 'Так' : 'Ні',
     ];
 
     return DataRow(
       cells: cells.map((cell) => DataCell(Text(cell))).toList(),
       onSelectChanged: (_) async =>
-          updateCallback(await redirectToModelView(context).then((v) => v.status)),
+          updateCallback(
+              await redirectToModelView(context).then((v) => v.status)),
     );
   }
 }
