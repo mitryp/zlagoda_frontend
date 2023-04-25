@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../model/basic_models/store_product.dart';
 import '../../theme.dart';
+import '../../utils/value_status.dart';
 
 const double _padding = 24;
 
@@ -12,12 +14,11 @@ class ButtonProps<T> {
   final Color color;
   final String? message;
 
-  const ButtonProps({
-    required this.fetchCallback,
-    required this.caption,
-    this.color = primary,
-    this.message
-  });
+  const ButtonProps(
+      {required this.fetchCallback,
+      required this.caption,
+      this.color = primary,
+      this.message});
 }
 
 class CreationDialog extends StatefulWidget {
@@ -37,6 +38,38 @@ class CreationDialog extends StatefulWidget {
 
 class _CreationDialogState extends State<CreationDialog> {
   bool isLoading = false;
+  final formKey = GlobalKey<FormState>();
+
+  void _onPressed(ButtonProps props) async {
+    if (!formKey.currentState!.validate()) return;
+
+    setState(() => isLoading = true);
+    final res = await props.fetchCallback(int.parse(widget.controller.text))
+        as StoreProduct?;
+    if (!mounted) return;
+
+    setState(() => isLoading = false);
+
+    Navigator.of(context).pop(res == null
+        ? ValueStatusWrapper<StoreProduct>.notChanged()
+        : ValueStatusWrapper<StoreProduct>.updated(res));
+  }
+
+  List<Widget> buildActions() {
+    return widget.buttonProps
+        .map((props) => Tooltip(
+              message: props.message,
+              child: ElevatedButton(
+                onPressed: () async => _onPressed(props),
+                style: ButtonStyle(
+                    backgroundColor: MaterialStatePropertyAll(props.color)),
+                child: isLoading
+                    ? const CircularProgressIndicator()
+                    : Text(props.caption),
+              ),
+            ))
+        .toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,24 +77,12 @@ class _CreationDialogState extends State<CreationDialog> {
       shape: RoundedRectangleBorder(borderRadius: defaultBorderRadius),
       contentPadding: const EdgeInsets.all(_padding),
       actionsPadding: const EdgeInsets.all(_padding).copyWith(top: 0),
-      content: widget.inputBuilder(widget.controller),
+      content: Form(
+        key: formKey,
+        child: widget.inputBuilder(widget.controller),
+      ),
       actionsAlignment: MainAxisAlignment.spaceAround,
-      actions: widget.buttonProps.map((props) =>
-          Tooltip(
-            message: props.message,
-            child: ElevatedButton(
-              onPressed: () async {
-                setState(() => isLoading = true);
-                final res = await props.fetchCallback(int.parse(widget.controller.text));
-                setState(() => isLoading = false);
-
-                Navigator.of(context).pop(res);
-              },
-              style: ButtonStyle(
-                  backgroundColor: MaterialStatePropertyAll(props.color)),
-              child: isLoading ? const CircularProgressIndicator() : Text(props.caption),
-            ),
-          )).toList(),
+      actions: buildActions(),
     );
   }
 }
@@ -73,8 +94,7 @@ Future<T?> showCreationDialog<T>({
 }) async =>
     showDialog<T>(
       context: context,
-      builder: (context) =>
-      CreationDialog(
+      builder: (context) => CreationDialog(
         inputBuilder: inputBuilder,
         buttonProps: buttonProps,
       ),

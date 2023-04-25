@@ -12,6 +12,7 @@ import '../services/http/prom_store_product_services.dart';
 import '../theme.dart';
 import '../view/dialogs/contents/prom_store_product_creation_dialog_content.dart';
 import '../view/dialogs/creation_dialog.dart';
+import '../view/dialogs/usages/show_prom_creation_dialog.dart';
 import '../view/widgets/resources/collections/collection_view_factory.dart';
 import '../view/widgets/resources/models/model_edit_view.dart';
 import '../view/widgets/resources/models/model_table.dart';
@@ -68,36 +69,9 @@ class AppNavigation {
     List<Model>? connectedModels,
   }) {
     //TODO test
-    if (model is StoreProduct && model.isProm) {
-      return showCreationDialog<ValueStatusWrapper<SSingle>>(
-        context: context,
-        inputBuilder: (textController) => PromStoreProductTextField(
-            controller: textController, validator: isNonNegativeInteger),
-        buttonProps: [
-          ButtonProps<PromStoreProduct>(
-            fetchCallback: (quantity) => update(
-                PromStoreProduct(
-                  baseStoreProductId: model.baseStoreProductId!,
-                  quantity: quantity,
-                ),
-                true),
-            caption: 'Додати',
-            message: 'Акційні товари будуть створені на основі доступних неакційних',
-          ),
-          ButtonProps<PromStoreProduct>(
-            fetchCallback: (quantity) => update(
-                PromStoreProduct(
-                  baseStoreProductId: model.baseStoreProductId!,
-                  quantity: quantity,
-                ),
-                false),
-            caption: 'Встановити',
-            color: secondary,
-            message: 'Буде встановлено нову кількість акційних товарів без зміни кількості неакційних товарів',
-          ),
-        ],
-      ).then((wr) => wr ?? ValueStatusWrapper<SSingle>.notChanged());
-    }
+    if (SSingle == StoreProduct && model is StoreProduct && model.isProm)
+      return showPromCreationDialog(context, model)
+          .then((wr) => (wr ?? ValueStatusWrapper<StoreProduct>.notChanged()) as ValueStatusWrapper<SSingle>);
 
     return Navigator.of(context)
         .push<ValueStatusWrapper<SSingle>>(MaterialPageRoute(
