@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../services/query_builder/filter.dart';
+import '../../../../theme.dart';
 import 'types.dart';
 
 class DateFilter extends StatefulWidget {
@@ -26,7 +27,16 @@ class _DateFilterState extends State<DateFilter> {
     return await showDateRangePicker(
       context: context,
       firstDate: DateTime(1900),
-      lastDate: DateTime(2100),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: const ColorScheme.light(primary: primary),
+            buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
+          ),
+          child: child!,
+        );
+      },
     );
   }
 
@@ -43,7 +53,7 @@ class _DateFilterState extends State<DateFilter> {
       widget.removeFilter(FilterOption.dateMax);
       widget.removeFilter(FilterOption.dateMin);
 
-      setState((){
+      setState(() {
         options[1] = defaultPeriodChoiceCaption;
       });
 
@@ -62,38 +72,28 @@ class _DateFilterState extends State<DateFilter> {
     widget.addFilter(Filter(FilterOption.dateMin, start));
     widget.addFilter(Filter(FilterOption.dateMax, end));
 
-    setState((){
+    setState(() {
       options[1] =
-      '${start.year}.${start.month}.${start.day} - ${end.year}.${end
-          .month}.${end.day}';
+          '${start.year}.${start.month}.${start.day} - ${end.year}.${end.month}.${end.day}';
     });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final selectedOptions = options
+        .map((option) => options.indexOf(option) == currentIndex)
+        .toList();
+
+    return ToggleButtons(
+      direction: Axis.horizontal,
+      onPressed: (int index) => _handleClick(index, selectedOptions),
+      isSelected: selectedOptions,
+      children: options
+          .map((option) => Padding(
+                padding: defaultButtonStyle.padding!.resolve({})! ~/ 2,
+                child: Text(option),
+              ))
+          .toList(),
+    );
+  }
 }
-
-
-@override
-Widget build(BuildContext context) {
-  final selectedOptions = options
-      .map((option) => options.indexOf(option) == currentIndex)
-      .toList();
-
-  return ToggleButtons(
-    direction: Axis.horizontal,
-    onPressed: (int index) => _handleClick(index, selectedOptions),
-    //TODO
-    borderRadius: const BorderRadius.all(Radius.circular(8)),
-    selectedBorderColor: Colors.red[700],
-    // TODO
-    selectedColor: Colors.white,
-    // TODO
-    fillColor: Colors.red[200],
-    // TODO
-    color: Colors.red[400],
-    // TODO
-    constraints: const BoxConstraints(
-      minHeight: 40.0,
-      minWidth: 80.0,
-    ),
-    isSelected: selectedOptions,
-    children: options.map((choice) => Text(choice)).toList(),
-  );
-}}

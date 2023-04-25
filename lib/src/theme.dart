@@ -68,5 +68,5 @@ final mainTheme = ThemeData.light().copyWith(
     ),
     dataTableTheme: const DataTableThemeData(
       headingTextStyle: TextStyle(fontWeight: FontWeight.w600)
-    )
+    ),
 );

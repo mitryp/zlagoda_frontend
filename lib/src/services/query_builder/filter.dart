@@ -23,14 +23,12 @@ enum FilterOption<T> {
   dateMin<DateTime>(),
   dateMax<DateTime>(),
   employeeSurname<String>(),
-  employeeName<String>(),
+  employeeId<String>(),
   position<Position>(),
   clientSurname<String>(),
   discount<int>(),
-  //TODO decide on whether we need both filters
   categoryName<String>(),
   categoryId<int>(),
-  //
   productName<String>(),
   isProm<bool>(),
   upc<String>();

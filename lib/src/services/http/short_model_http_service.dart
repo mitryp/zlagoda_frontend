@@ -2,6 +2,7 @@ import 'package:http/http.dart' as http;
 
 import '../../model/interfaces/search_model.dart';
 import '../../model/search_models/short_category.dart';
+import '../../model/search_models/short_cashier.dart';
 import '../../model/search_models/short_product.dart';
 import '../../utils/json_decode.dart';
 import 'http_service_helper.dart';
@@ -13,7 +14,6 @@ class ShortModelHttpService<SM extends ShortModel> {
   final JsonCastFunction<SM> castFunction;
 
   const ShortModelHttpService({required route, required this.castFunction})
-      //: route = 'api/short';
       : route = 'api/$route/short';
 
   Future<List<SM>> get() async {
@@ -45,4 +45,9 @@ class ShortCategoryService extends ShortModelHttpService<ShortCategory> {
 class ShortProductService extends ShortModelHttpService<ShortProduct> {
   const ShortProductService()
       : super(route: 'products', castFunction: ShortProduct.fromJson);
+}
+
+class ShortCashierService extends ShortModelHttpService<ShortCashier> {
+  const ShortCashierService()
+      : super(route: 'cashiers', castFunction: ShortCashier.fromJson);
 }

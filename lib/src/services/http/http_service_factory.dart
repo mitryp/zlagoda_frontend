@@ -10,6 +10,7 @@ import '../../model/joined_models/joined_store_product.dart';
 import '../../model/joined_models/product_with_category.dart';
 import '../../model/other_models/table_receipt.dart';
 import '../../model/search_models/short_category.dart';
+import '../../model/search_models/short_cashier.dart';
 import '../../model/search_models/short_product.dart';
 import '../../typedefs.dart';
 import 'model_http_service.dart';
@@ -40,6 +41,7 @@ ModelHttpService makeModelHttpService<S extends Serializable>() {
 const _classesToShortServiceConstructors = <Type, Constructor<ShortModelHttpService>>{
   ShortCategory: ShortCategoryService.new,
   ShortProduct: ShortProductService.new,
+  ShortCashier: ShortCashierService.new,
 };
 
 ShortModelHttpService<SM> makeShortModelHttpService<SM extends ShortModel>() {

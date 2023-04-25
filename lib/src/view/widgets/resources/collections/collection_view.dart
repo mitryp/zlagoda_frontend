@@ -133,7 +133,7 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>>
             children: [
               sort,
               filters.isEmpty ? const SizedBox() : divider,
-              ...filters,
+              ...makeSeparated(filters),
               searches.isEmpty ? const SizedBox() : divider,
               ...makeSeparated(searches),
             ],
