@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 
+import '../../services/http/prom_store_product_services.dart';
+import '../../theme.dart';
 import '../../typedefs.dart';
 import '../../utils/coins_to_currency.dart';
 import '../../utils/navigation.dart';
 import '../../utils/value_status.dart';
 import '../../view/dialogs/confirmation_dialog.dart';
+import '../../view/dialogs/contents/prom_store_product_creation_dialog_content.dart';
+import '../../view/dialogs/creation_dialog.dart';
 import '../basic_models/store_product.dart';
 import '../interfaces/convertible_to_row.dart';
 import '../interfaces/serializable.dart';
 import '../model_reference.dart';
+import '../other_models/prom_store_product.dart';
 import '../schema/field_description.dart';
 import '../schema/schema.dart';
 import '../schema/validators.dart';
@@ -25,42 +30,42 @@ class JoinedStoreProduct extends _JoinedStoreProduct
     [
       FieldDescription<int, JoinedStoreProduct>(
         'storeProductId',
-            (o) => o.storeProductId,
+        (o) => o.storeProductId,
         labelCaption: 'ID товару',
         fieldDisplayMode: FieldDisplayMode.none,
       ),
       FieldDescription<String, JoinedStoreProduct>(
         'upc',
-            (o) => o.upc,
+        (o) => o.upc,
         labelCaption: 'UPC',
       ), // todo default goods
       FieldDescription<String, JoinedStoreProduct>(
         'productName',
-            (o) => o.productName,
+        (o) => o.productName,
         labelCaption: 'Назва',
       ),
       FieldDescription<String, JoinedStoreProduct>(
         'manufacturer',
-            (o) => o.manufacturer,
+        (o) => o.manufacturer,
         labelCaption: 'Виробник',
       ),
       FieldDescription<int, JoinedStoreProduct>(
         'price',
-            (o) => o.price,
+        (o) => o.price,
         labelCaption: 'Ціна',
       ),
       FieldDescription<int, JoinedStoreProduct>(
         'quantity',
-            (o) => o.quantity,
+        (o) => o.quantity,
         labelCaption: 'Кількість',
       ),
       FieldDescription<int?, JoinedStoreProduct>.intForeignKey(
         'baseStoreProductId',
-            (o) => o.baseStoreProductId,
+        (o) => o.baseStoreProductId,
         labelCaption: 'ID базового товару у магазині',
         fieldDisplayMode: FieldDisplayMode.none,
         defaultForeignKey:
-        foreignKey<StoreProduct, ShortProduct>('baseStoreProductId'),
+            foreignKey<StoreProduct, ShortProduct>('baseStoreProductId'),
       ),
     ],
   );
@@ -90,23 +95,53 @@ class JoinedStoreProduct extends _JoinedStoreProduct
   @override
   JsonMap toJson() => schema.toJson(this);
 
-  void _showNewPromProductPopup(BuildContext context) {
-    showConfirmationDialog(context: context, builder: (context) =>
-        ConfirmationDialog(
-          content: TextFormField(
-            decoration: const InputDecoration(
-                label: Text('Кількість акційного товару')),
-            controller: TextEditingController(),
-            validator: isInteger,
-          ),
-        ));
+  void _onEditDiscountProduct(BuildContext context) {
+    showCreationDialog(
+      context: context,
+      inputBuilder: (textController) => PromStoreProductTextField(
+          controller: textController, validator: isNonNegativeInteger),
+      buttonProps: [
+        ButtonProps(
+          fetchCallback: (quantity) => update(PromStoreProduct(
+            baseStoreProductId: baseStoreProductId!,
+            quantity: quantity,
+          ), true),
+          caption: 'Створити акцію на неакційні товари',
+        ),
+        ButtonProps(
+          fetchCallback: (quantity) => update(PromStoreProduct(
+            baseStoreProductId: baseStoreProductId!,
+            quantity: quantity,
+          ), false),
+          caption: 'Змінити кількість акційних товарів',
+          color: secondary,
+        ),
+      ],
+    );
+  }
+
+  void _onAddDiscountProduct(BuildContext context) {
+    showCreationDialog(
+      context: context,
+      inputBuilder: (textController) => PromStoreProductTextField(
+          controller: textController, validator: isPositiveInteger),
+      buttonProps: [
+        ButtonProps(
+          fetchCallback: (quantity) => post(PromStoreProduct(
+            baseStoreProductId: storeProductId,
+            quantity: quantity,
+          )),
+          caption: 'Створити нову акцію',
+        )
+      ],
+    );
   }
 
   Widget _addDiscountProductButton(BuildContext context) {
     return ElevatedButton.icon(
         label: const Text('Додати акційний товар'),
         icon: const Icon(Icons.add),
-        onPressed: () => _showNewPromProductPopup(context));
+        onPressed: () => _onEditDiscountProduct(context));
   }
 
   @override
@@ -121,13 +156,13 @@ class JoinedStoreProduct extends _JoinedStoreProduct
     return AppNavigation.of(context).openModelViewFor<StoreProduct>(
       storeProduct,
       additionalButtonsBuilders:
-      isProm ? null : [(context) => _addDiscountProductButton(context)],
+          isProm ? null : [(context) => _addDiscountProductButton(context)],
     );
   }
 
   @override
-  DataRow buildRow(BuildContext context,
-      UpdateCallback<ValueChangeStatus> updateCallback) {
+  DataRow buildRow(
+      BuildContext context, UpdateCallback<ValueChangeStatus> updateCallback) {
     final cells = [
       upc,
       productName,
@@ -140,9 +175,8 @@ class JoinedStoreProduct extends _JoinedStoreProduct
 
     return DataRow(
       cells: cells.map((cell) => DataCell(Text(cell))).toList(),
-      onSelectChanged: (_) async =>
-          updateCallback(
-              await redirectToModelView(context).then((v) => v.status)),
+      onSelectChanged: (_) async => updateCallback(
+          await redirectToModelView(context).then((v) => v.status)),
     );
   }
 }

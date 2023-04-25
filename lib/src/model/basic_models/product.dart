@@ -10,6 +10,7 @@ import '../schema/field_description.dart';
 import '../schema/schema.dart';
 import '../schema/validators.dart';
 import '../search_models/short_category.dart';
+import '../search_models/short_product.dart';
 import 'category.dart';
 
 class Product extends Model with ConvertibleToRow<Product> {
@@ -80,4 +81,8 @@ class Product extends Model with ConvertibleToRow<Product> {
   @override
   Future<ValueStatusWrapper> redirectToModelView(BuildContext context) =>
       AppNavigation.of(context).toModelView<Product>(primaryKey);
+
+  @override
+  ShortProduct toSearchModel() =>
+      ShortProduct(primaryKey: upc, descriptiveAttr: '$upc $productName $manufacturer');
 }

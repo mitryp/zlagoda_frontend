@@ -2,21 +2,21 @@ import 'package:flutter/material.dart';
 
 import '../../../model/schema/validators.dart';
 
-class PromStoreProductCreation extends StatefulWidget {
+class PromStoreProductTextField extends StatefulWidget {
   final TextEditingController controller;
   final FieldValidator validator;
 
-  const PromStoreProductCreation({
+  const PromStoreProductTextField({
     required this.controller,
     required this.validator,
     super.key,
   });
   
   @override
-  State<PromStoreProductCreation> createState() => _PromStoreProductCreationState();
+  State<PromStoreProductTextField> createState() => _PromStoreProductTextFieldState();
 }
 
-class _PromStoreProductCreationState extends State<PromStoreProductCreation> {
+class _PromStoreProductTextFieldState extends State<PromStoreProductTextField> {
   @override
   Widget build(BuildContext context) {
       return TextFormField(

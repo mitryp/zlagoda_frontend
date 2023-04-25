@@ -24,8 +24,6 @@ typedef ControllerSuccessfulLogic<T> = T Function(http.Response response);
 /// [SCol] - the type of the recourse when the whole collection is fetched by GET collection
 /// [SSingle] - the type of the single row fetched by GET single
 abstract class ModelHttpService<SCol extends Serializable, SSingle extends Serializable> {
-  static const String baseRoute = 'localhost:5000';
-
   final String route;
   final JsonCastFunction<SCol> collectionCastFunction;
   final JsonCastFunction<SSingle> singleCastFunction;

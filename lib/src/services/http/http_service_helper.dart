@@ -11,11 +11,14 @@ import '../middleware/response/response_middleware.dart';
 typedef JsonCastFunction<S extends Serializable> = S? Function(JsonMap json);
 typedef ControllerSuccessfulLogic<T> = T Function(http.Response response);
 
+const String baseRoute = 'localhost:5000';
+
 enum HttpMethod {
   get,
   post,
   put,
-  delete;
+  delete,
+  patch;
 }
 
 Future<T> httpServiceController<T>(
