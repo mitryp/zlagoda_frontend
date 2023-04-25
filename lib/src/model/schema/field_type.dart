@@ -7,6 +7,7 @@ enum FieldType<T> {
   auto<dynamic>(_never),
   serializable<dynamic>(_never),
   constrainedToEnum<dynamic>(_never),
+  transitive<dynamic>(_never),
   text<String>(_stringConverter),
   number<int>(int.parse),
   currency<int>(_currencyConverter, _presentCurrency),

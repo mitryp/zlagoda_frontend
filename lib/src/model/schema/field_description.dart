@@ -17,6 +17,8 @@ typedef SerializableFieldEditor<S extends Serializable> = Future<S> Function(
   S? serializable,
 );
 
+typedef TransitiveFieldPresentation<T> = String Function(T);
+
 class FieldDescription<R, O> {
   final String fieldName;
   final FieldGetter<R, O> fieldGetter;
@@ -29,6 +31,7 @@ class FieldDescription<R, O> {
   final SerializableFieldEditor? serializableEditorBuilder;
   final DateConstraints? dateConstraints;
   final ForeignKey? defaultForeignKey;
+  final TransitiveFieldPresentation? transitiveFieldPresentation;
 
   const FieldDescription(
     this.fieldName,
@@ -42,6 +45,8 @@ class FieldDescription<R, O> {
   })  : enumConstraint = null,
         defaultForeignKey = null,
         serializableEditorBuilder = null,
+        transitiveFieldPresentation = null,
+        assert(fieldType != FieldType.transitive),
         assert(fieldType != FieldType.constrainedToEnum),
         assert(fieldType != FieldType.serializable),
         assert(fieldType != FieldType.intForeignKey && fieldType != FieldType.stringForeignKey),
@@ -51,27 +56,29 @@ class FieldDescription<R, O> {
     this.fieldName,
     this.fieldGetter, {
     required this.labelCaption,
-    required this.defaultForeignKey,
+    required ForeignKey this.defaultForeignKey,
     this.fieldDisplayMode = FieldDisplayMode.inModelView,
     this.isEditable = true,
   })  : enumConstraint = null,
         validator = _noValidation,
         fieldType = FieldType.stringForeignKey,
         serializableEditorBuilder = null,
-        dateConstraints = null;
+        dateConstraints = null,
+        transitiveFieldPresentation = null;
 
   const FieldDescription.intForeignKey(
     this.fieldName,
     this.fieldGetter, {
     required this.labelCaption,
-    required this.defaultForeignKey,
+    required ForeignKey this.defaultForeignKey,
     this.fieldDisplayMode = FieldDisplayMode.inModelView,
     this.isEditable = true,
   })  : enumConstraint = null,
         validator = _noValidation,
         fieldType = FieldType.intForeignKey,
         serializableEditorBuilder = null,
-        dateConstraints = null;
+        dateConstraints = null,
+        transitiveFieldPresentation = null;
 
   const FieldDescription.enumType(
     this.fieldName,
@@ -84,20 +91,36 @@ class FieldDescription<R, O> {
         fieldType = FieldType.constrainedToEnum,
         serializableEditorBuilder = null,
         dateConstraints = null,
-        defaultForeignKey = null;
+        defaultForeignKey = null,
+        transitiveFieldPresentation = null;
 
   const FieldDescription.serializable(
     this.fieldName,
     this.fieldGetter, {
     required this.labelCaption,
-    required this.serializableEditorBuilder,
+    required SerializableFieldEditor this.serializableEditorBuilder,
     this.fieldDisplayMode = FieldDisplayMode.everywhere,
   })  : fieldType = FieldType.serializable,
         isEditable = true,
         enumConstraint = null,
         validator = _noValidation,
         dateConstraints = null,
-        defaultForeignKey = null;
+        defaultForeignKey = null,
+        transitiveFieldPresentation = null;
+
+  const FieldDescription.transitive(
+    this.fieldName,
+    this.fieldGetter, {
+    required this.labelCaption,
+    required this.transitiveFieldPresentation,
+    this.fieldDisplayMode = FieldDisplayMode.everywhere,
+  })  : fieldType = FieldType.transitive,
+        isEditable = false,
+        enumConstraint = null,
+        validator = _noValidation,
+        dateConstraints = null,
+        defaultForeignKey = null,
+        serializableEditorBuilder = null;
 
   Symbol get symbol => Symbol(fieldName);
 
@@ -115,12 +138,22 @@ class FieldDescription<R, O> {
 
   String presentFieldOf(O object) {
     final value = fieldGetter(object);
-    if (value == null) return '';
+
+    if (value == null) {
+      return '';
+    }
+
+    if (fieldType == FieldType.transitive) {
+      return transitiveFieldPresentation!(value);
+    }
+
     return fieldType.presentation(value);
   }
 
-  bool get isOwnProperty =>
-      fieldType != FieldType.stringForeignKey && fieldType != FieldType.intForeignKey;
+  bool get isForeignKey =>
+      fieldType == FieldType.stringForeignKey || fieldType == FieldType.intForeignKey;
+
+  bool get isOwnProperty => !isForeignKey && fieldType != FieldType.transitive;
 
   @override
   bool operator ==(Object other) =>

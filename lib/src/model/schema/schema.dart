@@ -1,6 +1,7 @@
 import '../../typedefs.dart';
 import '../interfaces/serializable.dart';
 import 'field_description.dart';
+import 'field_type.dart';
 
 class Schema<O> {
   final Function classConstructor;
@@ -11,7 +12,7 @@ class Schema<O> {
   O? fromJson(JsonMap json) {
     final namedArgs = <Symbol, dynamic>{};
 
-    for (final retriever in fields) {
+    for (final retriever in fields.where((e) => e.fieldType != FieldType.transitive)) {
       final retrievedValue =
           retriever.extractor.extractFrom(json, retriever.fieldName);
 

@@ -48,6 +48,7 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
             ? field.fieldGetter(model)?.index.toString() ?? '0'
             : field.presentFieldOf(model);
       }
+      print('field $field, presentation $presentation');
 
       fieldsToControllers[field] = TextEditingController(text: presentation);
     }
@@ -94,7 +95,7 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
               .map(buildOwnFormField),
           const SizedBox(height: 10),
           ...fieldsToControllers.entries
-              .where((e) => !e.key.isOwnProperty && e.key.isEditable)
+              .where((e) => e.key.isForeignKey && e.key.isEditable)
               .map(buildForeignKeyEditor),
         ],
       ),

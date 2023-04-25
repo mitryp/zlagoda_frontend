@@ -49,6 +49,12 @@ class StoreProduct extends Model {
         fieldDisplayMode: FieldDisplayMode.none,
         defaultForeignKey: foreignKey<StoreProduct, ShortModel>('baseStoreProductId'),
       ),
+      FieldDescription.transitive(
+        'isProm',
+        (o) => o.isProm,
+        labelCaption: 'Акційний',
+        transitiveFieldPresentation: (b) => FieldType.boolean.presentation(b),
+      )
     ],
   );
 
