@@ -11,6 +11,7 @@ import '../../model/joined_models/product_with_category.dart';
 import '../../model/other_models/table_receipt.dart';
 import '../../model/search_models/short_category.dart';
 import '../../model/search_models/short_cashier.dart';
+import '../../model/search_models/short_client.dart';
 import '../../model/search_models/short_product.dart';
 import '../../typedefs.dart';
 import 'model_http_service.dart';
@@ -42,6 +43,7 @@ const _classesToShortServiceConstructors = <Type, Constructor<ShortModelHttpServ
   ShortCategory: ShortCategoryService.new,
   ShortProduct: ShortProductService.new,
   ShortCashier: ShortCashierService.new,
+  ShortClient: ShortClientService.new,
 };
 
 ShortModelHttpService<SM> makeShortModelHttpService<SM extends ShortModel>() {

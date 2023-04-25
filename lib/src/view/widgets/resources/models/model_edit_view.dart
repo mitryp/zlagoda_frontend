@@ -6,6 +6,7 @@ import '../../../../model/model_schema_factory.dart';
 import '../../../../model/schema/field_description.dart';
 import '../../../../model/schema/field_type.dart';
 import '../../../../model/schema/schema.dart';
+import '../../../../model/schema/validators.dart';
 import '../../../../services/http/http_service_factory.dart';
 import '../../../../services/http/model_http_service.dart';
 import '../../../../utils/locales.dart';
@@ -46,9 +47,10 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
       String? presentation;
       if (model != null) {
         presentation = field.fieldType == FieldType.constrainedToEnum
-            ? field.fieldGetter(model).index.toString()
+            ? field.fieldGetter(model)?.index.toString() ?? '0'
             : field.presentFieldOf(model);
       }
+
       fieldsToControllers[field] = TextEditingController(text: presentation);
     }
 
@@ -121,14 +123,18 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
       );
     }
 
+    final isPassword = field.fieldType == FieldType.password;
+
     return TextFormField(
       controller: controller,
       keyboardType: field.fieldType.inputType,
-      validator: field.validator,
+      validator: !isPassword || isEditing ? field.validator : notEmpty,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       decoration: InputDecoration(
         label: Text(field.labelCaption),
+        hintText: isPassword && isEditing ? 'Щоб не вносити змін, залиште поле порожнім' : null,
       ),
+      obscureText: isPassword,
     );
   }
 
@@ -298,7 +304,7 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
 
       dynamic value;
       if (field.fieldType == FieldType.constrainedToEnum) {
-        value = field.enumConstraint!.values[int.parse(controller.text)];
+        value = field.enumConstraint!.values[int.tryParse(controller.text) ?? 0];
       } else if (field.fieldType == FieldType.serializable) {
         value = fieldsToSerializable[field]!;
       } else {
@@ -307,6 +313,10 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
         } on FormatException catch (e) {
           value = null;
         }
+      }
+
+      if (field.isNullable && value == '') {
+        value = null;
       }
 
       json[field.fieldName] = value;

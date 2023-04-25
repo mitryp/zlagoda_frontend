@@ -52,6 +52,7 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
       try {
         model = await widget.fetchFunction();
       } on ResourceNotFetchedException catch (e) {
+        print(e);
         if (!mounted) return;
         return setState(() => exception = e);
       }
@@ -141,8 +142,9 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
       children: [
         const TableHeader("Пов'язані ресурси"),
         ...connectedModelTables.map(
-          (e) => EmbeddedModelTableCard(e, onUpdate: (newValue) {
-            if (!mounted) return;
+          (e) => EmbeddedModelTableCard(e, onUpdate: (status) {
+            if (!mounted || status.status == ValueChangeStatus.notChanged) return;
+            changeStatus = ValueStatusWrapper<M>(status.status, model);
             fetchResources(fetchModel: false, fetchConnectedTables: true);
           }),
         ),

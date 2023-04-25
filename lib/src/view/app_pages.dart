@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'pages/clients_view.dart';
-import 'pages/employees_view.dart';
-import 'pages/goods/goods_tab_view.dart';
-import 'pages/receipts_view.dart';
+import 'pages/collections/clients_view.dart';
+import 'pages/collections/employees_view.dart';
+import 'pages/collections/goods/goods_tab_view.dart';
+import 'pages/collections/receipts_view.dart';
 
 enum AppPage {
   goods(Icons.list, label: 'Товари'),
