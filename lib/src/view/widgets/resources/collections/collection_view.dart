@@ -167,8 +167,6 @@ class _CollectionTableState<R extends ConvertibleToRow<R>> extends State<Collect
   bool isLoaded = false;
   Object? error;
 
-  late final List<String> columnNames = columnNamesOf<R>();
-
   @override
   void initState() {
     super.initState();
@@ -218,7 +216,7 @@ class _CollectionTableState<R extends ConvertibleToRow<R>> extends State<Collect
 
     return DataTable(
       showCheckboxColumn: false,
-      columns: columnNames.map((name) => DataColumn(label: Text(name))).toList(),
+      columns: columnsOf<R>(),
       rows: items.map((m) => m.buildRow(context, _updateCallback)).toList(),
     );
   }

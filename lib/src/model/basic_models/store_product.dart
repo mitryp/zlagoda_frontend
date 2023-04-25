@@ -7,6 +7,7 @@ import '../schema/field_type.dart';
 import '../schema/schema.dart';
 import '../schema/validators.dart';
 import '../search_models/short_product.dart';
+import '../search_models/short_store_product.dart';
 import 'product.dart';
 
 class StoreProduct extends Model {
@@ -80,4 +81,10 @@ class StoreProduct extends Model {
         foreignKey<Product, ShortProduct>('upc', upc),
         foreignKey<StoreProduct, ShortModel>('baseProductId', baseStoreProductId),
       ];
+
+  @override
+  ShortModel toSearchModel() => ShortStoreProduct(
+        primaryKey: primaryKey,
+        descriptiveAttr: 'UPC $upc${isProm ? ' Акційний' : ''}',
+      );
 }

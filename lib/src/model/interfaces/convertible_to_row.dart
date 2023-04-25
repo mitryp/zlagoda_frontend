@@ -40,6 +40,9 @@ List<String> columnNamesOf<R extends ConvertibleToRow<R>>() {
   return schema.fields.where((r) => r.isShownInTable).map((r) => r.labelCaption).toList();
 }
 
+List<DataColumn> columnsOf<R extends ConvertibleToRow<R>>() =>
+    columnNamesOf<R>().map((name) => DataColumn(label: Text(name))).toList();
+
 /// Returns the values of the fields of the [convertible] which are displayed in the DataRow in the order
 /// of their [FieldDescription]s in the [Schema].
 ///

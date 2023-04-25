@@ -186,17 +186,26 @@ class EmbeddedModelTableCard<M extends Model> extends StatelessWidget {
 }
 
 class TableHeader extends StatelessWidget {
-  final String text;
+  static const EdgeInsets defaultPadding = EdgeInsets.only(top: 8, bottom: 8, left: 20);
 
-  const TableHeader(this.text, {super.key});
+  final String text;
+  final TextStyle style;
+  final EdgeInsetsGeometry padding;
+
+  const TableHeader(
+    this.text, {
+    this.style = const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+    this.padding = defaultPadding,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8).copyWith(left: 20),
+      padding: padding,
       child: Text(
         text,
-        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+        style: style,
       ),
     );
   }

@@ -7,6 +7,7 @@ import 'basic_models/store_product.dart';
 import 'common_models/address.dart';
 import 'common_models/name.dart';
 import 'interfaces/serializable.dart';
+import 'joined_models/joined_sale.dart';
 import 'joined_models/joined_store_product.dart';
 import 'joined_models/product_with_category.dart';
 import 'other_models/table_receipt.dart';
@@ -26,6 +27,7 @@ final _classesToSchemas = <Type, Schema>{
   TableReceipt: TableReceipt.schema,
   StoreProduct: StoreProduct.schema,
   JoinedStoreProduct: JoinedStoreProduct.schema,
+  JoinedSale: JoinedSale.schema,
 
   Name: Name.schema,
   Address: Address.schema,

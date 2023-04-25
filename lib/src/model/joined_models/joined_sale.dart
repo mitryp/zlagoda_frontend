@@ -1,6 +1,11 @@
+import 'package:flutter/material.dart';
+
 import '../../typedefs.dart';
+import '../../utils/navigation.dart';
+import '../../utils/value_status.dart';
 import '../basic_models/product.dart';
 import '../basic_models/store_product.dart';
+import '../interfaces/convertible_to_row.dart';
 import '../interfaces/model.dart';
 import '../interfaces/search_model.dart';
 import '../model_reference.dart';
@@ -9,7 +14,7 @@ import '../schema/field_type.dart';
 import '../schema/schema.dart';
 import '../search_models/short_product.dart';
 
-class JoinedSale extends Model {
+class JoinedSale extends Model with ConvertibleToRow<JoinedSale> {
   static final Schema<JoinedSale> schema = Schema(
     JoinedSale.new,
     [
@@ -75,4 +80,8 @@ class JoinedSale extends Model {
 
   @override
   JsonMap toJson() => schema.toJson(this);
+
+  @override
+  Future<ValueStatusWrapper> redirectToModelView(BuildContext context) =>
+      AppNavigation.of(context).toModelView<StoreProduct>(storeProductId);
 }
