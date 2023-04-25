@@ -69,9 +69,9 @@ class AppNavigation {
     List<Model>? connectedModels,
   }) {
     //TODO test
-    if (model is StoreProduct && model.isProm)
-      return showPromCreationDialog<SSingle>(context, model)
-          .then((wr) => wr ?? ValueStatusWrapper<SSingle>.notChanged());
+    if (SSingle == StoreProduct && model is StoreProduct && model.isProm)
+      return showPromCreationDialog(context, model)
+          .then((wr) => (wr ?? ValueStatusWrapper<StoreProduct>.notChanged()) as ValueStatusWrapper<SSingle>);
 
     return Navigator.of(context)
         .push<ValueStatusWrapper<SSingle>>(MaterialPageRoute(

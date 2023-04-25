@@ -14,12 +14,11 @@ class ButtonProps<T> {
   final Color color;
   final String? message;
 
-  const ButtonProps({
-    required this.fetchCallback,
-    required this.caption,
-    this.color = primary,
-    this.message
-  });
+  const ButtonProps(
+      {required this.fetchCallback,
+      required this.caption,
+      this.color = primary,
+      this.message});
 }
 
 class CreationDialog extends StatefulWidget {
@@ -45,25 +44,31 @@ class _CreationDialogState extends State<CreationDialog> {
     if (!formKey.currentState!.validate()) return;
 
     setState(() => isLoading = true);
-    final res = await props.fetchCallback(int.parse(widget.controller.text));
-    if(!mounted) return;
+    final res = await props.fetchCallback(int.parse(widget.controller.text))
+        as StoreProduct?;
+    if (!mounted) return;
 
     setState(() => isLoading = false);
 
-    Navigator.of(context).pop(ValueStatusWrapper<StoreProduct>.updated(res));
+    Navigator.of(context).pop(res == null
+        ? ValueStatusWrapper<StoreProduct>.notChanged()
+        : ValueStatusWrapper<StoreProduct>.updated(res));
   }
 
   List<Widget> buildActions() {
-    return widget.buttonProps.map((props) =>
-        Tooltip(
-          message: props.message,
-          child: ElevatedButton(
-            onPressed: ()async => _onPressed(props),
-            style: ButtonStyle(
-                backgroundColor: MaterialStatePropertyAll(props.color)),
-            child: isLoading ? const CircularProgressIndicator() : Text(props.caption),
-          ),
-        )).toList();
+    return widget.buttonProps
+        .map((props) => Tooltip(
+              message: props.message,
+              child: ElevatedButton(
+                onPressed: () async => _onPressed(props),
+                style: ButtonStyle(
+                    backgroundColor: MaterialStatePropertyAll(props.color)),
+                child: isLoading
+                    ? const CircularProgressIndicator()
+                    : Text(props.caption),
+              ),
+            ))
+        .toList();
   }
 
   @override
@@ -73,7 +78,7 @@ class _CreationDialogState extends State<CreationDialog> {
       contentPadding: const EdgeInsets.all(_padding),
       actionsPadding: const EdgeInsets.all(_padding).copyWith(top: 0),
       content: Form(
-          key: formKey,
+        key: formKey,
         child: widget.inputBuilder(widget.controller),
       ),
       actionsAlignment: MainAxisAlignment.spaceAround,
@@ -89,8 +94,7 @@ Future<T?> showCreationDialog<T>({
 }) async =>
     showDialog<T>(
       context: context,
-      builder: (context) =>
-      CreationDialog(
+      builder: (context) => CreationDialog(
         inputBuilder: inputBuilder,
         buttonProps: buttonProps,
       ),

@@ -107,6 +107,7 @@ class JoinedStoreProduct extends _JoinedStoreProduct
             quantity: quantity,
           )),
           caption: 'Створити нову акцію',
+          message: 'На основі неакційного товару',
         )
       ],
     );
