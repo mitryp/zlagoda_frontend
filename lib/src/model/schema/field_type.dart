@@ -9,7 +9,8 @@ enum FieldType<T> {
   text<String>(_stringConverter),
   number<int>(int.parse),
   currency<int>(_currencyConverter, _presentCurrency),
-  date<DateTime>(_parseDate, _presentDate),
+  date<DateTime>(_dateConverter, _presentDate),
+  boolean<bool>(_boolConverter, _presentBool),
   constrainedToEnum<dynamic>(_never),
   stringForeignKey<String>(_stringConverter),
   intForeignKey<int>(int.parse);
@@ -24,6 +25,8 @@ enum FieldType<T> {
 
 _never(_) {}
 
+String _presentBool(b) => b as bool ? 'Так' : 'Ні';
+
 String _stringConverter(string) => (string as String).trim();
 
 int _currencyConverter(coins) => (double.parse(_stringConverter(coins as String)) * 100).toInt();
@@ -37,9 +40,11 @@ String _presentDate(d) {
   return '${padWithZeros(date.day)}.${padWithZeros(date.month)}.${date.year}';
 }
 
+bool _boolConverter(boolStr) => (boolStr as String) == 'Так';
+
 String _presentCurrency(coins) => ((coins as int) / 100).toStringAsFixed(2);
 
-DateTime _parseDate(String date) {
+DateTime _dateConverter(String date) {
   final parts = date.split('.').map(int.parse).toList();
   return DateTime(parts[2], parts[1], parts[0]);
 }
