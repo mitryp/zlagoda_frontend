@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../typedefs.dart';
 import '../../utils/navigation.dart';
+import '../../utils/value_status.dart';
 import '../interfaces/convertible_to_row.dart';
 import '../interfaces/model.dart';
 import '../schema/field_description.dart';
@@ -48,7 +49,7 @@ class Category extends Model with ConvertibleToRow<Category> {
   JsonMap toJson() => schema.toJson(this);
 
   @override
-  void redirectToModelView(BuildContext context) =>
+  Future<ValueStatusWrapper> redirectToModelView(BuildContext context) =>
       AppNavigation.of(context).openModelViewFor<Category>(this);
 
   @override

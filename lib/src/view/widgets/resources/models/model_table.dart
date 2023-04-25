@@ -5,6 +5,7 @@ import '../../../../model/model_schema_factory.dart';
 import '../../../../model/schema/schema.dart';
 import '../../../../utils/locales.dart';
 import '../../../../utils/navigation.dart';
+import '../../../../utils/value_status.dart';
 
 typedef FieldGetter<R, M> = R Function(M);
 
@@ -16,7 +17,7 @@ class ModelTable<M extends Model> extends StatelessWidget {
 
   Schema<M> get schema => makeModelSchema<M>(model.runtimeType);
 
-  void redirectToModelView(BuildContext context) =>
+  Future<ValueStatusWrapper<M>> redirectToModelView(BuildContext context) =>
       AppNavigation.of(context).openModelViewFor<M>(model);
 
   @override

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../typedefs.dart';
 import '../../utils/coins_to_currency.dart';
 import '../../utils/navigation.dart';
+import '../../utils/value_status.dart';
 import '../basic_models/receipt.dart';
 import '../common_models/name.dart';
 import '../interfaces/convertible_to_row.dart';
@@ -11,17 +12,14 @@ import '../schema/field_description.dart';
 import '../schema/field_type.dart';
 import '../schema/schema.dart';
 
-class TableReceipt extends Model with ConvertibleToRow<TableReceipt>{
+class TableReceipt extends Model with ConvertibleToRow<TableReceipt> {
   static final Schema<TableReceipt> schema = Schema(
     TableReceipt.new,
     [
-      FieldDescription<int, TableReceipt>(
-        'receiptId',
-        (o) => o.receiptId,
-        labelCaption: 'Номер чеку',
-        fieldType: FieldType.number,
-        fieldDisplayMode: FieldDisplayMode.none
-      ),
+      FieldDescription<int, TableReceipt>('receiptId', (o) => o.receiptId,
+          labelCaption: 'Номер чеку',
+          fieldType: FieldType.number,
+          fieldDisplayMode: FieldDisplayMode.none),
       FieldDescription<int, TableReceipt>(
         'cost',
         (o) => o.cost,
@@ -29,16 +27,12 @@ class TableReceipt extends Model with ConvertibleToRow<TableReceipt>{
       ),
       FieldDescription<Name?, Receipt>.serializable(
         'clientName',
-            (o) => o.clientName,
+        (o) => o.clientName,
         labelCaption: "Ім'я клієнта",
         serializableEditorBuilder: nameEditorBuilder,
       ),
-      FieldDescription<Name, Receipt>.serializable(
-          'employeeName',
-              (o) => o.employeeName,
-          labelCaption: "Ім'я касира",
-          serializableEditorBuilder: nameEditorBuilder
-      ),
+      FieldDescription<Name, Receipt>.serializable('employeeName', (o) => o.employeeName,
+          labelCaption: "Ім'я касира", serializableEditorBuilder: nameEditorBuilder),
     ],
   );
 
@@ -63,19 +57,20 @@ class TableReceipt extends Model with ConvertibleToRow<TableReceipt>{
   get primaryKey => receiptId;
 
   @override
-  void redirectToModelView(BuildContext context) => AppNavigation.of(context)
-      .toModelView<Receipt>(primaryKey);
+  Future<ValueStatusWrapper> redirectToModelView(BuildContext context) =>
+      AppNavigation.of(context).toModelView<Receipt>(primaryKey);
 
   @override
-  DataRow buildRow(BuildContext context) {
+  DataRow buildRow(BuildContext context, UpdateCallback<ValueChangeStatus> updateCallback) {
     final cellValues = [
       toHryvnas(cost),
       clientName?.fullName ?? '',
       employeeName.fullName,
     ];
     return DataRow(
-          cells: cellValues.map((v) => DataCell(Text(v))).toList(),
-          onSelectChanged: (_) => redirectToModelView(context),
-        );
+      cells: cellValues.map((v) => DataCell(Text(v))).toList(),
+      onSelectChanged: (_) async =>
+          updateCallback(await redirectToModelView(context).then((v) => v.status)),
+    );
   }
 }

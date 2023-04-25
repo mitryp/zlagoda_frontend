@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../typedefs.dart';
 import '../../utils/navigation.dart';
+import '../../utils/value_status.dart';
 import '../common_models/address.dart';
 import '../common_models/name.dart';
 import '../interfaces/convertible_to_row.dart';
@@ -72,6 +73,6 @@ class Client extends Model with ConvertibleToRow<Client> {
   JsonMap toJson() => schema.toJson(this);
 
   @override
-  void redirectToModelView(BuildContext context) =>
+  Future<ValueStatusWrapper> redirectToModelView(BuildContext context) =>
       AppNavigation.of(context).toModelView<Client>(primaryKey);
 }

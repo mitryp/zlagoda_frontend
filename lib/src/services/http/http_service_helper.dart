@@ -19,15 +19,17 @@ enum HttpMethod {
 }
 
 Future<T> httpServiceController<T>(
-  http.Response response,
-  ControllerSuccessfulLogic<T> successLogic,
-) async {
+    http.Response response, ControllerSuccessfulLogic<T> successLogic,
+    [ControllerSuccessfulLogic<T>? unsuccessfulLogic]) async {
   final res = await applyResponseMiddleware(response);
 
   if (successCodes(res)) {
     return successLogic(res);
   }
 
+  if (unsuccessfulLogic != null) {
+    return unsuccessfulLogic(res);
+  }
   throw ResourceNotFetchedException(res.reasonPhrase);
 }
 

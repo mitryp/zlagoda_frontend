@@ -23,8 +23,7 @@ typedef ControllerSuccessfulLogic<T> = T Function(http.Response response);
 /// Implementation - Verkhohliad Kateryna
 /// [SCol] - the type of the recourse when the whole collection is fetched by GET collection
 /// [SSingle] - the type of the single row fetched by GET single
-abstract class ModelHttpService<SCol extends Serializable,
-    SSingle extends Serializable> {
+abstract class ModelHttpService<SCol extends Serializable, SSingle extends Serializable> {
   static const String baseRoute = 'localhost:5000';
 
   final String route;
@@ -36,19 +35,17 @@ abstract class ModelHttpService<SCol extends Serializable,
     required this.collectionCastFunction,
     JsonCastFunction<SSingle>? singleCastFunction,
   })  : assert(SCol == SSingle || singleCastFunction != null),
-        singleCastFunction = singleCastFunction ??
-            collectionCastFunction as JsonCastFunction<SSingle>;
+        singleCastFunction =
+            singleCastFunction ?? collectionCastFunction as JsonCastFunction<SSingle>;
 
-  String makeRoute([Object? path]) =>
-      'api/$route${path != null ? '/$path' : ''}';
+  String makeRoute([Object? path]) => 'api/$route${path != null ? '/$path' : ''}';
 
   Future<List<SCol>> get(QueryBuilder queryBuilder) async {
     final response = await makeRequest(
       HttpMethod.get,
       Uri.http(baseRoute, makeRoute(), queryBuilder.queryParams),
     ).catchError(
-      (err) => http.Response(
-          err is http.ClientException ? err.message : 'Unknown $err', 503),
+      (err) => http.Response(err is http.ClientException ? err.message : 'Unknown $err', 503),
     );
 
     return httpServiceController(response, (response) {
@@ -61,44 +58,41 @@ abstract class ModelHttpService<SCol extends Serializable,
   }
 
   Future<SSingle?> singleById(dynamic id) async {
-    final response =
-        await makeRequest(HttpMethod.get, Uri.http(baseRoute, makeRoute(id)))
-            .catchError((err) => http.Response('$err', 503));
+    final response = await makeRequest(HttpMethod.get, Uri.http(baseRoute, makeRoute(id)))
+        .catchError((err) => http.Response('$err', 503));
 
-    return httpServiceController(
-      response,
-      (response) => singleCastFunction(
-          decodeResponseBody<Map<String, dynamic>>(response)),
-    );
+    return httpServiceController(response, _tryDecodeSingleResource);
   }
 
-  Future<bool> post(SSingle row) async {
+  Future<SSingle?> post(SSingle row) async {
     final response = await makeRequest(
       HttpMethod.post,
       Uri.http(baseRoute, makeRoute()),
       body: row.toJson(),
     ).catchError((err) => http.Response(err.message, 503));
 
-    return httpServiceController(response, (response) => true);
+    return httpServiceController(response, _tryDecodeSingleResource);
   }
 
-  Future<bool> update(SSingle row, dynamic primaryKey) async {
+  Future<SSingle?> update(SSingle row, dynamic primaryKey) async {
     final response = await makeRequest(
       HttpMethod.put,
       Uri.http(baseRoute, makeRoute(primaryKey)),
       body: row.toJson(),
     ).catchError((err) => http.Response(err.message, 503));
 
-    return httpServiceController(response, (response) => true);
+    return httpServiceController(response, _tryDecodeSingleResource);
   }
 
   Future<bool> delete(dynamic id) async {
-    final response =
-        await makeRequest(HttpMethod.delete, Uri.http(baseRoute, makeRoute(id)))
-            .catchError((err) => http.Response(err.message, 503));
+    final response = await makeRequest(HttpMethod.delete, Uri.http(baseRoute, makeRoute(id)))
+        .catchError((err) => http.Response(err.message, 503));
 
-    return httpServiceController(response, (response) => true);
+    return httpServiceController(response, (response) => true, (response) => false);
   }
+
+  SSingle? _tryDecodeSingleResource(http.Response response) =>
+      singleCastFunction(decodeResponseBody<Map<String, dynamic>>(response));
 }
 
 /*
@@ -106,12 +100,10 @@ abstract class ModelHttpService<SCol extends Serializable,
  */
 
 class EmployeeService extends ModelHttpService<Employee, Employee> {
-  const EmployeeService()
-      : super(route: 'employees', collectionCastFunction: Employee.fromJson);
+  const EmployeeService() : super(route: 'employees', collectionCastFunction: Employee.fromJson);
 }
 
-class StoreProductService
-    extends ModelHttpService<JoinedStoreProduct, StoreProduct> {
+class StoreProductService extends ModelHttpService<JoinedStoreProduct, StoreProduct> {
   const StoreProductService()
       : super(
           route: 'store_products',

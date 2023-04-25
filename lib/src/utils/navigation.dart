@@ -9,6 +9,7 @@ import '../view/widgets/resources/collections/collection_view_factory.dart';
 import '../view/widgets/resources/models/model_edit_view.dart';
 import '../view/widgets/resources/models/model_table.dart';
 import '../view/widgets/resources/models/model_view.dart';
+import 'value_status.dart';
 
 class AppNavigation {
   final BuildContext context;
@@ -18,35 +19,58 @@ class AppNavigation {
   ModelHttpService<dynamic, S> _serviceOf<S extends Serializable>() =>
       makeModelHttpService<S>() as ModelHttpService<dynamic, S>;
 
-  void toModelView<SSingle extends Model>(dynamic primaryKey) {
+  Future<ValueStatusWrapper<SSingle>> toModelView<SSingle extends Model>(dynamic primaryKey) {
     assert(SSingle != Model);
 
     final modelFuture = _serviceOf<SSingle>().singleById(primaryKey).then((v) => v!);
 
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => ModelView<SSingle>(fetchFunction: () => modelFuture),
-      ),
-    );
+    return Navigator.of(context)
+        .push<ValueStatusWrapper<SSingle>>(
+          MaterialPageRoute(
+            builder: (context) => ModelView<SSingle>(fetchFunction: () => modelFuture),
+          ),
+        )
+        .then((wr) => wr ?? ValueStatusWrapper<SSingle>.notChanged());
   }
 
-  void openModelViewFor<SSingle extends Model>(SSingle model, [List<ModelTable>? connectedTables]) {
+  Future<ValueStatusWrapper<SSingle>> openModelViewFor<SSingle extends Model>(
+    SSingle model, [
+    List<ModelTable>? connectedTables,
+  ]) {
     assert(SSingle != Model);
 
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => ModelView<SSingle>(
-          fetchFunction: () => model,
-          connectedTables: connectedTables,
-        ),
-      ),
-    );
+    return Navigator.of(context)
+        .push<ValueStatusWrapper<SSingle>>(
+          MaterialPageRoute(
+            builder: (context) => ModelView<SSingle>(
+              fetchFunction: () => model,
+              connectedTables: connectedTables,
+            ),
+          ),
+        )
+        .then((wr) => wr ?? ValueStatusWrapper<SSingle>.notChanged());
   }
 
-  void openModelCreation<SSingle extends Model>() {
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => ModelEditForm<SSingle>(),
-    ));
+  Future<ValueStatusWrapper<SSingle>> openModelEditViewFor<SSingle extends Model>(
+    SSingle model, {
+    List<Model>? connectedModels,
+  }) {
+    return Navigator.of(context)
+        .push<ValueStatusWrapper<SSingle>>(MaterialPageRoute(
+          builder: (context) => ModelEditForm<SSingle>(
+            model: model,
+            connectedModels: /*connectedModelTables.map((t) => t.model).toList()*/ connectedModels,
+          ),
+        ))
+        .then((wr) => wr ?? ValueStatusWrapper<SSingle>.notChanged());
+  }
+
+  Future<ValueStatusWrapper<SSingle>> openModelCreation<SSingle extends Model>() {
+    return Navigator.of(context)
+        .push<ValueStatusWrapper<SSingle>>(MaterialPageRoute(
+          builder: (context) => ModelEditForm<SSingle>(),
+        ))
+        .then((wr) => wr ?? ValueStatusWrapper<SSingle>.notChanged());
   }
 
   void toCollectionView<SCol extends ConvertibleToRow<SCol>>() {

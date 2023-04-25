@@ -6,12 +6,15 @@ import '../../../../model/schema/schema.dart';
 import '../../../../services/query_builder/query_builder.dart';
 import '../../../../services/query_builder/sort.dart';
 import '../../../../typedefs.dart';
+import '../../../../utils/value_status.dart';
 import 'collection_view.dart';
+
+typedef RedirectCallbackWithValueStatus = Future<ValueStatusWrapper> Function(BuildContext);
 
 abstract class ModelCollectionView<SCol extends ConvertibleToRow<SCol>> extends StatefulWidget {
   final CsfDelegateConstructor searchFilterDelegate;
   final SortOption defaultSortField;
-  final RedirectCallback onAddPressed;
+  final RedirectCallbackWithValueStatus onAddPressed;
 
   const ModelCollectionView({
     required this.defaultSortField,

@@ -4,13 +4,14 @@ import '../../model/basic_models/employee.dart';
 import '../../services/query_builder/filter.dart';
 import '../../services/query_builder/sort.dart';
 import '../../utils/navigation.dart';
+import '../../utils/value_status.dart';
 import '../widgets/queries/filters/chips_filter.dart';
 import '../widgets/queries/filters/search_filter.dart';
 import '../widgets/queries/sort_block.dart';
 import '../widgets/resources/collections/collection_view.dart';
 import '../widgets/resources/collections/model_collection_view.dart';
 
-void _redirectToAddingModel(BuildContext context) =>
+Future<ValueStatusWrapper> _redirectToAddingModel(BuildContext context) =>
     AppNavigation.of(context).openModelCreation<Employee>();
 
 class EmployeesView extends ModelCollectionView<Employee> {

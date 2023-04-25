@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../typedefs.dart';
 import '../../utils/navigation.dart';
+import '../../utils/value_status.dart';
 import '../interfaces/convertible_to_row.dart';
 import '../interfaces/model.dart';
 import '../model_reference.dart';
@@ -77,6 +78,6 @@ class Product extends Model with ConvertibleToRow<Product> {
       [foreignKey<Category, ShortCategory>('categoryId', categoryId)];
 
   @override
-  void redirectToModelView(BuildContext context) =>
+  Future<ValueStatusWrapper> redirectToModelView(BuildContext context) =>
       AppNavigation.of(context).toModelView<Product>(primaryKey);
 }

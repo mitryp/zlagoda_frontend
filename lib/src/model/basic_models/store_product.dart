@@ -13,10 +13,11 @@ class StoreProduct extends Model {
   static final Schema<StoreProduct> schema = Schema(
     StoreProduct.new,
     [
-      FieldDescription<int, StoreProduct>(
+      FieldDescription<int?, StoreProduct>(
         'storeProductId',
         (o) => o.storeProductId,
         labelCaption: 'ID товару',
+        fieldType: FieldType.number,
         isEditable: false,
         fieldDisplayMode: FieldDisplayMode.none,
       ),

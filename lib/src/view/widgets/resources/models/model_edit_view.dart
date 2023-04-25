@@ -9,6 +9,7 @@ import '../../../../model/schema/schema.dart';
 import '../../../../services/http/http_service_factory.dart';
 import '../../../../services/http/model_http_service.dart';
 import '../../../../utils/locales.dart';
+import '../../../../utils/value_status.dart';
 import '../../../dialogs/confirmation_dialog.dart';
 import '../../../pages/page_base.dart';
 import '../../misc/clickable_absorb_pointer.dart';
@@ -223,30 +224,37 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
       icon: Icon(isEditing ? Icons.save : Icons.add),
       onPressed: () {
         if (!(formKey.currentState?.validate() ?? true)) return;
-        if (isEditing)
-          _update();
-        else
-          _create();
+        _processUpdatedModel((isEditing ? _update() : _create()).then((val) {
+          if (val == null) return ValueStatusWrapper.notChanged();
+          if (isEditing) return ValueStatusWrapper.updated(val);
+          return ValueStatusWrapper.created(val);
+        }));
       },
       label: Text(isEditing ? 'Зберегти' : 'Створити'),
     );
   }
 
-  Future<bool> _update() {
+  Future<void> _processUpdatedModel(Future<ValueStatusWrapper<M>> updatedModel) async {
+    final statusWrapper = await updatedModel;
+    if (!mounted) return;
+    Navigator.of(context).pop(statusWrapper);
+  }
+
+  Future<M?> _update() {
     final newModel = generateEditedModel();
     if (newModel == null) {
       print('update model is incorrect');
-      return Future.value(false);
+      return Future.value(null);
     }
 
     return httpService.update(newModel, newModel.primaryKey);
   }
 
-  Future<bool> _create() {
+  Future<M?> _create() {
     final newModel = generateEditedModel();
     if (newModel == null) {
       print('create model is incorrect');
-      return Future.value(false);
+      return Future.value(null);
     }
 
     return httpService.post(newModel);
@@ -257,20 +265,23 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
       padding: const EdgeInsets.only(right: 8),
       child: IconButton(
         icon: Icon(Icons.delete, color: Colors.red[800]),
-        onPressed: () async {
-          final res = await showConfirmationDialog(
-            context: context,
-            builder: (context) {
-              return const ConfirmationDialog.message('Ви точно хочете видалити цей ресурс?');
-            },
-          );
-
-          if (res && mounted) {
-            httpService.delete(widget.model!.primaryKey).then(Navigator.of(context).pop);
-          }
-        },
+        onPressed: _processDeletion,
       ),
     );
+  }
+
+  void _processDeletion() async {
+    final isConfirmed = await showConfirmationDialog(
+      context: context,
+      builder: (context) {
+        return const ConfirmationDialog.message('Ви точно хочете видалити цей ресурс?');
+      },
+    );
+
+    if (!isConfirmed || !mounted) return;
+    final res = await httpService.delete(widget.model!.primaryKey);
+    if (!res || !mounted) return;
+    Navigator.of(context).pop(ValueStatusWrapper<M>.deleted());
   }
 
   Map<String, dynamic> generateJson() {

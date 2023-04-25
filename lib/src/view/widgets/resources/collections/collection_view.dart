@@ -8,9 +8,10 @@ import '../../../../services/http/model_http_service.dart';
 import '../../../../services/query_builder/filter.dart';
 import '../../../../services/query_builder/query_builder.dart';
 import '../../../../services/query_builder/sort.dart';
-import '../../../../typedefs.dart';
+import '../../../../utils/value_status.dart';
 import '../../../pages/page_base.dart';
 import '../../utils/helping_functions.dart';
+import 'model_collection_view.dart';
 
 abstract class CollectionSearchFilterDelegate {
   final VoidCallback updateCallback;
@@ -56,7 +57,7 @@ typedef CsfDelegateConstructor = CollectionSearchFilterDelegate Function({
  */
 
 class CollectionView<SCol extends ConvertibleToRow<SCol>> extends StatefulWidget {
-  final RedirectCallback onAddPressed;
+  final RedirectCallbackWithValueStatus onAddPressed;
   final QueryBuilder queryBuilder;
   final CsfDelegateConstructor searchFilterDelegate;
 
@@ -71,8 +72,8 @@ class CollectionView<SCol extends ConvertibleToRow<SCol>> extends StatefulWidget
   State<CollectionView<SCol>> createState() => _CollectionViewState<SCol>();
 }
 
-class _CollectionViewState<SCol extends ConvertibleToRow<SCol>>
-    extends State<CollectionView<SCol>> {
+class _CollectionViewState<SCol extends ConvertibleToRow<SCol>> extends State<CollectionView<SCol>>
+    with RouteAware {
   late final ModelHttpService<SCol, dynamic> httpService =
       makeModelHttpService<SCol>() as ModelHttpService<SCol, dynamic>;
 
@@ -126,24 +127,27 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>>
 
     return Card(
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
-          child: Flex(
-            direction: Axis.horizontal,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              sort,
-              filters.isEmpty ? const SizedBox() : divider,
-              ...makeSeparated(filters),
-              searches.isEmpty ? const SizedBox() : divider,
-              ...makeSeparated(searches),
-            ],
-          ),
-        ));
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
+      child: Flex(
+        direction: Axis.horizontal,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          sort,
+          filters.isEmpty ? const SizedBox() : divider,
+          ...makeSeparated(filters),
+          searches.isEmpty ? const SizedBox() : divider,
+          ...makeSeparated(searches),
+        ],
+      ),
+    ));
   }
 
-  Widget buildAddButton() => ElevatedButton(
-        onPressed: () => widget.onAddPressed(context),
-        child: const Text('Додати'),
+  Widget buildAddButton() => ElevatedButton.icon(
+        icon: const Icon(Icons.add),
+        onPressed: () => widget.onAddPressed(context).then((v) {
+          if (v.status != ValueChangeStatus.notChanged) fetchItems();
+        }),
+        label: const Text('Створити'),
       );
 }
 
@@ -168,8 +172,8 @@ class _CollectionTableState<R extends ConvertibleToRow<R>> extends State<Collect
   @override
   void initState() {
     super.initState();
-    updateSubscription = widget.updateStream.listen((_) => loadItems());
-    loadItems();
+    updateSubscription = widget.updateStream.listen((_) => fetchItems());
+    fetchItems();
   }
 
   @override
@@ -178,7 +182,7 @@ class _CollectionTableState<R extends ConvertibleToRow<R>> extends State<Collect
     super.dispose();
   }
 
-  Future<void> loadItems() {
+  Future<void> fetchItems() {
     setState(() {
       isLoaded = false;
       error = null;
@@ -215,7 +219,12 @@ class _CollectionTableState<R extends ConvertibleToRow<R>> extends State<Collect
     return DataTable(
       showCheckboxColumn: false,
       columns: columnNames.map((name) => DataColumn(label: Text(name))).toList(),
-      rows: items.map((m) => m.buildRow(context)).toList(),
+      rows: items.map((m) => m.buildRow(context, _updateCallback)).toList(),
     );
+  }
+
+  void _updateCallback(ValueChangeStatus updatedStatus) {
+    if (updatedStatus == ValueChangeStatus.notChanged) return;
+    fetchItems();
   }
 }

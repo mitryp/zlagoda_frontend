@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import '../../typedefs.dart';
 import '../../utils/coins_to_currency.dart';
 import '../../utils/navigation.dart';
+import '../../utils/value_status.dart';
 import '../basic_models/store_product.dart';
 import '../interfaces/convertible_to_row.dart';
 import '../interfaces/serializable.dart';
-import '../model_reference.dart';
 import '../schema/field_description.dart';
 import '../schema/schema.dart';
 
@@ -14,8 +14,7 @@ abstract class _JoinedStoreProduct implements Serializable {
   const _JoinedStoreProduct();
 }
 
-class JoinedStoreProduct extends _JoinedStoreProduct
-    with ConvertibleToRow<JoinedStoreProduct> {
+class JoinedStoreProduct extends _JoinedStoreProduct with ConvertibleToRow<JoinedStoreProduct> {
   static final Schema<JoinedStoreProduct> schema = Schema(
     JoinedStoreProduct.new,
     [
@@ -32,12 +31,12 @@ class JoinedStoreProduct extends _JoinedStoreProduct
       ), // todo default goods
       FieldDescription<String, JoinedStoreProduct>(
         'productName',
-            (o) => o.productName,
+        (o) => o.productName,
         labelCaption: 'Назва',
       ),
       FieldDescription<String, JoinedStoreProduct>(
         'manufacturer',
-            (o) => o.manufacturer,
+        (o) => o.manufacturer,
         labelCaption: 'Виробник',
       ),
       FieldDescription<int, JoinedStoreProduct>(
@@ -85,20 +84,19 @@ class JoinedStoreProduct extends _JoinedStoreProduct
   JsonMap toJson() => schema.toJson(this);
 
   @override
-  void redirectToModelView(BuildContext context) {
-    //TODO check whether it works
+  Future<ValueStatusWrapper> redirectToModelView(BuildContext context) async {
     StoreProduct? storeProduct = StoreProduct.fromJSON(toJson());
 
     if (storeProduct == null) {
       print('store product is null');
-      return;
+      return ValueStatusWrapper.notChanged();
     }
 
-    AppNavigation.of(context).openModelViewFor<StoreProduct>(storeProduct);
+    return AppNavigation.of(context).openModelViewFor<StoreProduct>(storeProduct);
   }
 
   @override
-  DataRow buildRow(BuildContext context) {
+  DataRow buildRow(BuildContext context, UpdateCallback<ValueChangeStatus> updateCallback) {
     final cells = [
       upc,
       productName,
@@ -111,7 +109,8 @@ class JoinedStoreProduct extends _JoinedStoreProduct
 
     return DataRow(
       cells: cells.map((cell) => DataCell(Text(cell))).toList(),
-      onSelectChanged: (_) => redirectToModelView(context),
+      onSelectChanged: (_) async =>
+          updateCallback(await redirectToModelView(context).then((v) => v.status)),
     );
   }
 }

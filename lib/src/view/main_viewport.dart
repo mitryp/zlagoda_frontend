@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:zlagoda_frontend/src/view/widgets/resources/models/model_view.dart';
 
 import '../model/basic_models/employee.dart';
-import '../services/http/http_service_factory.dart';
 import '../services/middleware/request/authentication_middleware.dart';
 import '../services/middleware/response/auth_handle_middleware.dart';
 import '../services/middleware/response/response_display_middleware.dart';
+import '../utils/navigation.dart';
 import 'app_pages.dart';
 import 'widgets/middleware_context/request_middleware_context.dart';
 import 'widgets/middleware_context/response_middleware_context.dart';
@@ -52,12 +51,6 @@ class _MainViewportState extends State<MainViewport> {
   }
 
   Widget buildMainView() {
-    // return Expanded(
-    //   child: ModelView<Employee>(
-    //     fetchFunction: () => makeHttpService<Employee>().singleById(0).then((v) => v!),
-    //   ),
-    // );
-
     return Expanded(
       child: ClipPath(
         child: Navigator(
@@ -75,27 +68,36 @@ class _MainViewportState extends State<MainViewport> {
       child: NavigationRail(
         selectedIndex: AppPage.values.indexOf(currentPage),
         destinations: railDestinations,
-        trailing: Expanded(
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: ElevatedButton.icon(
-                label: FittedBox(
-                  child: Text(UserManager.of(context).currentUser?.name.firstName ?? 'No user'),
-                ),
-                icon: const Icon(Icons.account_circle),
-                onPressed: () {},
-              ),
-            ),
-          ),
-        ),
+        trailing: buildProfileLink(),
         onDestinationSelected: (index) {
           if (index == currentPageIndex) return;
 
           setState(() => currentPageIndex = index);
           Navigator.of(nestedNavigatorKey.currentContext!).pushNamed(currentPage.route);
         },
+      ),
+    );
+  }
+
+  Expanded buildProfileLink() {
+    final userManager = UserManager.of(context);
+
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 16),
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: ElevatedButton.icon(
+            label: FittedBox(
+              child: Text(userManager.currentUser?.name.firstName ?? 'No user'),
+            ),
+            icon: const Icon(Icons.account_circle),
+            onPressed: () {
+              if (userManager.currentUser == null) return;
+              AppNavigation.of(context).toModelView<Employee>(userManager.currentUser!.userId);
+            },
+          ),
+        ),
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../model/basic_models/employee.dart';
 import '../../../services/auth/user.dart';
 
 typedef UserModificationCallback = void Function(User? user);
@@ -37,8 +38,7 @@ class UserManager extends InheritedWidget {
     required VoidCallback loginRedirect,
     required super.child,
     super.key,
-  })
-      : _userModificationCallback = userModificationCallback,
+  })  : _userModificationCallback = userModificationCallback,
         _loginRedirect = loginRedirect;
 
   factory UserManager.of(BuildContext context) =>
@@ -52,4 +52,11 @@ class UserManager extends InheritedWidget {
   void logout() => setCurrentUser(null);
 
   void redirectToLogin() => WidgetsBinding.instance.addPostFrameCallback((_) => _loginRedirect());
+
+  bool hasPosition(Position position) => currentUser?.role == position;
+
+  bool hasPositionPermissions(Position position) {
+    if (currentUser == null) return false;
+    return currentUser!.role == Position.manager || currentUser!.role == position;
+  }
 }

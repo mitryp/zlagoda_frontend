@@ -1,22 +1,34 @@
 import 'package:flutter/material.dart';
 
+import '../../../model/basic_models/employee.dart';
+import '../../widgets/permissions/user_manager.dart';
 import 'categories_view.dart';
 import 'products_view.dart';
 import 'store_products_view.dart';
 
 Widget buildProductsView(BuildContext context) => const ProductsView();
+
 Widget buildStoreProductsView(BuildContext context) => const StoreProductsView();
+
 Widget buildCategoriesView(BuildContext context) => const CategoriesView();
 
 enum GoodsTab {
   products('Товари', builder: buildProductsView),
   storeProducts('Товари в магазині', builder: buildStoreProductsView),
-  categories('Категорії', builder: buildCategoriesView);
+  categories(
+    'Категорії',
+    builder: buildCategoriesView,
+    requiredPositionPermissions: Position.manager,
+  );
 
   final String tabName;
   final WidgetBuilder builder;
+  final Position requiredPositionPermissions;
 
-  const GoodsTab(this.tabName, {required this.builder});
+  const GoodsTab(this.tabName, {
+    required this.builder,
+    this.requiredPositionPermissions = Position.cashier,
+  });
 }
 
 class GoodsTabView extends StatefulWidget {
@@ -28,7 +40,12 @@ class GoodsTabView extends StatefulWidget {
 
 class _GoodsTabViewState extends State<GoodsTabView>
     with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
-  late final tabController = TabController(length: 3, vsync: this);
+  late final userManager = UserManager.of(context);
+  late final tabController = TabController(
+      length: GoodsTab.values
+          .where(currentUserHasPermissionToView)
+          .length,
+      vsync: this);
 
   GoodsTab get currentTab => GoodsTab.values[tabController.index];
 
@@ -63,10 +80,16 @@ class _GoodsTabViewState extends State<GoodsTabView>
     );
   }
 
-  List<Widget> buildTabs() => GoodsTab.values.map(buildTab).toList();
+  List<Widget> buildTabs() => GoodsTab.values.where(currentUserHasPermissionToView).map(buildTab).toList();
+
+  bool currentUserHasPermissionToView(GoodsTab tab) =>
+      userManager.hasPositionPermissions(tab.requiredPositionPermissions);
 
   Widget buildTab(GoodsTab tab) {
-    final background = Theme.of(context).colorScheme.background;
+    final background = Theme
+        .of(context)
+        .colorScheme
+        .background;
 
     return Container(
       height: 35,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../typedefs.dart';
 import '../../utils/navigation.dart';
+import '../../utils/value_status.dart';
 import '../../view/widgets/resources/models/model_table.dart';
 import '../basic_models/category.dart';
 import '../basic_models/product.dart';
@@ -14,10 +15,8 @@ abstract class _ProductWithCategory implements Serializable {
   const _ProductWithCategory();
 }
 
-class ProductWithCategory extends _ProductWithCategory
-    with ConvertibleToRow<ProductWithCategory> {
-  static final Schema<ProductWithCategory> schema =
-      Schema(ProductWithCategory.new, [
+class ProductWithCategory extends _ProductWithCategory with ConvertibleToRow<ProductWithCategory> {
+  static final Schema<ProductWithCategory> schema = Schema(ProductWithCategory.new, [
     FieldDescription<Product, ProductWithCategory>(
       'product',
       (o) => o.product,
@@ -45,19 +44,20 @@ class ProductWithCategory extends _ProductWithCategory
   }
 
   @override
-  JsonMap toJson() =>
-      {...Product.schema.toJson(product), ...Category.schema.toJson(category)};
+  JsonMap toJson() => {...Product.schema.toJson(product), ...Category.schema.toJson(category)};
 
   @override
-  void redirectToModelView(BuildContext context) => AppNavigation.of(context)
+  Future<ValueStatusWrapper> redirectToModelView(BuildContext context) => AppNavigation.of(context)
       .openModelViewFor<Product>(product, [ModelTable<Category>(category)]);
 
   @override
-  DataRow buildRow(BuildContext context) => DataRow(
+  DataRow buildRow(BuildContext context, UpdateCallback<ValueChangeStatus> updateCallback) =>
+      DataRow(
         cells: [
-          ...product.buildRow(context).cells,
-          ...category.buildRow(context).cells
+          ...product.buildRow(context, (_) {}).cells,
+          ...category.buildRow(context, (_) {}).cells
         ],
-        onSelectChanged: (_) => redirectToModelView(context),
+        onSelectChanged: (_) async =>
+            updateCallback(await redirectToModelView(context).then((v) => v.status)),
       );
 }

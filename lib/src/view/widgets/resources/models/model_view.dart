@@ -6,10 +6,11 @@ import '../../../../theme.dart';
 import '../../../../typedefs.dart';
 import '../../../../utils/exceptions.dart';
 import '../../../../utils/locales.dart';
+import '../../../../utils/navigation.dart';
+import '../../../../utils/value_status.dart';
 import '../../../pages/page_base.dart';
 import '../../permissions/authorizer.dart';
 import '../../text_link.dart';
-import 'model_edit_view.dart';
 import 'model_table.dart';
 
 class ModelView<M extends Model> extends StatefulWidget {
@@ -23,10 +24,11 @@ class ModelView<M extends Model> extends StatefulWidget {
 }
 
 class _ModelViewState<M extends Model> extends State<ModelView<M>> {
-  late final M model;
-  late final List<ModelTable> connectedModelTables;
+  late M model;
+  late List<ModelTable> connectedModelTables;
   bool isResourceLoaded = false;
   ResourceNotFetchedException? exception;
+  ValueStatusWrapper<M> changeStatus = ValueStatusWrapper.notChanged();
 
   @override
   void initState() {
@@ -34,14 +36,22 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
     fetchResources();
   }
 
-  Future<void> fetchResources() async {
-    try {
-      model = await widget.fetchFunction();
-    } on ResourceNotFetchedException catch (e) {
-      if (!mounted) return;
-      return setState(() => exception = e);
+  Future<void> fetchResources({bool fetchModel = true, bool fetchConnectedTables = true}) async {
+    setState(() {
+      isResourceLoaded = false;
+      exception = null;
+    });
+    if (fetchModel) {
+      try {
+        model = await widget.fetchFunction();
+      } on ResourceNotFetchedException catch (e) {
+        if (!mounted) return;
+        return setState(() => exception = e);
+      }
     }
-    connectedModelTables = widget.connectedTables ??
+
+    var connectedTables = fetchConnectedTables ? null : widget.connectedTables;
+    connectedModelTables = connectedTables ??
         await Future.wait(model.foreignKeys
             .where((fk) => fk.reference.isConnected)
             .map((fk) => fk.tableGenerator()));
@@ -59,29 +69,36 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
       return buildLoadingPlaceholder();
     }
 
-    return Scaffold(
-      appBar: AppBar(),
-      body: SingleChildScrollView(
-        child: PageBase.row(
-          bodyPadding: const EdgeInsets.all(25),
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TableHeader(makeModelLocalizedName<M>(model.runtimeType)),
-                ModelTable(model, showModelName: false),
+    return WillPopScope(
+      onWillPop: () async {
+        WidgetsBinding.instance
+            .addPostFrameCallback((_) => Navigator.of(context).pop(changeStatus));
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(),
+        body: SingleChildScrollView(
+          child: PageBase.row(
+            bodyPadding: const EdgeInsets.all(25),
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TableHeader(makeModelLocalizedName<M>(model.runtimeType)),
+                  ModelTable(model, showModelName: false),
+                ],
+              ),
+              if (connectedModelTables.isNotEmpty) ...[
+                const SizedBox(width: 125),
+                buildConnectedModels(),
               ],
-            ),
-            if (connectedModelTables.isNotEmpty) ...[
-              const SizedBox(width: 125),
-              buildConnectedModels(),
             ],
-          ],
+          ),
         ),
+        floatingActionButton: buildEditButton(),
       ),
-      floatingActionButton: buildEditButton(),
     );
   }
 
@@ -107,7 +124,12 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const TableHeader("Пов'язані ресурси"),
-        ...connectedModelTables.map(EmbeddedModelTableCard.new),
+        ...connectedModelTables.map(
+          (e) => EmbeddedModelTableCard(e, onUpdate: (newValue) {
+            if (!mounted) return;
+            fetchResources(fetchModel: false, fetchConnectedTables: true);
+          }),
+        ),
       ],
     );
   }
@@ -118,30 +140,40 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
       child: ElevatedButton.icon(
         label: const Text('Редагувати'),
         icon: const Icon(Icons.edit),
-        onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => ModelEditForm<M>(
-              model: model,
-              connectedModels: connectedModelTables.map((t) => t.model).toList(),
-            ),
-          ));
-        },
+        onPressed: _processEditPress,
       ),
     );
+  }
+
+  void _processEditPress() async {
+    final valueStatus = await AppNavigation.of(context).openModelEditViewFor(model,
+        connectedModels: connectedModelTables.map((t) => t.model).toList());
+    final status = valueStatus.status;
+
+    print('new status: $status');
+    if (!mounted || status == ValueChangeStatus.notChanged) return;
+    changeStatus = valueStatus;
+    if (status == ValueChangeStatus.deleted || status == ValueChangeStatus.created) {
+      print('popping ${valueStatus.status}');
+      return Navigator.of(context).pop(valueStatus);
+    }
+    model = valueStatus.value!;
+    fetchResources(fetchModel: false, fetchConnectedTables: true);
   }
 }
 
 class EmbeddedModelTableCard<M extends Model> extends StatelessWidget {
   final ModelTable<M> child;
+  final UpdateCallback<ValueStatusWrapper<M>> onUpdate;
 
-  const EmbeddedModelTableCard(this.child, {super.key});
+  const EmbeddedModelTableCard(this.child, {required this.onUpdate, super.key});
 
   @override
   Widget build(BuildContext context) {
     return Card(
       child: InkWell(
         borderRadius: defaultBorderRadius,
-        onTap: () => child.redirectToModelView(context),
+        onTap: () async => onUpdate(await child.redirectToModelView(context)),
         child: Padding(
           padding: const EdgeInsets.all(8).copyWith(top: 12),
           child: child,
