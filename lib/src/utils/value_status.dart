@@ -9,6 +9,8 @@ class ValueStatusWrapper<T> {
   final T? value;
   ValueChangeStatus status;
 
+  ValueStatusWrapper(this.status, [this.value]);
+
   ValueStatusWrapper.notChanged()
       : status = ValueChangeStatus.notChanged,
         value = null;

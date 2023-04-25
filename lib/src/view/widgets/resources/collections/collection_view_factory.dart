@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../../model/basic_models/product.dart';
 import '../../../../model/interfaces/convertible_to_row.dart';
-import '../../../pages/goods/products_view.dart';
+import '../../../pages/collections/goods/products_view.dart';
 import 'model_collection_view.dart';
 
 typedef CollectionViewConstructor<SCol extends ConvertibleToRow<SCol>> = //
