@@ -39,13 +39,11 @@ class CreationDialog extends StatefulWidget {
 
 class _CreationDialogState extends State<CreationDialog> {
   bool isLoading = false;
-  Object? err;
-
   final formKey = GlobalKey<FormState>();
 
   void _onPressed(ButtonProps props) async {
     if (!formKey.currentState!.validate()) return;
-    
+
     setState(() => isLoading = true);
     StoreProduct? res;
     try {
@@ -54,7 +52,6 @@ class _CreationDialogState extends State<CreationDialog> {
       print('caught format exception when trying to decode store product in prom store product');
       res = const StoreProduct(upc: 'upc', price: -1, quantity: -1); // todo remove
     }
-
     if (!mounted) return;
 
     setState(() => isLoading = false);
