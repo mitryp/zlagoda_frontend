@@ -112,7 +112,7 @@ class JoinedStoreProduct extends _JoinedStoreProduct
   }
 
   Widget _addDiscountProductButton(BuildContext context) {
-    return ElevatedButton.icon(
+    return OutlinedButton.icon(
       label: const Text('Додати акційний товар'),
       icon: const Icon(Icons.add),
       onPressed: () => _onAddDiscountProduct(context),
@@ -130,7 +130,7 @@ class JoinedStoreProduct extends _JoinedStoreProduct
 
     return AppNavigation.of(context).openModelViewFor<StoreProduct>(
       storeProduct,
-      additionalButtonsBuilders: isProm ? null : [(context) => _addDiscountProductButton(context)],
+      additionalButtonsBuilders: isProm ? null : [_addDiscountProductButton],
     );
   }
 

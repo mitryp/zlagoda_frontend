@@ -47,7 +47,7 @@ class Client extends Model with ConvertibleToRow<Client>, ConvertibleToPdf<Clien
         (o) => o.discount,
         labelCaption: 'Знижка (%)',
         fieldType: FieldType.number,
-        validator: isInteger,
+        validator: isIntegerInRange(0, 100),
       ),
     ],
   );
