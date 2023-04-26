@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../../model/basic_models/employee.dart';
 import '../../../../model/interfaces/convertible_to_row.dart';
+import '../../../../model/other_models/table_receipt.dart';
 import '../../../../services/http/helpers/collection_slice_wrapper.dart';
 import '../../../../services/http/helpers/http_service_factory.dart';
 import '../../../../services/http/model_http_service.dart';
@@ -11,6 +13,7 @@ import '../../../../services/query_builder/query_builder.dart';
 import '../../../../services/query_builder/sort.dart';
 import '../../../../utils/value_status.dart';
 import '../../../pages/page_base.dart';
+import '../../permissions/authorizer.dart';
 import '../../utils/helping_functions.dart';
 import 'model_collection_view.dart';
 
@@ -48,8 +51,8 @@ abstract class CollectionSearchFilterDelegate {
 }
 
 typedef CsfDelegateConstructor = CollectionSearchFilterDelegate Function({
-  required QueryBuilder queryBuilder,
-  required VoidCallback updateCallback,
+required QueryBuilder queryBuilder,
+required VoidCallback updateCallback,
 });
 
 /*
@@ -78,7 +81,7 @@ class CollectionView<SCol extends ConvertibleToRow<SCol>> extends StatefulWidget
 class _CollectionViewState<SCol extends ConvertibleToRow<SCol>> extends State<CollectionView<SCol>>
     with RouteAware {
   late final ModelHttpService<SCol, dynamic> httpService =
-      makeModelHttpService<SCol>() as ModelHttpService<SCol, dynamic>;
+  makeModelHttpService<SCol>() as ModelHttpService<SCol, dynamic>;
 
   late CollectionSearchFilterDelegate searchFilterDelegate = widget.searchFilterDelegate(
     queryBuilder: widget.queryBuilder,
@@ -132,30 +135,37 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>> extends State<Co
 
     return Card(
         child: Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
-      child: Flex(
-        direction: Axis.horizontal,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          sort,
-          filters.isEmpty ? const SizedBox() : divider,
-          ...makeSeparated(filters),
-          searches.isEmpty ? const SizedBox() : divider,
-          ...makeSeparated(searches),
-        ],
-      ),
-    ));
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
+          child: Flex(
+            direction: Axis.horizontal,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              sort,
+              filters.isEmpty ? const SizedBox() : divider,
+              ...makeSeparated(filters),
+              searches.isEmpty ? const SizedBox() : divider,
+              ...makeSeparated(searches),
+            ],
+          ),
+        ));
   }
 
   Widget buildAddButton() {
-    return ElevatedButton.icon(
-      icon: const Icon(Icons.add),
-      onPressed: () => widget.onAddPressed(context).then(
-        (v) {
-          if (v.status != ValueChangeStatus.notChanged) fetchItems();
-        },
+    final authStrategy = SCol == TableReceipt ? hasPosition(Position.cashier) : hasPosition(
+        Position.manager);
+
+    return Authorizer.emptyUnauthorized(
+      authorizationStrategy: authStrategy,
+      child: ElevatedButton.icon(
+        icon: const Icon(Icons.add),
+        onPressed: () =>
+            widget.onAddPressed(context).then(
+                  (v) {
+                if (v.status != ValueChangeStatus.notChanged) fetchItems();
+              },
+            ),
+        label: const Text('Створити'),
       ),
-      label: const Text('Створити'),
     );
   }
 }
@@ -203,7 +213,7 @@ class _CollectionTableState<R extends ConvertibleToRow<R>> extends State<Collect
     });
 
     return widget.itemsSupplier().then(
-      (collectionSlice) {
+          (collectionSlice) {
         if (!mounted) return;
 
         setState(() {
@@ -260,7 +270,7 @@ class _CollectionTableState<R extends ConvertibleToRow<R>> extends State<Collect
                 ),
                 Text(
                   '${offset ~/ limit + 1} '
-                  '/ ${(totalCount / limit + .4).round()}',
+                      '/ ${(totalCount / limit + .4).round()}',
                 ),
                 IconButton(
                   onPressed: () {
