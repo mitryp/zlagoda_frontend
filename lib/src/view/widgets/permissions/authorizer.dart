@@ -15,8 +15,14 @@ typedef UserAuthorizationStrategy = bool Function(User? user);
 ///
 class Authorizer extends StatelessWidget {
   static const emptyPlaceholder = SizedBox();
-  static const noPermissionPlaceholder = FittedBox(
-    child: Text('У вас недостатньо прав для перегляду вмісту'),
+  static const noPermissionPlaceholder = Center(
+    child: Text(
+      'У вас недостатньо прав для перегляду вмісту',
+      style: TextStyle(
+        fontSize: 16,
+        color: Colors.red,
+      ),
+    ),
   );
 
   final UserAuthorizationStrategy authorizationStrategy;

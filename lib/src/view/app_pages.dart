@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../model/basic_models/employee.dart';
 import 'pages/collections/clients_view.dart';
 import 'pages/collections/employees_view.dart';
 import 'pages/collections/goods/goods_tab_view.dart';
@@ -11,14 +12,15 @@ enum AppPage {
   clients(Icons.group, label: 'Клієнти'),
   employees(Icons.person, label: 'Працівники');
 
-  const AppPage(this.iconData, {required this.label});
+  final IconData iconData;
+  final String label;
+  final Position requiredPosition;
+
+  const AppPage(this.iconData, {required this.label, this.requiredPosition = Position.cashier});
 
   String get route => '/app/$name';
 
   WidgetBuilder get widget => pagesToWidgets[this]!;
-
-  final IconData iconData;
-  final String label;
 }
 
 final pagesToWidgets = <AppPage, WidgetBuilder>{

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../model/basic_models/client.dart';
 import '../../../../model/basic_models/employee.dart';
 import '../../../../model/basic_models/receipt.dart';
 import '../../../../model/basic_models/store_product.dart';
@@ -14,6 +15,7 @@ import '../../../../utils/value_status.dart';
 import '../../../dialogs/usages/show_prom_creation_dialog.dart';
 import '../../../pages/page_base.dart';
 import '../../permissions/authorizer.dart';
+import '../../permissions/user_manager.dart';
 import '../../text_link.dart';
 import '../../utils/helping_functions.dart';
 import 'model_table.dart';
@@ -41,10 +43,13 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
   ResourceNotFetchedException? exception;
   ValueStatusWrapper<M> changeStatus = ValueStatusWrapper.notChanged();
 
+  UserAuthorizationStrategy get authStrategy =>
+      (M == Receipt || M == Client) ? hasUser : hasPosition(Position.manager);
+
   @override
-  void initState() {
-    super.initState();
-    fetchResources();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (authStrategy.call(UserManager.of(context).currentUser)) fetchResources();
   }
 
   Future<void> fetchResources({bool fetchModel = true, bool fetchConnectedTables = true}) async {
@@ -74,52 +79,72 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
 
   @override
   Widget build(BuildContext context) {
-    if (exception != null) {
-      return buildErrorMessage();
+    Widget? guard;
+
+    if (!authStrategy.call(UserManager.of(context).currentUser)) {
+      guard = Authorizer.noPermissionPlaceholder;
+    } else if (exception != null) {
+      guard = buildErrorMessage();
+    } else if (!isResourceLoaded) {
+      guard = buildLoadingPlaceholder();
     }
-    if (!isResourceLoaded) {
-      return buildLoadingPlaceholder();
+    if (guard != null) {
+      return Scaffold(
+        appBar: AppBar(),
+        body: guard,
+      );
     }
 
-    return WillPopScope(
-      onWillPop: () async {
-        WidgetsBinding.instance
-            .addPostFrameCallback((_) => Navigator.of(context).pop(changeStatus));
-        return false;
-      },
-      child: Scaffold(
-        appBar: AppBar(),
-        body: SingleChildScrollView(
-          child: PageBase.row(
-            bodyPadding: const EdgeInsets.all(25),
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TableHeader(makeModelLocalizedName<M>(model.runtimeType)),
-                  ModelTable(model, showModelName: false),
-                ],
-              ),
-              if (connectedModelTables.isNotEmpty) ...[
-                const SizedBox(width: 125),
-                buildConnectedModels(),
-              ],
-            ],
-          ),
-        ),
-        floatingActionButton: widget.additionalButtonsBuilders != null
-            ? Flex(
-                direction: Axis.horizontal,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: makeSeparated([
-                  ...widget.additionalButtonsBuilders!.map((builder) => builder(context)),
-                  buildEditButton(),
-                ]))
-            : buildEditButton(),
+    return Authorizer(
+      authorizationStrategy: authStrategy,
+      child: WillPopScope(
+        onWillPop: () async {
+          WidgetsBinding.instance
+              .addPostFrameCallback((_) => Navigator.of(context).pop(changeStatus));
+          return false;
+        },
+        child: buildContent(),
       ),
     );
+  }
+
+  Scaffold buildContent() {
+    return Scaffold(
+      appBar: AppBar(),
+      body: SingleChildScrollView(
+        child: PageBase.row(
+          bodyPadding: const EdgeInsets.all(25),
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TableHeader(makeModelLocalizedName<M>(model.runtimeType)),
+                ModelTable(model, showModelName: false),
+              ],
+            ),
+            if (connectedModelTables.isNotEmpty) ...[
+              const SizedBox(width: 125),
+              buildConnectedModels(),
+            ],
+          ],
+        ),
+      ),
+      floatingActionButton: buildButtonSection(context),
+    );
+  }
+
+  Widget buildButtonSection(BuildContext context) {
+    return widget.additionalButtonsBuilders != null
+        ? Flex(
+            direction: Axis.horizontal,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: makeSeparated([
+              ...widget.additionalButtonsBuilders!.map((builder) => builder(context)),
+              buildEditButton(),
+            ]))
+        : buildEditButton();
   }
 
   Widget buildLoadingPlaceholder() => const Center(child: CircularProgressIndicator());
@@ -167,7 +192,8 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
 
     return Authorizer.emptyUnauthorized(
       authorizationStrategy: (User? user) =>
-          hasPosition(Position.manager).call(user) && M != Receipt,
+          (M == Client && hasUser(user)) ||
+          (hasPosition(Position.manager).call(user) && M != Receipt),
       child: ElevatedButton.icon(
         label: const Text('Редагувати'),
         icon: const Icon(Icons.edit),
@@ -182,20 +208,6 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
       connectedModels: connectedModelTables.map((t) => t.model).toList(),
     );
     _processModelChange(future);
-
-    // final statusWrapper = await AppNavigation.of(context).openModelEditViewFor(
-    //   model,
-    //   connectedModels: connectedModelTables.map((t) => t.model).toList(),
-    // );
-    // final status = statusWrapper.status;
-    //
-    // if (!mounted || status == ValueChangeStatus.notChanged) return;
-    // changeStatus = statusWrapper;
-    // if (status == ValueChangeStatus.deleted || status == ValueChangeStatus.created) {
-    //   return Navigator.of(context).pop(statusWrapper);
-    // }
-    // model = statusWrapper.value!;
-    // fetchResources(fetchModel: false, fetchConnectedTables: true);
   }
 
   void _processStoreProductEditPress() async {

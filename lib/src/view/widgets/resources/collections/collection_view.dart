@@ -1,19 +1,20 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-
 import '../../../../model/interfaces/convertible_to_pdf.dart';
+import '../../../../model/basic_models/employee.dart';
 import '../../../../model/interfaces/convertible_to_row.dart';
+import '../../../../model/other_models/table_receipt.dart';
 import '../../../../services/http/helpers/collection_slice_wrapper.dart';
 import '../../../../services/http/helpers/http_service_factory.dart';
 import '../../../../services/http/model_http_service.dart';
 import '../../../../services/query_builder/filter.dart';
 import '../../../../services/query_builder/query_builder.dart';
 import '../../../../services/query_builder/sort.dart';
-import '../../../../theme.dart';
 import '../../../../utils/value_status.dart';
 import '../../../pages/page_base.dart';
 import '../../reports/open_report_button.dart';
+import '../../permissions/authorizer.dart';
 import '../../utils/helping_functions.dart';
 import 'model_collection_view.dart';
 
@@ -62,8 +63,8 @@ typedef CsfDelegateConstructor = CollectionSearchFilterDelegate Function({
     -> add button
  */
 
-class CollectionView<SCol extends ConvertibleToRow<SCol>, CTPdf extends ConvertibleToPdf<CTPdf>>
-    extends StatefulWidget {
+class CollectionView<SCol extends ConvertibleToRow<SCol>,
+    CTPdf extends ConvertibleToPdf<CTPdf>> extends StatefulWidget {
   final RedirectCallbackWithValueStatus onAddPressed;
   final QueryBuilder queryBuilder;
   late final QueryBuilder initialQB;
@@ -79,10 +80,12 @@ class CollectionView<SCol extends ConvertibleToRow<SCol>, CTPdf extends Converti
   }
 
   @override
-  State<CollectionView<SCol, CTPdf>> createState() => _CollectionViewState<SCol, CTPdf>();
+  State<CollectionView<SCol, CTPdf>> createState() =>
+      _CollectionViewState<SCol, CTPdf>();
 }
 
-class _CollectionViewState<SCol extends ConvertibleToRow<SCol>, CTPdf extends ConvertibleToPdf<CTPdf>>
+class _CollectionViewState<SCol extends ConvertibleToRow<SCol>,
+        CTPdf extends ConvertibleToPdf<CTPdf>>
     extends State<CollectionView<SCol, CTPdf>> with RouteAware {
   late final ModelHttpService<SCol, dynamic> httpService =
       makeModelHttpService<SCol>() as ModelHttpService<SCol, dynamic>;
@@ -107,17 +110,17 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>, CTPdf extends Co
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          ReportButton<CTPdf>(queryBuilder: widget.initialQB),
-        ],
-        automaticallyImplyLeading: false,
-      ),
       body: PageBase.column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          buildSearchFilters(),
+          Flex(
+              direction: Axis.horizontal,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                buildSearchFilters(),
+                ReportButton<CTPdf>(queryBuilder: widget.initialQB),
+              ]),
           CollectionTable<SCol>(
             itemsSupplier: () => httpService.get(widget.queryBuilder),
             updateStream: updateStreamController.stream,
@@ -163,13 +166,23 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>, CTPdf extends Co
     ));
   }
 
-  Widget buildAddButton() => ElevatedButton.icon(
-        icon: const Icon(Icons.add),
-        onPressed: () => widget.onAddPressed(context).then((v) {
-          if (v.status != ValueChangeStatus.notChanged) fetchItems();
-        }),
-        label: const Text('Створити'),
-      );
+  Widget buildAddButton() {
+    final authStrategy = SCol == TableReceipt
+        ? hasPosition(Position.cashier)
+        : hasPosition(Position.manager);
+
+    return Authorizer.emptyUnauthorized(
+        authorizationStrategy: authStrategy,
+        child: ElevatedButton.icon(
+          icon: const Icon(Icons.add),
+          onPressed: () => widget.onAddPressed(context).then(
+            (v) {
+              if (v.status != ValueChangeStatus.notChanged) fetchItems();
+            },
+          ),
+          label: const Text('Створити'),
+        ));
+  }
 
   Widget buildReportButton() {
     return Padding(
@@ -253,59 +266,105 @@ class _CollectionTableState<R extends ConvertibleToRow<R>>
       );
     }
 
-    // print(isLoaded);
-    // print(items.map((item) => item.toJson()));
+    final limit = widget.queryBuilder.paginationLimit;
+    final offset = widget.queryBuilder.paginationOffset;
 
-    return PaginatedDataTable(
-      showCheckboxColumn: false,
-      columns: columnsOf<R>(),
-      //rows: items.map((m) => m.buildRow(context, _updateCallback)).toList(),
-      source: CollectionViewSource(
-        context: context,
-        totalCount: totalCount,
-        items: items,
-        fetchItems: fetchItems,
+    return IntrinsicWidth(
+      child: Column(
+        children: [
+          DataTable(
+            showCheckboxColumn: false,
+            columns: columnsOf<R>(),
+            rows:
+                items.map((e) => e.buildRow(context, _updateCallback)).toList(),
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    if (offset == 0) return;
+                    widget.queryBuilder.paginationOffset = offset - limit;
+                    fetchItems();
+                  },
+                  icon: const Icon(Icons.arrow_left),
+                  splashRadius: 20,
+                ),
+                Text(
+                  '${offset ~/ limit + 1} '
+                  '/ ${(totalCount / limit + .4).round()}',
+                ),
+                IconButton(
+                  onPressed: () {
+                    if (offset >= totalCount - limit) return;
+                    widget.queryBuilder.paginationOffset = offset + limit;
+                    fetchItems();
+                  },
+                  icon: const Icon(Icons.arrow_right),
+                  splashRadius: 20,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
-      rowsPerPage: itemsPerPage,
-      onPageChanged: (value) {
-        setState(() => widget.queryBuilder.paginationOffset = value);
-        fetchItems();
-      },
     );
+    // return PaginatedDataTable(
+    //   showCheckboxColumn: false,
+    //   columns: columnsOf<R>(),
+    //   //rows: items.map((m) => m.buildRow(context, _updateCallback)).toList(),
+    //   source: CollectionViewSource(
+    //     context: context,
+    //     totalCount: totalCount,
+    //     items: items,
+    //     fetchItems: fetchItems,
+    //   ),
+    //   rowsPerPage: min(itemsPerPage, items.length),
+    //   // onPageChanged: (value) {
+    //   // setState(() => widget.queryBuilder.paginationOffset = value);
+    //   // fetchItems();
+    //   // },
+    // );
   }
-}
-
-class CollectionViewSource<R extends ConvertibleToRow<R>>
-    extends DataTableSource {
-  final BuildContext context;
-  final List<R> items;
-  final int totalCount;
-  final Future<void> Function() fetchItems;
-
-  CollectionViewSource({
-    required this.context,
-    required this.totalCount,
-    required this.items,
-    required this.fetchItems,
-  });
 
   void _updateCallback(ValueChangeStatus updatedStatus) {
     if (updatedStatus == ValueChangeStatus.notChanged) return;
     fetchItems();
   }
-
-  @override
-  DataRow? getRow(int index) {
-    if (index >= items.length) return null;
-    return items[index].buildRow(context, _updateCallback);
-  }
-
-  @override
-  bool get isRowCountApproximate => false;
-
-  @override
-  int get rowCount => totalCount;
-
-  @override
-  int get selectedRowCount => 0;
 }
+
+// class CollectionViewSource<R extends ConvertibleToRow<R>> extends DataTableSource {
+//   final BuildContext context;
+//   final List<R> items;
+//   final int totalCount;
+//   final Future<void> Function() fetchItems;
+//
+//   CollectionViewSource({
+//     required this.context,
+//     required this.totalCount,
+//     required this.items,
+//     required this.fetchItems,
+//   });
+//
+//   void _updateCallback(ValueChangeStatus updatedStatus) {
+//     if (updatedStatus == ValueChangeStatus.notChanged) return;
+//     fetchItems();
+//   }
+//
+//   @override
+//   DataRow? getRow(int index) {
+//     if (index >= items.length) return null;
+//     return items[index].buildRow(context, _updateCallback);
+//   }
+//
+//   @override
+//   bool get isRowCountApproximate => false;
+//
+//   @override
+//   int get rowCount => totalCount;
+//
+//   @override
+//   int get selectedRowCount => 0;
+// }

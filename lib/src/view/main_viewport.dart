@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../model/basic_models/employee.dart';
+import '../services/http/helpers/http_service_helper.dart';
 import '../services/middleware/request/authentication_middleware.dart';
 import '../services/middleware/response/auth_handle_middleware.dart';
 import '../services/middleware/response/response_display_middleware.dart';
+import '../utils/json_decode.dart';
 import '../utils/navigation.dart';
 import 'app_pages.dart';
 import 'widgets/middleware_context/request_middleware_context.dart';
@@ -92,9 +94,10 @@ class _MainViewportState extends State<MainViewport> {
               child: Text(userManager.currentUser?.name.firstName ?? 'No user'),
             ),
             icon: const Icon(Icons.account_circle),
-            onPressed: () {
-              if (userManager.currentUser == null) return;
-              AppNavigation.of(context).toModelView<Employee>(userManager.currentUser!.userId);
+            onPressed: () async {
+              final user = await _fetchCurrentUser(context); // todo returns 404
+              if (!mounted || user == null) return;
+              AppNavigation.of(context).openModelViewFor<Employee>(user);
             },
           ),
         ),
@@ -119,4 +122,19 @@ class _MainViewportState extends State<MainViewport> {
             ))
         .toList();
   }
+}
+
+Future<Employee?> _fetchCurrentUser(BuildContext context) async {
+  if (UserManager.of(context).currentUser == null) return null;
+  return _makeCurrentUserRequest();
+}
+
+Future<Employee?> _makeCurrentUserRequest() async {
+  final res = await makeRequest(HttpMethod.get, Uri.http(baseRoute, 'api/employees/me'));
+
+  return httpServiceController(
+    res,
+    (response) => Employee.fromJson(decodeResponseBody<Map<String, dynamic>>(response)),
+    (response) => null,
+  );
 }
