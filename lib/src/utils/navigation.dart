@@ -12,6 +12,7 @@ import '../view/widgets/resources/collections/collection_view_factory.dart';
 import '../view/widgets/resources/models/model_edit_view.dart';
 import '../view/widgets/resources/models/model_table.dart';
 import '../view/widgets/resources/models/model_view.dart';
+import '../view/widgets/resources/receipt_creation_view.dart';
 import '../view/widgets/resources/receipt_model_view.dart';
 import 'value_status.dart';
 
@@ -30,7 +31,7 @@ class AppNavigation {
 
   Future<ValueStatusWrapper<SSingle>> toModelView<SSingle extends Model>(dynamic primaryKey) {
     assert(SSingle != Model);
-
+    print('opening model view for $SSingle with pk of $primaryKey');
     Future<SSingle> fetchFunction() => _serviceOf<SSingle>().singleById(primaryKey).then((v) => v!);
     final FetchWidgetConstructor<SSingle> constructor = (SSingle != Receipt
         ? ModelView<SSingle>.new
@@ -82,6 +83,14 @@ class AppNavigation {
   }
 
   Future<ValueStatusWrapper<SSingle>> openModelCreation<SSingle extends Model>() {
+    if (SSingle == Receipt) {
+      return Navigator.of(context)
+          .push<ValueStatusWrapper<SSingle>>(MaterialPageRoute(
+            builder: (context) => const ReceiptCreationView(),
+          ))
+          .then((wr) => wr ?? ValueStatusWrapper.notChanged());
+    }
+
     return Navigator.of(context)
         .push<ValueStatusWrapper<SSingle>>(MaterialPageRoute(
           builder: (context) => ModelEditForm<SSingle>(),

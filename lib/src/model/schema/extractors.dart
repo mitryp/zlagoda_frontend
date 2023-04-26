@@ -9,6 +9,7 @@ typedef NullableAddress = Address?;
 
 Extractor<T> makeExtractor<T>() {
   final typesToExtractors = {
+    bool: BoolExtractor.new,
     DateTime: DateTimeExtractor.new,
     Address: AddressExtractor.new,
     NullableAddress: AddressExtractor.new,
@@ -37,6 +38,15 @@ T? extractInlineFrom<T>(JsonMap json, String field) {
 class Extractor<T> {
   T? extractFrom(JsonMap json, String field) =>
       extractInlineFrom<T>(json, field);
+}
+
+class BoolExtractor extends Extractor<bool> {
+  @override
+  bool? extractFrom(JsonMap json, String field) {
+    final intValue = extractInlineFrom<int>(json, field);
+
+    return intValue == null ? null : intValue == 1;
+  }
 }
 
 class DateTimeExtractor extends Extractor<DateTime> {

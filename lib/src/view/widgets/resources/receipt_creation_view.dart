@@ -12,8 +12,11 @@ class _ReceiptCreationViewState extends State<ReceiptCreationView> {
   Widget build(BuildContext context) {
       return Scaffold(
         appBar: AppBar(
-          // title: ,
+          title: const Text('Створення чеку'),
         ),
+        body: Column(children: [
+          // todo
+        ]),
       );
   }
 }

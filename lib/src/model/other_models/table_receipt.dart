@@ -8,6 +8,7 @@ import '../basic_models/receipt.dart';
 import '../common_models/name.dart';
 import '../interfaces/convertible_to_row.dart';
 import '../interfaces/model.dart';
+import '../schema/date_constraints.dart';
 import '../schema/field_description.dart';
 import '../schema/field_type.dart';
 import '../schema/schema.dart';
@@ -23,22 +24,41 @@ class TableReceipt extends Model with ConvertibleToRow<TableReceipt> {
         fieldType: FieldType.number,
         fieldDisplayMode: FieldDisplayMode.none,
       ),
-      FieldDescription<int, TableReceipt>(
-        'cost',
-        (o) => o.cost,
-        labelCaption: 'Вартість',
+      FieldDescription<DateTime, TableReceipt>(
+        'date',
+        (o) => o.date,
+        labelCaption: 'Дата',
+        fieldType: FieldType.datetime,
+        dateConstraints: const DateConstraints(toFirstDate: Duration(days: 365 * 100)),
       ),
-      FieldDescription<Name?, Receipt>.serializable(
+      FieldDescription<Name?, TableReceipt>.serializable(
         'clientName',
         (o) => o.clientName,
         labelCaption: "Ім'я клієнта",
         serializableEditorBuilder: nameEditorBuilder,
       ),
-      FieldDescription<Name, Receipt>.serializable(
+      FieldDescription<Name, TableReceipt>.serializable(
         'employeeName',
         (o) => o.employeeName,
         labelCaption: "Ім'я касира",
         serializableEditorBuilder: nameEditorBuilder,
+      ),
+      FieldDescription<int, TableReceipt>(
+        'cost',
+        (o) => o.cost,
+        labelCaption: 'Вартість',
+      ),
+      FieldDescription<int, TableReceipt>(
+        'tax',
+        (o) => o.tax,
+        labelCaption: 'Податок',
+        fieldType: FieldType.number,
+      ),
+      FieldDescription<int, TableReceipt>(
+        'discount',
+        (o) => o.discount,
+        labelCaption: 'Знижка',
+        fieldType: FieldType.number,
       ),
     ],
   );
@@ -47,11 +67,17 @@ class TableReceipt extends Model with ConvertibleToRow<TableReceipt> {
   final int cost;
   final Name? clientName;
   final Name employeeName;
+  final DateTime date;
+  final int discount;
+  final int tax;
 
   const TableReceipt({
     this.receiptId,
     required this.cost,
+    required this.date,
     this.clientName,
+    required this.tax,
+    required this.discount,
     required this.employeeName,
   });
 
@@ -70,9 +96,12 @@ class TableReceipt extends Model with ConvertibleToRow<TableReceipt> {
   @override
   DataRow buildRow(BuildContext context, UpdateCallback<ValueChangeStatus> updateCallback) {
     final cellValues = [
-      toHryvnas(cost),
-      clientName?.fullName ?? '',
+      FieldType.datetime.presentation(date),
+      clientName?.fullName ?? 'немає даних',
       employeeName.fullName,
+      toHryvnas(cost),
+      toHryvnas(tax),
+      '$discount %'
     ];
     return DataRow(
       cells: cellValues.map((v) => DataCell(Text(v))).toList(),
