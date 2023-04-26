@@ -269,48 +269,54 @@ class _CollectionTableState<R extends ConvertibleToRow<R>>
     final limit = widget.queryBuilder.paginationLimit;
     final offset = widget.queryBuilder.paginationOffset;
 
-    return IntrinsicWidth(
-      child: Column(
-        children: [
-          DataTable(
-            showCheckboxColumn: false,
-            columns: columnsOf<R>(),
-            rows:
-                items.map((e) => e.buildRow(context, _updateCallback)).toList(),
-          ),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
+    return items.isEmpty
+        ? const Center(
+            child: Padding(
+                padding: EdgeInsets.all(30.0),
+                child: Text('Записи в системі обліку відсутні.')))
+        : IntrinsicWidth(
+            child: Column(
               children: [
-                IconButton(
-                  onPressed: () {
-                    if (offset == 0) return;
-                    widget.queryBuilder.paginationOffset = offset - limit;
-                    fetchItems();
-                  },
-                  icon: const Icon(Icons.arrow_left),
-                  splashRadius: 20,
+                DataTable(
+                  showCheckboxColumn: false,
+                  columns: columnsOf<R>(),
+                  rows: items
+                      .map((e) => e.buildRow(context, _updateCallback))
+                      .toList(),
                 ),
-                Text(
-                  '${offset ~/ limit + 1} '
-                  '/ ${(totalCount / limit + .4).round()}',
-                ),
-                IconButton(
-                  onPressed: () {
-                    if (offset >= totalCount - limit) return;
-                    widget.queryBuilder.paginationOffset = offset + limit;
-                    fetchItems();
-                  },
-                  icon: const Icon(Icons.arrow_right),
-                  splashRadius: 20,
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          if (offset == 0) return;
+                          widget.queryBuilder.paginationOffset = offset - limit;
+                          fetchItems();
+                        },
+                        icon: const Icon(Icons.arrow_left),
+                        splashRadius: 20,
+                      ),
+                      Text(
+                        '${offset ~/ limit + 1} '
+                        '/ ${(totalCount / limit + .4).round()}',
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          if (offset >= totalCount - limit) return;
+                          widget.queryBuilder.paginationOffset = offset + limit;
+                          fetchItems();
+                        },
+                        icon: const Icon(Icons.arrow_right),
+                        splashRadius: 20,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
+          );
     // return PaginatedDataTable(
     //   showCheckboxColumn: false,
     //   columns: columnsOf<R>(),
