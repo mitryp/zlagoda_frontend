@@ -81,7 +81,7 @@ class ReceiptsSearchFilters extends CollectionSearchFilterDelegate {
       const [
         StatsFetcher<int>(
             fieldName: 'sum',
-            label: 'Сума проданих чеків відповідно до фільтрів',
+            label: 'Сума фільтрованих чеків',
             url: 'api/receipts/total_sum',
             allowedFilters: [
               FilterOption.dateMin,

@@ -44,7 +44,7 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
   ValueStatusWrapper<M> changeStatus = ValueStatusWrapper.notChanged();
 
   UserAuthorizationStrategy get authStrategy =>
-      (M == Receipt || M == Client) ? hasUser : hasPosition(Position.manager);
+      (M == Receipt || M == Client || M == Employee) ? hasUser : hasPosition(Position.manager);
 
   @override
   void didChangeDependencies() {
@@ -79,15 +79,19 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = UserManager.of(context).currentUser;
     Widget? guard;
 
-    if (!authStrategy.call(UserManager.of(context).currentUser)) {
-      guard = Authorizer.noPermissionPlaceholder;
-    } else if (exception != null) {
+    if (exception != null) {
       guard = buildErrorMessage();
     } else if (!isResourceLoaded) {
       guard = buildLoadingPlaceholder();
+    } else if (!authStrategy.call(currentUser) &&
+        model is! Employee &&
+        (model as Employee).employeeId != currentUser?.userId) {
+      guard = Authorizer.noPermissionPlaceholder;
     }
+
     if (guard != null) {
       return Scaffold(
         appBar: AppBar(),
