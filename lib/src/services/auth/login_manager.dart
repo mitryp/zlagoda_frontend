@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../utils/secure_storage.dart' as storage;
-import '../../view/widgets/permissions/user_manager.dart';
+import '../../view/widgets/auth/user_manager.dart';
 import 'auth_service.dart';
 import 'user.dart';
 

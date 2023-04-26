@@ -14,12 +14,12 @@ import '../../../../services/query_builder/query_builder.dart';
 import '../../../../services/query_builder/sort.dart';
 import '../../../../utils/value_status.dart';
 import '../../../pages/page_base.dart';
-import '../../permissions/authorizer.dart';
+import '../../auth/authorizer.dart';
 import '../../reports/open_report_button.dart';
 import '../../utils/helping_functions.dart';
 import 'model_collection_view.dart';
 
-const itemsPerPage = 10;
+const itemsPerPage = 8;
 
 abstract class CollectionSearchFilterDelegate {
   final VoidCallback updateCallback;
@@ -53,7 +53,7 @@ abstract class CollectionSearchFilterDelegate {
 
   String subRoute(BuildContext context) => '';
 
-  Widget? additionalRequestHandler(BuildContext context) => null;
+  Widget? buildStats(BuildContext context) => null;
 }
 
 typedef CsfDelegateConstructor = CollectionSearchFilterDelegate Function({
@@ -151,6 +151,7 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>,
     final sort = searchFilterDelegate.buildSort(context);
     final filters = searchFilterDelegate.buildFilters(context);
     final searches = searchFilterDelegate.buildSearches(context);
+    final stats = searchFilterDelegate.buildStats(context);
 
     return Card(
         child: Padding(
@@ -164,6 +165,8 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>,
           ...makeSeparated(filters),
           searches.isEmpty ? const SizedBox() : divider,
           ...makeSeparated(searches),
+          stats == null ? const SizedBox() : divider,
+          if (stats != null) stats,
         ],
       ),
     ));

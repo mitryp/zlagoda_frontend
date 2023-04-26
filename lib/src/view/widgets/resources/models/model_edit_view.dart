@@ -16,7 +16,7 @@ import '../../../../utils/value_status.dart';
 import '../../../dialogs/confirmation_dialog.dart';
 import '../../../pages/page_base.dart';
 import '../../misc/clickable_absorb_pointer.dart';
-import '../../permissions/authorizer.dart';
+import '../../auth/authorizer.dart';
 
 class ModelEditForm<M extends Model> extends StatefulWidget {
   final M? model;
