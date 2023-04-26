@@ -4,7 +4,7 @@ import 'sort.dart';
 
 class QueryBuilder {
   int paginationLimit = 0;
-  int paginationPage = 1;
+  int paginationOffset = 0;
   final Set<Filter> _filters = {};
   Sort sort;
 
@@ -27,7 +27,7 @@ class QueryBuilder {
       'limit': '$paginationLimit',
     };
 
-    if (paginationLimit != 0) queryParams['offset'] = '${paginationPage * paginationLimit}';
+    if (paginationLimit != 0) queryParams['offset'] = '$paginationOffset';
 
     for (var filter in _filters) {
       var value = filter.value;

@@ -25,9 +25,10 @@ Future<ValueStatusWrapper<StoreProduct>?> showPromCreationDialog(
               ),
               controlTotalQuantity: true);
         },
-        caption: 'Додати',
+        caption: 'Встановити',
         message:
-            'Акційні товари будуть створені на основі доступних неакційних',
+            'Кількість пов\'язаних неакційних товарів буде відредаговано так, '
+                'щоб загальна кількість товару на складі не змінилася',
       ),
       ButtonProps<PromStoreProduct>(
         fetchCallback: (quantity) {
@@ -38,10 +39,11 @@ Future<ValueStatusWrapper<StoreProduct>?> showPromCreationDialog(
               ),
               controlTotalQuantity: false);
         },
-        caption: 'Встановити',
+        caption: 'Встановити без обліку',
         color: secondary,
         message:
-            'Буде встановлено нову кількість акційних товарів без зміни кількості неакційних товарів',
+            'Буде встановлено нову кількість акційних товарів без '
+                'зміни кількості неакційних товарів',
       ),
     ],
   );

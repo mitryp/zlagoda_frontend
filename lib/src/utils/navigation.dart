@@ -5,7 +5,7 @@ import '../model/basic_models/store_product.dart';
 import '../model/interfaces/convertible_to_row.dart';
 import '../model/interfaces/model.dart';
 import '../model/interfaces/serializable.dart';
-import '../services/http/http_service_factory.dart';
+import '../services/http/helpers/http_service_factory.dart';
 import '../services/http/model_http_service.dart';
 import '../view/dialogs/usages/show_prom_creation_dialog.dart';
 import '../view/widgets/resources/collections/collection_view_factory.dart';

@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 
 import '../../model/other_models/prom_store_product.dart';
 import '../../utils/json_decode.dart';
-import 'http_service_helper.dart';
+import 'helpers/http_service_helper.dart';
 
 String makeRoute(int id) => 'api/store_products/$id/prom';
 

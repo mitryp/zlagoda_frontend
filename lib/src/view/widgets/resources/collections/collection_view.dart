@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 
 import '../../../../model/interfaces/convertible_to_row.dart';
-import '../../../../services/http/http_service_factory.dart';
+import '../../../../services/http/helpers/collection_slice_wrapper.dart';
+import '../../../../services/http/helpers/http_service_factory.dart';
 import '../../../../services/http/model_http_service.dart';
 import '../../../../services/query_builder/filter.dart';
 import '../../../../services/query_builder/query_builder.dart';
@@ -12,6 +14,8 @@ import '../../../../utils/value_status.dart';
 import '../../../pages/page_base.dart';
 import '../../utils/helping_functions.dart';
 import 'model_collection_view.dart';
+
+const itemsPerPage = 5;
 
 abstract class CollectionSearchFilterDelegate {
   final VoidCallback updateCallback;
@@ -56,28 +60,32 @@ typedef CsfDelegateConstructor = CollectionSearchFilterDelegate Function({
     -> add button
  */
 
-class CollectionView<SCol extends ConvertibleToRow<SCol>> extends StatefulWidget {
+class CollectionView<SCol extends ConvertibleToRow<SCol>>
+    extends StatefulWidget {
   final RedirectCallbackWithValueStatus onAddPressed;
   final QueryBuilder queryBuilder;
   final CsfDelegateConstructor searchFilterDelegate;
 
-  const CollectionView({
+  CollectionView({
     required this.searchFilterDelegate,
     required this.onAddPressed,
     required this.queryBuilder,
     super.key,
-  });
+  }) {
+    queryBuilder.paginationLimit = itemsPerPage;
+  }
 
   @override
   State<CollectionView<SCol>> createState() => _CollectionViewState<SCol>();
 }
 
-class _CollectionViewState<SCol extends ConvertibleToRow<SCol>> extends State<CollectionView<SCol>>
-    with RouteAware {
+class _CollectionViewState<SCol extends ConvertibleToRow<SCol>>
+    extends State<CollectionView<SCol>> with RouteAware {
   late final ModelHttpService<SCol, dynamic> httpService =
       makeModelHttpService<SCol>() as ModelHttpService<SCol, dynamic>;
 
-  late CollectionSearchFilterDelegate searchFilterDelegate = widget.searchFilterDelegate(
+  late CollectionSearchFilterDelegate searchFilterDelegate =
+      widget.searchFilterDelegate(
     queryBuilder: widget.queryBuilder,
     updateCallback: fetchItems,
   );
@@ -102,6 +110,7 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>> extends State<Co
           CollectionTable<SCol>(
             itemsSupplier: () => httpService.get(widget.queryBuilder),
             updateStream: updateStreamController.stream,
+            queryBuilder: widget.queryBuilder,
           ),
         ],
       ),
@@ -127,7 +136,8 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>> extends State<Co
 
     return Card(
         child: Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
+      padding: const EdgeInsets.symmetric(
+          vertical: 12, horizontal: horizontalPadding),
       child: Flex(
         direction: Axis.horizontal,
         mainAxisSize: MainAxisSize.min,
@@ -152,18 +162,26 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>> extends State<Co
 }
 
 class CollectionTable<R extends ConvertibleToRow<R>> extends StatefulWidget {
-  final Future<List<R>> Function() itemsSupplier;
+  final Future<CollectionSliceWrapper<R>> Function() itemsSupplier;
   final Stream<void> updateStream;
+  final QueryBuilder queryBuilder;
 
-  const CollectionTable({required this.itemsSupplier, required this.updateStream, super.key});
+  const CollectionTable({
+    required this.itemsSupplier,
+    required this.updateStream,
+    required this.queryBuilder,
+    super.key,
+  });
 
   @override
   State<CollectionTable<R>> createState() => _CollectionTableState<R>();
 }
 
-class _CollectionTableState<R extends ConvertibleToRow<R>> extends State<CollectionTable<R>> {
+class _CollectionTableState<R extends ConvertibleToRow<R>>
+    extends State<CollectionTable<R>> {
   late final StreamSubscription<void> updateSubscription;
   late List<R> items;
+  late int totalCount;
   bool isLoaded = false;
   Object? error;
 
@@ -187,10 +205,13 @@ class _CollectionTableState<R extends ConvertibleToRow<R>> extends State<Collect
     });
 
     return widget.itemsSupplier().then(
-      (items) {
+      (collectionSlice) {
         if (!mounted) return;
+
         setState(() {
-          this.items = items;
+          this.items = collectionSlice.items;
+          this.totalCount = collectionSlice.totalCount;
+
           isLoaded = true;
         });
       },
@@ -214,15 +235,59 @@ class _CollectionTableState<R extends ConvertibleToRow<R>> extends State<Collect
       );
     }
 
-    return DataTable(
+    print(isLoaded);
+    print(items.map((item) => item.toJson()));
+
+    return PaginatedDataTable(
       showCheckboxColumn: false,
       columns: columnsOf<R>(),
-      rows: items.map((m) => m.buildRow(context, _updateCallback)).toList(),
+      //rows: items.map((m) => m.buildRow(context, _updateCallback)).toList(),
+      source: CollectionViewSource(
+        context: context,
+        totalCount: totalCount,
+        items: items,
+        fetchItems: fetchItems,
+      ),
+      rowsPerPage: itemsPerPage,
+      onPageChanged: (value) {
+        setState(() => widget.queryBuilder.paginationOffset = value);
+        fetchItems();
+      },
     );
   }
+}
+
+class CollectionViewSource<R extends ConvertibleToRow<R>>
+    extends DataTableSource {
+  final BuildContext context;
+  final List<R> items;
+  final int totalCount;
+  final Future<void> Function() fetchItems;
+
+  CollectionViewSource({
+    required this.context,
+    required this.totalCount,
+    required this.items,
+    required this.fetchItems,
+  });
 
   void _updateCallback(ValueChangeStatus updatedStatus) {
     if (updatedStatus == ValueChangeStatus.notChanged) return;
     fetchItems();
   }
+
+  @override
+  DataRow? getRow(int index) {
+    if (index >= items.length) return null;
+    return items[index].buildRow(context, _updateCallback);
+  }
+
+  @override
+  bool get isRowCountApproximate => false;
+
+  @override
+  int get rowCount => totalCount;
+
+  @override
+  int get selectedRowCount => 0;
 }
