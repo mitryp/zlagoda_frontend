@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../services/http/prom_store_product_services.dart';
-import '../../theme.dart';
 import '../../typedefs.dart';
 import '../../utils/coins_to_currency.dart';
 import '../../utils/navigation.dart';
 import '../../utils/value_status.dart';
-import '../../view/dialogs/confirmation_dialog.dart';
 import '../../view/dialogs/contents/prom_store_product_creation_dialog_content.dart';
 import '../../view/dialogs/creation_dialog.dart';
 import '../basic_models/store_product.dart';
@@ -65,8 +63,7 @@ class JoinedStoreProduct extends _JoinedStoreProduct
         (o) => o.baseStoreProductId,
         labelCaption: 'ID базового товару у магазині',
         fieldDisplayMode: FieldDisplayMode.none,
-        defaultForeignKey:
-            foreignKey<StoreProduct, ShortProduct>('baseStoreProductId'),
+        defaultForeignKey: foreignKey<StoreProduct, ShortProduct>('baseStoreProductId'),
       ),
     ],
   );
@@ -99,10 +96,10 @@ class JoinedStoreProduct extends _JoinedStoreProduct
   void _onAddDiscountProduct(BuildContext context) {
     showCreationDialog(
       context: context,
-      inputBuilder: (textController) => PromStoreProductTextField(
-          controller: textController, validator: isPositiveInteger),
+      inputBuilder: (textController) =>
+          PromStoreProductTextField(controller: textController, validator: isPositiveInteger),
       buttonProps: [
-        ButtonProps<PromStoreProduct>(
+        ButtonProps<StoreProduct>(
           fetchCallback: (quantity) => post(PromStoreProduct(
             baseStoreProductId: storeProductId,
             quantity: quantity,
@@ -116,9 +113,10 @@ class JoinedStoreProduct extends _JoinedStoreProduct
 
   Widget _addDiscountProductButton(BuildContext context) {
     return ElevatedButton.icon(
-        label: const Text('Додати акційний товар'),
-        icon: const Icon(Icons.add),
-        onPressed: () => _onAddDiscountProduct(context));
+      label: const Text('Додати акційний товар'),
+      icon: const Icon(Icons.add),
+      onPressed: () => _onAddDiscountProduct(context),
+    );
   }
 
   @override
@@ -132,14 +130,12 @@ class JoinedStoreProduct extends _JoinedStoreProduct
 
     return AppNavigation.of(context).openModelViewFor<StoreProduct>(
       storeProduct,
-      additionalButtonsBuilders:
-          isProm ? null : [(context) => _addDiscountProductButton(context)],
+      additionalButtonsBuilders: isProm ? null : [(context) => _addDiscountProductButton(context)],
     );
   }
 
   @override
-  DataRow buildRow(
-      BuildContext context, UpdateCallback<ValueChangeStatus> updateCallback) {
+  DataRow buildRow(BuildContext context, UpdateCallback<ValueChangeStatus> updateCallback) {
     final cells = [
       upc,
       productName,
@@ -152,8 +148,8 @@ class JoinedStoreProduct extends _JoinedStoreProduct
 
     return DataRow(
       cells: cells.map((cell) => DataCell(Text(cell))).toList(),
-      onSelectChanged: (_) async => updateCallback(
-          await redirectToModelView(context).then((v) => v.status)),
+      onSelectChanged: (_) async =>
+          updateCallback(await redirectToModelView(context).then((v) => v.status)),
     );
   }
 }

@@ -45,21 +45,28 @@ class _CreationDialogState extends State<CreationDialog> {
     if (!formKey.currentState!.validate()) return;
 
     setState(() => isLoading = true);
-    final res = await props.fetchCallback(int.parse(widget.controller.text)) as StoreProduct?;
+    StoreProduct? res;
+    try {
+      res = await props.fetchCallback(int.parse(widget.controller.text)) as StoreProduct?;
+    } on FormatException {
+      print('caught format exception when trying to decode store product in prom store product');
+      res = const StoreProduct(upc: 'upc', price: -1, quantity: -1); // todo remove
+    }
     if (!mounted) return;
 
     setState(() => isLoading = false);
+    if (res == null) return;
 
-    Navigator.of(context).pop(res == null
-        ? ValueStatusWrapper<StoreProduct>.notChanged()
-        : ValueStatusWrapper<StoreProduct>.updated(res));
+    // todo make this work
+    // Navigator.of(context).pop(ValueStatusWrapper<StoreProduct>.updated(res));
+    Navigator.of(context).pop(ValueStatusWrapper<StoreProduct>.deleted());
   }
 
   Widget buildButtonFromProp(ButtonProps props) {
     return Tooltip(
       message: props.message,
       child: ElevatedButton(
-        onPressed: () async => _onPressed(props),
+        onPressed: () => _onPressed(props),
         style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(props.color)),
         child: isLoading ? const CircularProgressIndicator() : Text(props.caption),
       ),

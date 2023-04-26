@@ -21,6 +21,18 @@ const codesToMessages = {
   504: 'Сервер не зміг виконати запит вчасно',
 };
 
+SnackBar statusSnackBar(String title, {String? subtitle, bool isSuccess = true}) {
+  final color = isSuccess ? Colors.green[300] : Colors.red[100];
+
+  return SnackBar(
+    content: ListTile(
+      title: Text(title),
+      subtitle: subtitle != null ? Text(subtitle) : null,
+    ),
+    backgroundColor: color,
+  );
+}
+
 SnackBar _defaultSnackBar(Response res) {
   String? message;
   try {
@@ -29,17 +41,9 @@ SnackBar _defaultSnackBar(Response res) {
     message = 'Сервер не надав додаткової інформації';
   }
 
-  final color = successCodes(res) ? Colors.green[300] : Colors.red[100];
   final title = codesToMessages[res.statusCode] ?? 'Невідомий код відповіді';
-  final subtitle = message != null ? Text(message) : null;
 
-  return SnackBar(
-    content: ListTile(
-      title: Text(title),
-      subtitle: subtitle,
-    ),
-    backgroundColor: color,
-  );
+  return statusSnackBar(title, subtitle: message, isSuccess: hasSuccessCode(res));
 }
 
 /// A middleware for displaying an informational snackbar about the processed response.
