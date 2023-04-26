@@ -70,7 +70,7 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
       appBar: AppBar(
         title: Text('${isEditing ? 'Редагування' : 'Створення'} / ${makeModelLocalizedName<M>()}'),
         actions: [
-          if (isEditing) buildDeleteButton(),
+          if (isEditing) buildDeleteButton(_processDeletion),
         ],
       ),
       body: SingleChildScrollView(
@@ -274,16 +274,6 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
     return httpService.post(newModel);
   }
 
-  Widget buildDeleteButton() {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: IconButton(
-        icon: Icon(Icons.delete, color: Colors.red[800]),
-        onPressed: _processDeletion,
-      ),
-    );
-  }
-
   void _processDeletion() async {
     final isConfirmed = await showConfirmationDialog(
       context: context,
@@ -335,4 +325,14 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
   }
 
   M? generateEditedModel() => schema.fromJson(generateJson());
+}
+
+Widget buildDeleteButton(VoidCallback processDeletion) {
+  return Padding(
+    padding: const EdgeInsets.only(right: 8),
+    child: IconButton(
+      icon: Icon(Icons.delete, color: Colors.red[800]),
+      onPressed: processDeletion,
+    ),
+  );
 }

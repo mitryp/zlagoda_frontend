@@ -5,8 +5,10 @@ import '../../typedefs.dart';
 import '../../utils/coins_to_currency.dart';
 import '../../utils/navigation.dart';
 import '../../utils/value_status.dart';
+import '../../view/dialogs/confirmation_dialog.dart';
 import '../../view/dialogs/contents/prom_store_product_creation_dialog_content.dart';
 import '../../view/dialogs/creation_dialog.dart';
+import '../../view/widgets/resources/models/model_edit_view.dart';
 import '../basic_models/store_product.dart';
 import '../interfaces/convertible_to_pdf.dart';
 import '../interfaces/convertible_to_row.dart';
@@ -23,7 +25,9 @@ abstract class _JoinedStoreProduct implements Serializable {
 }
 
 class JoinedStoreProduct extends _JoinedStoreProduct
-    with ConvertibleToRow<JoinedStoreProduct>, ConvertibleToPdf<JoinedStoreProduct> {
+    with
+        ConvertibleToRow<JoinedStoreProduct>,
+        ConvertibleToPdf<JoinedStoreProduct> {
   static final Schema<JoinedStoreProduct> schema = Schema(
     JoinedStoreProduct.new,
     [
@@ -63,7 +67,8 @@ class JoinedStoreProduct extends _JoinedStoreProduct
         (o) => o.baseStoreProductId,
         labelCaption: 'ID базового товару у магазині',
         fieldDisplayMode: FieldDisplayMode.none,
-        defaultForeignKey: foreignKey<StoreProduct, ShortProduct>('baseStoreProductId'),
+        defaultForeignKey:
+            foreignKey<StoreProduct, ShortProduct>('baseStoreProductId'),
       ),
     ],
   );
@@ -96,11 +101,11 @@ class JoinedStoreProduct extends _JoinedStoreProduct
   void _onAddDiscountProduct(BuildContext context) {
     showCreationDialog(
       context: context,
-      inputBuilder: (textController) =>
-          PromStoreProductTextField(controller: textController, validator: isPositiveInteger),
+      inputBuilder: (textController) => PromStoreProductTextField(
+          controller: textController, validator: isPositiveInteger),
       buttonProps: [
         ButtonProps<StoreProduct>(
-          fetchCallback: (quantity) => post(PromStoreProduct(
+          fetchCallback: (quantity) => PromStoreProductService.post(PromStoreProduct(
             baseStoreProductId: storeProductId,
             quantity: quantity,
           )),
@@ -109,6 +114,21 @@ class JoinedStoreProduct extends _JoinedStoreProduct
         )
       ],
     );
+  }
+
+  void _onDeleteDiscountProduct(BuildContext context) async {
+    final isConfirmed = await showConfirmationDialog(
+      context: context,
+      builder: (context) {
+        return const ConfirmationDialog.message(
+            'Ви точно хочете видалити цей ресурс?');
+      },
+    );
+
+    if (!isConfirmed) return;
+    final res = await PromStoreProductService.delete(storeProductId);
+    //if (!res || !mounted) return;
+    //Navigator.of(context).pop(ValueStatusWrapper<StoreProduct>.deleted());
   }
 
   Widget _addDiscountProductButton(BuildContext context) {
@@ -130,26 +150,29 @@ class JoinedStoreProduct extends _JoinedStoreProduct
 
     return AppNavigation.of(context).openModelViewFor<StoreProduct>(
       storeProduct,
-      additionalButtonsBuilders: isProm ? null : [(context) => _addDiscountProductButton(context)],
+      additionalButtonsBuilders: isProm
+          ? [(context) => buildDeleteButton(() => _onDeleteDiscountProduct(context))]
+          : [(context) => _addDiscountProductButton(context)],
     );
   }
 
   List<String> get cellsData => [
-    upc,
-    productName,
-    manufacturer,
-    toHryvnas(price),
-    quantity.toString(),
-    toHryvnas(price * quantity),
-    isProm ? 'Так' : 'Ні',
-  ];
+        upc,
+        productName,
+        manufacturer,
+        toHryvnas(price),
+        quantity.toString(),
+        toHryvnas(price * quantity),
+        isProm ? 'Так' : 'Ні',
+      ];
 
   @override
-  DataRow buildRow(BuildContext context, UpdateCallback<ValueChangeStatus> updateCallback) {
+  DataRow buildRow(
+      BuildContext context, UpdateCallback<ValueChangeStatus> updateCallback) {
     return DataRow(
       cells: cellsData.map((cell) => DataCell(Text(cell))).toList(),
-      onSelectChanged: (_) async =>
-          updateCallback(await redirectToModelView(context).then((v) => v.status)),
+      onSelectChanged: (_) async => updateCallback(
+          await redirectToModelView(context).then((v) => v.status)),
     );
   }
 
