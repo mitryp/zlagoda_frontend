@@ -49,7 +49,7 @@ List<DataColumn> columnsOf<R extends ConvertibleToRow<R>>() =>
 Iterable<dynamic> rowValues<R extends ConvertibleToRow<R>>(R convertible) {
   final schema = makeModelSchema<R>();
 
-  return schema.fields.where((r) => r.isShownInTable).map((r) => r.fieldGetter(convertible));
+  return schema.fields.where((r) => r.isShownInTable).map((r) => r.presentFieldOf(convertible));
 }
 
 List<DataCell> cellsFromValues<R extends ConvertibleToRow<R>>(R convertible,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../typedefs.dart';
+import '../../utils/coins_to_currency.dart';
 import '../../utils/navigation.dart';
 import '../../utils/value_status.dart';
 import '../basic_models/product.dart';
@@ -32,17 +33,25 @@ class JoinedSale extends Model with ConvertibleToRow<JoinedSale> {
         'price',
         (o) => o.price,
         labelCaption: 'Ціна',
+        fieldType: FieldType.currency,
       ),
       FieldDescription<int, JoinedSale>(
         'quantity',
         (o) => o.quantity,
         labelCaption: 'Кількість',
+        fieldType: FieldType.number,
       ),
       FieldDescription<int, JoinedSale>.intForeignKey(
         'storeProductId',
         (o) => o.storeProductId,
         labelCaption: 'Товар в магазині',
         defaultForeignKey: foreignKey<StoreProduct, ShortModel>('storeProductId'),
+      ),
+      FieldDescription<String, JoinedSale>.transitive(
+        'cost',
+        (o) => toHryvnas(o.price * o.quantity),
+        labelCaption: 'Вартість',
+        transitiveFieldPresentation: (f) => '$f',
       ),
       FieldDescription<bool, JoinedSale>(
         'isProm',

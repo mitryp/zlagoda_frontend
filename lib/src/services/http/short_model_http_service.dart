@@ -5,6 +5,7 @@ import '../../model/search_models/short_cashier.dart';
 import '../../model/search_models/short_category.dart';
 import '../../model/search_models/short_client.dart';
 import '../../model/search_models/short_product.dart';
+import '../../model/search_models/short_store_product.dart';
 import '../../utils/json_decode.dart';
 import 'http_service_helper.dart';
 
@@ -44,9 +45,18 @@ class ShortProductService extends ShortModelHttpService<ShortProduct> {
 }
 
 class ShortCashierService extends ShortModelHttpService<ShortCashier> {
-  const ShortCashierService() : super(route: 'employees/cashiers', castFunction: ShortCashier.fromJson);
+  const ShortCashierService()
+      : super(route: 'employees/cashiers', castFunction: ShortCashier.fromJson);
 }
 
 class ShortClientService extends ShortModelHttpService<ShortClient> {
   const ShortClientService() : super(route: 'clients', castFunction: ShortClient.fromJson);
+}
+
+class ShortStoreProductService extends ShortModelHttpService<ShortStoreProduct> {
+  const ShortStoreProductService()
+      : super(
+          route: 'store_products',
+          castFunction: ShortStoreProduct.fromJson,
+        );
 }

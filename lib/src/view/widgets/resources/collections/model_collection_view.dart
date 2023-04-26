@@ -7,6 +7,7 @@ import '../../../../services/query_builder/query_builder.dart';
 import '../../../../services/query_builder/sort.dart';
 import '../../../../typedefs.dart';
 import '../../../../utils/value_status.dart';
+import '../../permissions/authorizer.dart';
 import 'collection_view.dart';
 
 typedef RedirectCallbackWithValueStatus = Future<ValueStatusWrapper> Function(BuildContext);
@@ -15,11 +16,13 @@ abstract class ModelCollectionView<SCol extends ConvertibleToRow<SCol>> extends 
   final CsfDelegateConstructor searchFilterDelegate;
   final SortOption defaultSortField;
   final RedirectCallbackWithValueStatus onAddPressed;
+  final UserAuthorizationStrategy authorizationStrategy;
 
   const ModelCollectionView({
     required this.defaultSortField,
     required this.searchFilterDelegate,
     required this.onAddPressed,
+    this.authorizationStrategy = hasUser,
     super.key,
   });
 
@@ -35,10 +38,13 @@ class _ModelCollectionViewState<SCol extends ConvertibleToRow<SCol>>
 
   @override
   Widget build(BuildContext context) {
-    return CollectionView<SCol>(
-      searchFilterDelegate: widget.searchFilterDelegate,
-      onAddPressed: widget.onAddPressed,
-      queryBuilder: queryBuilder,
+    return Authorizer(
+      authorizationStrategy: widget.authorizationStrategy,
+      child: CollectionView<SCol>(
+        searchFilterDelegate: widget.searchFilterDelegate,
+        onAddPressed: widget.onAddPressed,
+        queryBuilder: queryBuilder,
+      ),
     );
   }
 }

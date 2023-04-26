@@ -25,7 +25,8 @@ enum GoodsTab {
   final WidgetBuilder builder;
   final Position requiredPositionPermissions;
 
-  const GoodsTab(this.tabName, {
+  const GoodsTab(
+    this.tabName, {
     required this.builder,
     this.requiredPositionPermissions = Position.cashier,
   });
@@ -42,10 +43,7 @@ class _GoodsTabViewState extends State<GoodsTabView>
     with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   late final userManager = UserManager.of(context);
   late final tabController = TabController(
-      length: GoodsTab.values
-          .where(currentUserHasPermissionToView)
-          .length,
-      vsync: this);
+      length: GoodsTab.values.where(currentUserHasPermissionToView).length, vsync: this);
 
   GoodsTab get currentTab => GoodsTab.values[tabController.index];
 
@@ -72,7 +70,10 @@ class _GoodsTabViewState extends State<GoodsTabView>
             padding: const EdgeInsets.all(8),
             child: TabBarView(
               controller: tabController,
-              children: GoodsTab.values.map((e) => e.builder(context)).toList(),
+              children: GoodsTab.values
+                  .where(currentUserHasPermissionToView)
+                  .map((e) => e.builder(context))
+                  .toList(),
             ),
           ),
         ),
@@ -80,16 +81,14 @@ class _GoodsTabViewState extends State<GoodsTabView>
     );
   }
 
-  List<Widget> buildTabs() => GoodsTab.values.where(currentUserHasPermissionToView).map(buildTab).toList();
+  List<Widget> buildTabs() =>
+      GoodsTab.values.where(currentUserHasPermissionToView).map(buildTab).toList();
 
   bool currentUserHasPermissionToView(GoodsTab tab) =>
       userManager.hasPositionPermissions(tab.requiredPositionPermissions);
 
   Widget buildTab(GoodsTab tab) {
-    final background = Theme
-        .of(context)
-        .colorScheme
-        .background;
+    final background = Theme.of(context).colorScheme.background;
 
     return Container(
       height: 35,

@@ -3,9 +3,9 @@ import '../interfaces/search_model.dart';
 import '../schema/field_description.dart';
 import '../schema/schema.dart';
 
-class ShortStoreProduct extends ShortModel<String> {
+class ShortStoreProduct extends ShortModel<int> {
   static final Schema<ShortStoreProduct> schema = Schema(ShortStoreProduct.new, [
-    FieldDescription<String, ShortStoreProduct>(
+    FieldDescription<int, ShortStoreProduct>(
       'primaryKey',
       (o) => o.primaryKey,
       labelCaption: '',
