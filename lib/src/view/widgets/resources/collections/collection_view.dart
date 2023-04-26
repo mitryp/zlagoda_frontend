@@ -48,11 +48,13 @@ abstract class CollectionSearchFilterDelegate {
   List<Widget> buildFilters(BuildContext context);
 
   Widget buildSort(BuildContext context);
+
+  String subRoute(BuildContext context) => '';
 }
 
 typedef CsfDelegateConstructor = CollectionSearchFilterDelegate Function({
-required QueryBuilder queryBuilder,
-required VoidCallback updateCallback,
+  required QueryBuilder queryBuilder,
+  required VoidCallback updateCallback,
 });
 
 /*
@@ -81,7 +83,7 @@ class CollectionView<SCol extends ConvertibleToRow<SCol>> extends StatefulWidget
 class _CollectionViewState<SCol extends ConvertibleToRow<SCol>> extends State<CollectionView<SCol>>
     with RouteAware {
   late final ModelHttpService<SCol, dynamic> httpService =
-  makeModelHttpService<SCol>() as ModelHttpService<SCol, dynamic>;
+      makeModelHttpService<SCol>() as ModelHttpService<SCol, dynamic>;
 
   late CollectionSearchFilterDelegate searchFilterDelegate = widget.searchFilterDelegate(
     queryBuilder: widget.queryBuilder,
@@ -90,9 +92,11 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>> extends State<Co
   late final StreamController<void> updateStreamController = StreamController();
 
   @override
-  void initState() {
-    super.initState();
-    widget.queryBuilder.paginationLimit = itemsPerPage;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    widget.queryBuilder
+      ..paginationLimit = itemsPerPage
+      ..subRoute = searchFilterDelegate.subRoute(context);
     fetchItems();
   }
 
@@ -135,35 +139,34 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>> extends State<Co
 
     return Card(
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
-          child: Flex(
-            direction: Axis.horizontal,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              sort,
-              filters.isEmpty ? const SizedBox() : divider,
-              ...makeSeparated(filters),
-              searches.isEmpty ? const SizedBox() : divider,
-              ...makeSeparated(searches),
-            ],
-          ),
-        ));
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
+      child: Flex(
+        direction: Axis.horizontal,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          sort,
+          filters.isEmpty ? const SizedBox() : divider,
+          ...makeSeparated(filters),
+          searches.isEmpty ? const SizedBox() : divider,
+          ...makeSeparated(searches),
+        ],
+      ),
+    ));
   }
 
   Widget buildAddButton() {
-    final authStrategy = SCol == TableReceipt ? hasPosition(Position.cashier) : hasPosition(
-        Position.manager);
+    final authStrategy =
+        SCol == TableReceipt ? hasPosition(Position.cashier) : hasPosition(Position.manager);
 
     return Authorizer.emptyUnauthorized(
       authorizationStrategy: authStrategy,
       child: ElevatedButton.icon(
         icon: const Icon(Icons.add),
-        onPressed: () =>
-            widget.onAddPressed(context).then(
-                  (v) {
-                if (v.status != ValueChangeStatus.notChanged) fetchItems();
-              },
-            ),
+        onPressed: () => widget.onAddPressed(context).then(
+          (v) {
+            if (v.status != ValueChangeStatus.notChanged) fetchItems();
+          },
+        ),
         label: const Text('Створити'),
       ),
     );
@@ -213,7 +216,7 @@ class _CollectionTableState<R extends ConvertibleToRow<R>> extends State<Collect
     });
 
     return widget.itemsSupplier().then(
-          (collectionSlice) {
+      (collectionSlice) {
         if (!mounted) return;
 
         setState(() {
@@ -270,7 +273,7 @@ class _CollectionTableState<R extends ConvertibleToRow<R>> extends State<Collect
                 ),
                 Text(
                   '${offset ~/ limit + 1} '
-                      '/ ${(totalCount / limit + .4).round()}',
+                  '/ ${(totalCount / limit + .4).round()}',
                 ),
                 IconButton(
                   onPressed: () {

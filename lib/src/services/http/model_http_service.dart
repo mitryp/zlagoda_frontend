@@ -42,12 +42,15 @@ abstract class ModelHttpService<SCol extends Serializable, SSingle extends Seria
   Future<CollectionSliceWrapper<SCol>> get(QueryBuilder queryBuilder) async {
     final response = await makeRequest(
       HttpMethod.get,
-      Uri.http(baseRoute, makeRoute(), queryBuilder.queryParams),
+      Uri.http(
+          baseRoute,
+          makeRoute(queryBuilder.subRoute.isNotEmpty ? queryBuilder.subRoute : null),
+          queryBuilder.queryParams),
     ).catchError(
       (err) => http.Response(err is http.ClientException ? err.message : 'Unknown $err', 503),
     );
 
-    final totalCount = int.parse(response.headers['x-total-count']!);
+    final totalCount = int.tryParse(response.headers['x-total-count']??'')??0;
     final items = await httpServiceController(response, (response) {
       return decodeResponseBody<List<dynamic>>(response)
           .map((m) => collectionCastFunction(m))
@@ -56,10 +59,7 @@ abstract class ModelHttpService<SCol extends Serializable, SSingle extends Seria
           .cast<SCol>();
     });
 
-    return CollectionSliceWrapper<SCol>(
-      items: items,
-      totalCount: totalCount
-    );
+    return CollectionSliceWrapper<SCol>(items: items, totalCount: totalCount);
   }
 
   Future<SSingle?> singleById(dynamic id) async {
