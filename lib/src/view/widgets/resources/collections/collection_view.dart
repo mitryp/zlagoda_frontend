@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 
@@ -60,32 +59,28 @@ typedef CsfDelegateConstructor = CollectionSearchFilterDelegate Function({
     -> add button
  */
 
-class CollectionView<SCol extends ConvertibleToRow<SCol>>
-    extends StatefulWidget {
+class CollectionView<SCol extends ConvertibleToRow<SCol>> extends StatefulWidget {
   final RedirectCallbackWithValueStatus onAddPressed;
   final QueryBuilder queryBuilder;
   final CsfDelegateConstructor searchFilterDelegate;
 
-  CollectionView({
+  const CollectionView({
     required this.searchFilterDelegate,
     required this.onAddPressed,
     required this.queryBuilder,
     super.key,
-  }) {
-    queryBuilder.paginationLimit = itemsPerPage;
-  }
+  });
 
   @override
   State<CollectionView<SCol>> createState() => _CollectionViewState<SCol>();
 }
 
-class _CollectionViewState<SCol extends ConvertibleToRow<SCol>>
-    extends State<CollectionView<SCol>> with RouteAware {
+class _CollectionViewState<SCol extends ConvertibleToRow<SCol>> extends State<CollectionView<SCol>>
+    with RouteAware {
   late final ModelHttpService<SCol, dynamic> httpService =
       makeModelHttpService<SCol>() as ModelHttpService<SCol, dynamic>;
 
-  late CollectionSearchFilterDelegate searchFilterDelegate =
-      widget.searchFilterDelegate(
+  late CollectionSearchFilterDelegate searchFilterDelegate = widget.searchFilterDelegate(
     queryBuilder: widget.queryBuilder,
     updateCallback: fetchItems,
   );
@@ -94,6 +89,7 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>>
   @override
   void initState() {
     super.initState();
+    widget.queryBuilder.paginationLimit = itemsPerPage;
     fetchItems();
   }
 
@@ -136,8 +132,7 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>>
 
     return Card(
         child: Padding(
-      padding: const EdgeInsets.symmetric(
-          vertical: 12, horizontal: horizontalPadding),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
       child: Flex(
         direction: Axis.horizontal,
         mainAxisSize: MainAxisSize.min,
@@ -152,13 +147,17 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>>
     ));
   }
 
-  Widget buildAddButton() => ElevatedButton.icon(
-        icon: const Icon(Icons.add),
-        onPressed: () => widget.onAddPressed(context).then((v) {
+  Widget buildAddButton() {
+    return ElevatedButton.icon(
+      icon: const Icon(Icons.add),
+      onPressed: () => widget.onAddPressed(context).then(
+        (v) {
           if (v.status != ValueChangeStatus.notChanged) fetchItems();
-        }),
-        label: const Text('Створити'),
-      );
+        },
+      ),
+      label: const Text('Створити'),
+    );
+  }
 }
 
 class CollectionTable<R extends ConvertibleToRow<R>> extends StatefulWidget {
@@ -177,8 +176,7 @@ class CollectionTable<R extends ConvertibleToRow<R>> extends StatefulWidget {
   State<CollectionTable<R>> createState() => _CollectionTableState<R>();
 }
 
-class _CollectionTableState<R extends ConvertibleToRow<R>>
-    extends State<CollectionTable<R>> {
+class _CollectionTableState<R extends ConvertibleToRow<R>> extends State<CollectionTable<R>> {
   late final StreamSubscription<void> updateSubscription;
   late List<R> items;
   late int totalCount;
@@ -235,30 +233,75 @@ class _CollectionTableState<R extends ConvertibleToRow<R>>
       );
     }
 
-    print(isLoaded);
-    print(items.map((item) => item.toJson()));
+    final limit = widget.queryBuilder.paginationLimit;
+    final offset = widget.queryBuilder.paginationOffset;
 
-    return PaginatedDataTable(
-      showCheckboxColumn: false,
-      columns: columnsOf<R>(),
-      //rows: items.map((m) => m.buildRow(context, _updateCallback)).toList(),
-      source: CollectionViewSource(
-        context: context,
-        totalCount: totalCount,
-        items: items,
-        fetchItems: fetchItems,
+    return IntrinsicWidth(
+      child: Column(
+        children: [
+          DataTable(
+            showCheckboxColumn: false,
+            columns: columnsOf<R>(),
+            rows: items.map((e) => e.buildRow(context, _updateCallback)).toList(),
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    if (offset == 0) return;
+                    widget.queryBuilder.paginationOffset = offset - limit;
+                    fetchItems();
+                  },
+                  icon: const Icon(Icons.arrow_left),
+                  splashRadius: 20,
+                ),
+                Text(
+                  '${offset ~/ limit + 1} '
+                  '/ ${(totalCount / limit + .4).round()}',
+                ),
+                IconButton(
+                  onPressed: () {
+                    if (offset >= totalCount - limit) return;
+                    widget.queryBuilder.paginationOffset = offset + limit;
+                    fetchItems();
+                  },
+                  icon: const Icon(Icons.arrow_right),
+                  splashRadius: 20,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
-      rowsPerPage: itemsPerPage,
-      onPageChanged: (value) {
-        setState(() => widget.queryBuilder.paginationOffset = value);
-        fetchItems();
-      },
     );
+    // return PaginatedDataTable(
+    //   showCheckboxColumn: false,
+    //   columns: columnsOf<R>(),
+    //   //rows: items.map((m) => m.buildRow(context, _updateCallback)).toList(),
+    //   source: CollectionViewSource(
+    //     context: context,
+    //     totalCount: totalCount,
+    //     items: items,
+    //     fetchItems: fetchItems,
+    //   ),
+    //   rowsPerPage: min(itemsPerPage, items.length),
+    //   // onPageChanged: (value) {
+    //   // setState(() => widget.queryBuilder.paginationOffset = value);
+    //   // fetchItems();
+    //   // },
+    // );
+  }
+
+  void _updateCallback(ValueChangeStatus updatedStatus) {
+    if (updatedStatus == ValueChangeStatus.notChanged) return;
+    fetchItems();
   }
 }
 
-class CollectionViewSource<R extends ConvertibleToRow<R>>
-    extends DataTableSource {
+class CollectionViewSource<R extends ConvertibleToRow<R>> extends DataTableSource {
   final BuildContext context;
   final List<R> items;
   final int totalCount;
