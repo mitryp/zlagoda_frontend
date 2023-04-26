@@ -12,12 +12,12 @@ class Schema<O> {
   O? fromJson(JsonMap json) {
     final namedArgs = <Symbol, dynamic>{};
 
-    for (final retriever in fields.where((e) => e.fieldType != FieldType.transitive)) {
-      final retrievedValue =
-          retriever.extractor.extractFrom(json, retriever.fieldName);
+    for (final field in fields) {
+      if (field.fieldType == FieldType.transitive) continue;
+      final retrievedValue = field.extractor.extractFrom(json, field.fieldName);
 
-      if (retriever.isNullable || retrievedValue != null)
-        namedArgs[retriever.symbol] = retrievedValue;
+      if (field.isNullable || retrievedValue != null)
+        namedArgs[field.symbol] = retrievedValue;
       else
         return null;
     }

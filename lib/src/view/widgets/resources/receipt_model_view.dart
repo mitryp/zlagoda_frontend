@@ -1,11 +1,18 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
+import '../../../model/basic_models/client.dart';
+import '../../../model/basic_models/employee.dart';
 import '../../../model/basic_models/receipt.dart';
 import '../../../model/interfaces/convertible_to_row.dart';
+import '../../../model/interfaces/model.dart';
 import '../../../model/joined_models/joined_sale.dart';
 import '../../../model/schema/field_type.dart';
 import '../../../utils/coins_to_currency.dart';
+import '../../../utils/navigation.dart';
 import '../../../utils/value_status.dart';
+import '../text_link.dart';
 
 typedef ReceiptFetchFunction = Future<Receipt> Function();
 
@@ -39,6 +46,7 @@ class _ReceiptModelViewState extends State<ReceiptModelView> {
       receipt = await widget.fetchFunction();
     } catch (err) {
       if (!mounted) return;
+      rethrow;
       return setState(() => error = err);
     }
 
@@ -76,9 +84,7 @@ class _ReceiptModelViewState extends State<ReceiptModelView> {
 
   Widget buildReceiptInfo() {
     final info = {
-      'Дата': FieldType.date.presentation(receipt.date),
-      'Клієнт': receipt.clientName ?? 'немає даних',
-      'Касир': receipt.employeeName,
+      'Дата': FieldType.datetime.presentation(receipt.date),
       'Вартість': toHryvnas(receipt.cost),
       'Податок': toHryvnas(receipt.tax),
     };
@@ -87,7 +93,10 @@ class _ReceiptModelViewState extends State<ReceiptModelView> {
       padding: const EdgeInsets.only(left: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: info.entries.map(buildReceiptFieldPresentation).toList(),
+        children: [
+          ...info.entries.map(buildReceiptFieldPresentation),
+          ...buildReferences(),
+        ],
       ),
     );
   }
@@ -104,6 +113,44 @@ class _ReceiptModelViewState extends State<ReceiptModelView> {
           ],
         ),
       ),
+    );
+  }
+
+  Iterable<Widget> buildReferences() {
+    final client = receipt.clientId, employee = receipt.employeeId;
+    return [
+      buildReference('Клієнт', buildLink<Client>(receipt.clientName?.fullName, client)),
+      buildReference('Касир', buildLink<Employee>(receipt.employeeName.fullName, employee)),
+    ];
+  }
+
+  Widget buildReference(String label, Widget reference) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(width: 8),
+        reference,
+      ],
+    );
+  }
+
+  Widget buildLink<M extends Model>(String? repr, dynamic foreignKey) {
+    if (repr == null) {
+      return const Text(
+        'немає даних',
+        style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+      );
+    }
+
+    return TextLink(
+      repr,
+      onTap:
+          foreignKey != null ? () => AppNavigation.of(context).toModelView<M>(foreignKey) : () {},
+      style: const TextStyle(fontSize: 17),
     );
   }
 

@@ -20,11 +20,13 @@ class Receipt extends TableReceipt {
         'receiptId',
         (o) => o.receiptId,
         labelCaption: 'Номер чеку',
+        fieldType: FieldType.number,
       ),
       FieldDescription<int, Receipt>(
         'cost',
         (o) => o.cost,
         labelCaption: 'Загальна вартість',
+        fieldType: FieldType.currency,
       ),
       FieldDescription<String?, Receipt>.stringForeignKey(
         'clientId',
@@ -42,7 +44,7 @@ class Receipt extends TableReceipt {
         'date',
         (o) => o.date,
         labelCaption: 'Дата',
-        fieldType: FieldType.date,
+        fieldType: FieldType.datetime,
         dateConstraints: const DateConstraints(toFirstDate: Duration(days: 365 * 100)),
       ),
       FieldDescription<int, Receipt>(
@@ -69,11 +71,15 @@ class Receipt extends TableReceipt {
         labelCaption: 'Продані товари',
         fieldType: FieldType.auto,
       ),
+      FieldDescription<int, Receipt>(
+        'discount',
+            (o) => o.discount,
+        labelCaption: 'Знижка',
+        fieldType: FieldType.number,
+      ),
     ],
   );
 
-  final DateTime date;
-  final int tax;
   final String? clientId;
   final String employeeId;
   final List<JoinedSale> sales;
@@ -81,11 +87,12 @@ class Receipt extends TableReceipt {
   const Receipt({
     super.receiptId,
     required super.cost,
+    this.clientId,
     super.clientName,
     required super.employeeName,
-    required this.date,
-    required this.tax,
-    this.clientId,
+    required super.date,
+    required super.tax,
+    required super.discount,
     required this.employeeId,
     required this.sales,
   });
