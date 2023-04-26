@@ -14,7 +14,8 @@ import '../../../widgets/resources/collections/model_collection_view.dart';
 Future<ValueStatusWrapper> _redirectToAddingModel(BuildContext context) =>
     AppNavigation.of(context).openModelCreation<StoreProduct>();
 
-class StoreProductsView extends ModelCollectionView<JoinedStoreProduct> {
+
+class StoreProductsView extends ModelCollectionView<JoinedStoreProduct, JoinedStoreProduct> {
   const StoreProductsView({super.key})
       : super(
           defaultSortField: SortOption.productName,

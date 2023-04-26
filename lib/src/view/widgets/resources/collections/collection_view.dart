@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-
+import '../../../../model/interfaces/convertible_to_pdf.dart';
 import '../../../../model/basic_models/employee.dart';
 import '../../../../model/interfaces/convertible_to_row.dart';
 import '../../../../model/other_models/table_receipt.dart';
@@ -13,6 +13,7 @@ import '../../../../services/query_builder/query_builder.dart';
 import '../../../../services/query_builder/sort.dart';
 import '../../../../utils/value_status.dart';
 import '../../../pages/page_base.dart';
+import '../../reports/open_report_button.dart';
 import '../../permissions/authorizer.dart';
 import '../../utils/helping_functions.dart';
 import 'model_collection_view.dart';
@@ -64,28 +65,35 @@ typedef CsfDelegateConstructor = CollectionSearchFilterDelegate Function({
     -> add button
  */
 
-class CollectionView<SCol extends ConvertibleToRow<SCol>> extends StatefulWidget {
+class CollectionView<SCol extends ConvertibleToRow<SCol>,
+    CTPdf extends ConvertibleToPdf<CTPdf>> extends StatefulWidget {
   final RedirectCallbackWithValueStatus onAddPressed;
   final QueryBuilder queryBuilder;
+  late final QueryBuilder initialQB;
   final CsfDelegateConstructor searchFilterDelegate;
 
-  const CollectionView({
+  CollectionView({
     required this.searchFilterDelegate,
     required this.onAddPressed,
     required this.queryBuilder,
     super.key,
-  });
+  }) {
+    initialQB = QueryBuilder(sort: queryBuilder.sort);
+  }
 
   @override
-  State<CollectionView<SCol>> createState() => _CollectionViewState<SCol>();
+  State<CollectionView<SCol, CTPdf>> createState() =>
+      _CollectionViewState<SCol, CTPdf>();
 }
 
-class _CollectionViewState<SCol extends ConvertibleToRow<SCol>> extends State<CollectionView<SCol>>
-    with RouteAware {
+class _CollectionViewState<SCol extends ConvertibleToRow<SCol>,
+        CTPdf extends ConvertibleToPdf<CTPdf>>
+    extends State<CollectionView<SCol, CTPdf>> with RouteAware {
   late final ModelHttpService<SCol, dynamic> httpService =
       makeModelHttpService<SCol>() as ModelHttpService<SCol, dynamic>;
 
-  late CollectionSearchFilterDelegate searchFilterDelegate = widget.searchFilterDelegate(
+  late CollectionSearchFilterDelegate searchFilterDelegate =
+      widget.searchFilterDelegate(
     queryBuilder: widget.queryBuilder,
     updateCallback: fetchItems,
   );
@@ -109,7 +117,13 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>> extends State<Co
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          buildSearchFilters(),
+          Flex(
+              direction: Axis.horizontal,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                buildSearchFilters(),
+                ReportButton<CTPdf>(queryBuilder: widget.initialQB),
+              ]),
           CollectionTable<SCol>(
             itemsSupplier: () => httpService.get(widget.queryBuilder),
             updateStream: updateStreamController.stream,
@@ -139,7 +153,8 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>> extends State<Co
 
     return Card(
         child: Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
+      padding: const EdgeInsets.symmetric(
+          vertical: 12, horizontal: horizontalPadding),
       child: Flex(
         direction: Axis.horizontal,
         mainAxisSize: MainAxisSize.min,
@@ -155,20 +170,27 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>> extends State<Co
   }
 
   Widget buildAddButton() {
-    final authStrategy =
-        SCol == TableReceipt ? hasPosition(Position.cashier) : hasPosition(Position.manager);
+    final authStrategy = SCol == TableReceipt
+        ? hasPosition(Position.cashier)
+        : hasPosition(Position.manager);
 
     return Authorizer.emptyUnauthorized(
-      authorizationStrategy: authStrategy,
-      child: ElevatedButton.icon(
-        icon: const Icon(Icons.add),
-        onPressed: () => widget.onAddPressed(context).then(
-          (v) {
-            if (v.status != ValueChangeStatus.notChanged) fetchItems();
-          },
-        ),
-        label: const Text('Створити'),
-      ),
+        authorizationStrategy: authStrategy,
+        child: ElevatedButton.icon(
+          icon: const Icon(Icons.add),
+          onPressed: () => widget.onAddPressed(context).then(
+            (v) {
+              if (v.status != ValueChangeStatus.notChanged) fetchItems();
+            },
+          ),
+          label: const Text('Створити'),
+        ));
+  }
+
+  Widget buildReportButton() {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: ReportButton<CTPdf>(queryBuilder: widget.initialQB),
     );
   }
 }
@@ -189,7 +211,8 @@ class CollectionTable<R extends ConvertibleToRow<R>> extends StatefulWidget {
   State<CollectionTable<R>> createState() => _CollectionTableState<R>();
 }
 
-class _CollectionTableState<R extends ConvertibleToRow<R>> extends State<CollectionTable<R>> {
+class _CollectionTableState<R extends ConvertibleToRow<R>>
+    extends State<CollectionTable<R>> {
   late final StreamSubscription<void> updateSubscription;
   late List<R> items;
   late int totalCount;
@@ -255,7 +278,8 @@ class _CollectionTableState<R extends ConvertibleToRow<R>> extends State<Collect
           DataTable(
             showCheckboxColumn: false,
             columns: columnsOf<R>(),
-            rows: items.map((e) => e.buildRow(context, _updateCallback)).toList(),
+            rows:
+                items.map((e) => e.buildRow(context, _updateCallback)).toList(),
           ),
           Align(
             alignment: Alignment.bottomRight,
@@ -314,36 +338,36 @@ class _CollectionTableState<R extends ConvertibleToRow<R>> extends State<Collect
   }
 }
 
-class CollectionViewSource<R extends ConvertibleToRow<R>> extends DataTableSource {
-  final BuildContext context;
-  final List<R> items;
-  final int totalCount;
-  final Future<void> Function() fetchItems;
-
-  CollectionViewSource({
-    required this.context,
-    required this.totalCount,
-    required this.items,
-    required this.fetchItems,
-  });
-
-  void _updateCallback(ValueChangeStatus updatedStatus) {
-    if (updatedStatus == ValueChangeStatus.notChanged) return;
-    fetchItems();
-  }
-
-  @override
-  DataRow? getRow(int index) {
-    if (index >= items.length) return null;
-    return items[index].buildRow(context, _updateCallback);
-  }
-
-  @override
-  bool get isRowCountApproximate => false;
-
-  @override
-  int get rowCount => totalCount;
-
-  @override
-  int get selectedRowCount => 0;
-}
+// class CollectionViewSource<R extends ConvertibleToRow<R>> extends DataTableSource {
+//   final BuildContext context;
+//   final List<R> items;
+//   final int totalCount;
+//   final Future<void> Function() fetchItems;
+//
+//   CollectionViewSource({
+//     required this.context,
+//     required this.totalCount,
+//     required this.items,
+//     required this.fetchItems,
+//   });
+//
+//   void _updateCallback(ValueChangeStatus updatedStatus) {
+//     if (updatedStatus == ValueChangeStatus.notChanged) return;
+//     fetchItems();
+//   }
+//
+//   @override
+//   DataRow? getRow(int index) {
+//     if (index >= items.length) return null;
+//     return items[index].buildRow(context, _updateCallback);
+//   }
+//
+//   @override
+//   bool get isRowCountApproximate => false;
+//
+//   @override
+//   int get rowCount => totalCount;
+//
+//   @override
+//   int get selectedRowCount => 0;
+// }

@@ -13,7 +13,7 @@ import '../../widgets/resources/collections/model_collection_view.dart';
 Future<ValueStatusWrapper> _redirectToAddingModel(BuildContext context) =>
     AppNavigation.of(context).openModelCreation<Client>();
 
-class ClientsView extends ModelCollectionView<Client> {
+class ClientsView extends ModelCollectionView<Client, Client> {
   const ClientsView({super.key})
       : super(
           defaultSortField: SortOption.clientSurname,

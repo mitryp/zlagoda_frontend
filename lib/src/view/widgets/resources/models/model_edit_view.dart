@@ -68,7 +68,7 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${isEditing ? 'Редагування' : 'Створення'} ${makeModelLocalizedName<M>()}'),
+        title: Text('${isEditing ? 'Редагування' : 'Створення'} / ${makeModelLocalizedName<M>()}'),
         actions: [
           if (isEditing) buildDeleteButton(),
         ],

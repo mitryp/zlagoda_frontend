@@ -18,7 +18,7 @@ Future<ValueStatusWrapper> _redirectToAddingModel(BuildContext context) =>
 
 bool _isManager(User? user) => hasPosition(Position.manager)(user);
 
-class EmployeesView extends ModelCollectionView<Employee> {
+class EmployeesView extends ModelCollectionView<Employee, Employee> {
   const EmployeesView({super.key})
       : super(
           defaultSortField: SortOption.employeeSurname,

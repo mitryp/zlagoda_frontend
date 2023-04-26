@@ -1,11 +1,10 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 import '../../../model/basic_models/client.dart';
 import '../../../model/basic_models/employee.dart';
 import '../../../model/basic_models/receipt.dart';
 import '../../../model/interfaces/convertible_to_row.dart';
+import '../../../model/interfaces/convertibles_helper.dart';
 import '../../../model/interfaces/model.dart';
 import '../../../model/joined_models/joined_sale.dart';
 import '../../../model/schema/field_type.dart';

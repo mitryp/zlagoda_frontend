@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../typedefs.dart';
 import '../../utils/navigation.dart';
 import '../../utils/value_status.dart';
+import '../interfaces/convertible_to_pdf.dart';
 import '../interfaces/convertible_to_row.dart';
 import '../interfaces/model.dart';
 import '../schema/field_description.dart';
@@ -11,7 +12,7 @@ import '../schema/schema.dart';
 import '../schema/validators.dart';
 import '../search_models/short_category.dart';
 
-class Category extends Model with ConvertibleToRow<Category> {
+class Category extends Model with ConvertibleToRow<Category>, ConvertibleToPdf<Category> {
   static final Schema<Category> schema = Schema(
     Category.new,
     [
@@ -47,6 +48,9 @@ class Category extends Model with ConvertibleToRow<Category> {
 
   @override
   JsonMap toJson() => schema.toJson(this);
+
+  @override
+  String toString() => categoryName;
 
   @override
   Future<ValueStatusWrapper> redirectToModelView(BuildContext context) =>
