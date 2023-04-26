@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../model/basic_models/employee.dart';
 import '../../../model/basic_models/receipt.dart';
 import '../../../model/other_models/table_receipt.dart';
+import '../../../model/schema/extractors.dart';
 import '../../../model/search_models/short_cashier.dart';
 import '../../../services/query_builder/filter.dart';
 import '../../../services/query_builder/sort.dart';
@@ -14,6 +15,7 @@ import '../../widgets/queries/filters/date_filter.dart';
 import '../../widgets/queries/sort_block.dart';
 import '../../widgets/resources/collections/collection_view.dart';
 import '../../widgets/resources/collections/model_collection_view.dart';
+import '../../widgets/stats_block.dart';
 
 Future<ValueStatusWrapper<Receipt>> _redirectToReceiptCreation(BuildContext context) =>
     AppNavigation.of(context).openModelCreation<Receipt>();
@@ -74,7 +76,21 @@ class ReceiptsSearchFilters extends CollectionSearchFilterDelegate {
       UserManager.of(context).hasPosition(Position.cashier) ? 'me' : '';
 
   @override
-  Widget? buildStats(BuildContext context) {
-    return const Text('Статистика');
+  Widget? buildStats(BuildContext context, Stream<void> updateStream) {
+    return StatsBlock(
+      const [
+        StatsFetcher<int>(
+            fieldName: 'sum',
+            label: 'Сума проданих чеків відповідно до фільтрів',
+            url: 'api/receipts/total_sum',
+            allowedFilters: [
+              FilterOption.dateMin,
+              FilterOption.dateMax,
+              FilterOption.employeeId,
+            ]),
+      ],
+      updateStream: updateStream,
+      queryBuilder: queryBuilder,
+    );
   }
 }

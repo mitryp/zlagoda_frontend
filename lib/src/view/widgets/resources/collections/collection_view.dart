@@ -53,7 +53,7 @@ abstract class CollectionSearchFilterDelegate {
 
   String subRoute(BuildContext context) => '';
 
-  Widget? buildStats(BuildContext context) => null;
+  Widget? buildStats(BuildContext context, Stream<void> updateStream) => null;
 }
 
 typedef CsfDelegateConstructor = CollectionSearchFilterDelegate Function({
@@ -98,7 +98,7 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>,
     queryBuilder: widget.queryBuilder,
     updateCallback: fetchItems,
   );
-  late final StreamController<void> updateStreamController = StreamController();
+  late final StreamController<void> updateStreamController = StreamController.broadcast();
 
   @override
   void didChangeDependencies() {
@@ -125,10 +125,13 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>,
                 buildSearchFilters(),
                 ReportButton<CTPdf>(queryBuilder: widget.initialQB),
               ]),
-          CollectionTable<SCol>(
-            itemsSupplier: () => httpService.get(widget.queryBuilder),
-            updateStream: updateStreamController.stream,
-            queryBuilder: widget.queryBuilder,
+          ConstrainedBox(
+            constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width / 2),
+            child: CollectionTable<SCol>(
+              itemsSupplier: () => httpService.get(widget.queryBuilder),
+              updateStream: updateStreamController.stream,
+              queryBuilder: widget.queryBuilder,
+            ),
           ),
         ],
       ),
@@ -151,7 +154,7 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>,
     final sort = searchFilterDelegate.buildSort(context);
     final filters = searchFilterDelegate.buildFilters(context);
     final searches = searchFilterDelegate.buildSearches(context);
-    final stats = searchFilterDelegate.buildStats(context);
+    final stats = searchFilterDelegate.buildStats(context, updateStreamController.stream);
 
     return Card(
         child: Padding(

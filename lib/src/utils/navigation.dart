@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../model/basic_models/product.dart';
 import '../model/basic_models/receipt.dart';
 import '../model/basic_models/store_product.dart';
 import '../model/interfaces/convertible_to_row.dart';
@@ -7,6 +8,7 @@ import '../model/interfaces/model.dart';
 import '../model/interfaces/serializable.dart';
 import '../services/http/helpers/http_service_factory.dart';
 import '../services/http/model_http_service.dart';
+import '../view/dialogs/product_stats_dialog.dart';
 import '../view/dialogs/usages/show_prom_creation_dialog.dart';
 import '../view/widgets/resources/collections/collection_view_factory.dart';
 import '../view/widgets/resources/models/model_edit_view.dart';
@@ -31,7 +33,7 @@ class AppNavigation {
 
   Future<ValueStatusWrapper<SSingle>> toModelView<SSingle extends Model>(dynamic primaryKey) {
     assert(SSingle != Model);
-    print('opening model view for $SSingle with pk of $primaryKey');
+
     Future<SSingle> fetchFunction() => _serviceOf<SSingle>().singleById(primaryKey).then((v) => v!);
     final FetchWidgetConstructor<SSingle> constructor = (SSingle != Receipt
         ? ModelView<SSingle>.new
@@ -49,6 +51,10 @@ class AppNavigation {
   Future<ValueStatusWrapper<SSingle>> openModelViewFor<SSingle extends Model>(SSingle model,
       {List<ModelTable>? connectedTables, List<WidgetBuilder>? additionalButtonsBuilders}) {
     assert(SSingle != Model);
+
+    if (SSingle == Product && additionalButtonsBuilders == null) {
+      additionalButtonsBuilders = [buildProductStatsDialogButton];
+    }
 
     return Navigator.of(context)
         .push<ValueStatusWrapper<SSingle>>(
