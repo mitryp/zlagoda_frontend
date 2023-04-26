@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../model/basic_models/employee.dart';
-import '../services/http/http_service_helper.dart';
+import '../services/http/helpers/http_service_helper.dart';
 import '../services/middleware/request/authentication_middleware.dart';
 import '../services/middleware/response/auth_handle_middleware.dart';
 import '../services/middleware/response/response_display_middleware.dart';
