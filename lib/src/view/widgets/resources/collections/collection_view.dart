@@ -13,12 +13,12 @@ import '../../../../services/query_builder/query_builder.dart';
 import '../../../../services/query_builder/sort.dart';
 import '../../../../utils/value_status.dart';
 import '../../../pages/page_base.dart';
-import '../../reports/open_report_button.dart';
 import '../../permissions/authorizer.dart';
+import '../../reports/open_report_button.dart';
 import '../../utils/helping_functions.dart';
 import 'model_collection_view.dart';
 
-const itemsPerPage = 5;
+const itemsPerPage = 10;
 
 abstract class CollectionSearchFilterDelegate {
   final VoidCallback updateCallback;
@@ -51,6 +51,8 @@ abstract class CollectionSearchFilterDelegate {
   Widget buildSort(BuildContext context);
 
   String subRoute(BuildContext context) => '';
+
+  Widget? additionalRequestHandler(BuildContext context) => null;
 }
 
 typedef CsfDelegateConstructor = CollectionSearchFilterDelegate Function({
@@ -65,8 +67,8 @@ typedef CsfDelegateConstructor = CollectionSearchFilterDelegate Function({
     -> add button
  */
 
-class CollectionView<SCol extends ConvertibleToRow<SCol>,
-    CTPdf extends ConvertibleToPdf<CTPdf>> extends StatefulWidget {
+class CollectionView<SCol extends ConvertibleToRow<SCol>, CTPdf extends ConvertibleToPdf<CTPdf>>
+    extends StatefulWidget {
   final RedirectCallbackWithValueStatus onAddPressed;
   final QueryBuilder queryBuilder;
   late final QueryBuilder initialQB;
@@ -82,18 +84,16 @@ class CollectionView<SCol extends ConvertibleToRow<SCol>,
   }
 
   @override
-  State<CollectionView<SCol, CTPdf>> createState() =>
-      _CollectionViewState<SCol, CTPdf>();
+  State<CollectionView<SCol, CTPdf>> createState() => _CollectionViewState<SCol, CTPdf>();
 }
 
 class _CollectionViewState<SCol extends ConvertibleToRow<SCol>,
-        CTPdf extends ConvertibleToPdf<CTPdf>>
-    extends State<CollectionView<SCol, CTPdf>> with RouteAware {
+        CTPdf extends ConvertibleToPdf<CTPdf>> extends State<CollectionView<SCol, CTPdf>>
+    with RouteAware {
   late final ModelHttpService<SCol, dynamic> httpService =
       makeModelHttpService<SCol>() as ModelHttpService<SCol, dynamic>;
 
-  late CollectionSearchFilterDelegate searchFilterDelegate =
-      widget.searchFilterDelegate(
+  late CollectionSearchFilterDelegate searchFilterDelegate = widget.searchFilterDelegate(
     queryBuilder: widget.queryBuilder,
     updateCallback: fetchItems,
   );
@@ -153,8 +153,7 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>,
 
     return Card(
         child: Padding(
-      padding: const EdgeInsets.symmetric(
-          vertical: 12, horizontal: horizontalPadding),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
       child: Flex(
         direction: Axis.horizontal,
         mainAxisSize: MainAxisSize.min,
@@ -211,8 +210,7 @@ class CollectionTable<R extends ConvertibleToRow<R>> extends StatefulWidget {
   State<CollectionTable<R>> createState() => _CollectionTableState<R>();
 }
 
-class _CollectionTableState<R extends ConvertibleToRow<R>>
-    extends State<CollectionTable<R>> {
+class _CollectionTableState<R extends ConvertibleToRow<R>> extends State<CollectionTable<R>> {
   late final StreamSubscription<void> updateSubscription;
   late List<R> items;
   late int totalCount;
@@ -269,73 +267,59 @@ class _CollectionTableState<R extends ConvertibleToRow<R>>
       );
     }
 
+    if (items.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(30.0),
+          child: Text('Записи в системі обліку відсутні.'),
+        ),
+      );
+    }
+
     final limit = widget.queryBuilder.paginationLimit;
     final offset = widget.queryBuilder.paginationOffset;
 
-    return items.isEmpty
-        ? const Center(
-            child: Padding(
-                padding: EdgeInsets.all(30.0),
-                child: Text('Записи в системі обліку відсутні.')))
-        : IntrinsicWidth(
-            child: Column(
+    return IntrinsicWidth(
+      child: Column(
+        children: [
+          DataTable(
+            showCheckboxColumn: false,
+            columns: columnsOf<R>(),
+            rows: items.map((e) => e.buildRow(context, _updateCallback)).toList(),
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                DataTable(
-                  showCheckboxColumn: false,
-                  columns: columnsOf<R>(),
-                  rows: items
-                      .map((e) => e.buildRow(context, _updateCallback))
-                      .toList(),
+                IconButton(
+                  onPressed: () {
+                    if (offset == 0) return;
+                    widget.queryBuilder.paginationOffset = offset - limit;
+                    fetchItems();
+                  },
+                  icon: const Icon(Icons.arrow_left),
+                  splashRadius: 20,
                 ),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          if (offset == 0) return;
-                          widget.queryBuilder.paginationOffset = offset - limit;
-                          fetchItems();
-                        },
-                        icon: const Icon(Icons.arrow_left),
-                        splashRadius: 20,
-                      ),
-                      Text(
-                        '${offset ~/ limit + 1} '
-                        '/ ${(totalCount / limit + .4).round()}',
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          if (offset >= totalCount - limit) return;
-                          widget.queryBuilder.paginationOffset = offset + limit;
-                          fetchItems();
-                        },
-                        icon: const Icon(Icons.arrow_right),
-                        splashRadius: 20,
-                      ),
-                    ],
-                  ),
+                Text(
+                  '${offset ~/ limit + 1} '
+                  '/ ${(totalCount / limit + .4).round()}',
+                ),
+                IconButton(
+                  onPressed: () {
+                    if (offset >= totalCount - limit) return;
+                    widget.queryBuilder.paginationOffset = offset + limit;
+                    fetchItems();
+                  },
+                  icon: const Icon(Icons.arrow_right),
+                  splashRadius: 20,
                 ),
               ],
             ),
-          );
-    // return PaginatedDataTable(
-    //   showCheckboxColumn: false,
-    //   columns: columnsOf<R>(),
-    //   //rows: items.map((m) => m.buildRow(context, _updateCallback)).toList(),
-    //   source: CollectionViewSource(
-    //     context: context,
-    //     totalCount: totalCount,
-    //     items: items,
-    //     fetchItems: fetchItems,
-    //   ),
-    //   rowsPerPage: min(itemsPerPage, items.length),
-    //   // onPageChanged: (value) {
-    //   // setState(() => widget.queryBuilder.paginationOffset = value);
-    //   // fetchItems();
-    //   // },
-    // );
+          ),
+        ],
+      ),
+    );
   }
 
   void _updateCallback(ValueChangeStatus updatedStatus) {
@@ -343,37 +327,3 @@ class _CollectionTableState<R extends ConvertibleToRow<R>>
     fetchItems();
   }
 }
-
-// class CollectionViewSource<R extends ConvertibleToRow<R>> extends DataTableSource {
-//   final BuildContext context;
-//   final List<R> items;
-//   final int totalCount;
-//   final Future<void> Function() fetchItems;
-//
-//   CollectionViewSource({
-//     required this.context,
-//     required this.totalCount,
-//     required this.items,
-//     required this.fetchItems,
-//   });
-//
-//   void _updateCallback(ValueChangeStatus updatedStatus) {
-//     if (updatedStatus == ValueChangeStatus.notChanged) return;
-//     fetchItems();
-//   }
-//
-//   @override
-//   DataRow? getRow(int index) {
-//     if (index >= items.length) return null;
-//     return items[index].buildRow(context, _updateCallback);
-//   }
-//
-//   @override
-//   bool get isRowCountApproximate => false;
-//
-//   @override
-//   int get rowCount => totalCount;
-//
-//   @override
-//   int get selectedRowCount => 0;
-// }

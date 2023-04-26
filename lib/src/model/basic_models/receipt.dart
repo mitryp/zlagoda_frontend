@@ -60,7 +60,7 @@ class Receipt extends Model
       ),
       FieldDescription<int, Receipt>(
         'discount',
-            (o) => o.discount,
+        (o) => o.discount,
         labelCaption: 'Знижка',
         fieldType: FieldType.number,
       ),
