@@ -134,22 +134,25 @@ class JoinedStoreProduct extends _JoinedStoreProduct
     );
   }
 
+  List<String> get cellsData => [
+    upc,
+    productName,
+    manufacturer,
+    toHryvnas(price),
+    quantity.toString(),
+    toHryvnas(price * quantity),
+    isProm ? 'Так' : 'Ні',
+  ];
+
   @override
   DataRow buildRow(BuildContext context, UpdateCallback<ValueChangeStatus> updateCallback) {
-    final cells = [
-      upc,
-      productName,
-      manufacturer,
-      toHryvnas(price),
-      quantity.toString(),
-      toHryvnas(price * quantity),
-      isProm ? 'Так' : 'Ні',
-    ];
-
     return DataRow(
-      cells: cells.map((cell) => DataCell(Text(cell))).toList(),
+      cells: cellsData.map((cell) => DataCell(Text(cell))).toList(),
       onSelectChanged: (_) async =>
           updateCallback(await redirectToModelView(context).then((v) => v.status)),
     );
   }
+
+  @override
+  List<dynamic> get pdfRow => cellsData;
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../../model/basic_models/employee.dart';
 import '../../../model/basic_models/receipt.dart';
-import '../../../model/other_models/table_receipt.dart';
 import '../../../model/search_models/short_cashier.dart';
 import '../../../services/query_builder/filter.dart';
 import '../../../services/query_builder/sort.dart';
@@ -19,7 +18,7 @@ Future<ValueStatusWrapper<Receipt>> _redirectToReceiptCreation(
         BuildContext context) =>
     AppNavigation.of(context).openModelCreation<Receipt>();
 
-class ReceiptsView extends ModelCollectionView<TableReceipt, Receipt> {
+class ReceiptsView extends ModelCollectionView<Receipt, Receipt> {
   const ReceiptsView({super.key})
       : super(
           defaultSortField: SortOption.date,

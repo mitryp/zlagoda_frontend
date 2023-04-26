@@ -4,7 +4,6 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
 import '../../../model/interfaces/convertible_to_pdf.dart';
-import '../../../model/interfaces/convertibles_helper.dart';
 import '../../../services/http/helpers/http_service_factory.dart';
 import '../../../services/query_builder/query_builder.dart';
 import '../../../theme.dart';
@@ -54,17 +53,51 @@ class _ReportButtonState<CTPdf extends ConvertibleToPdf<CTPdf>>
   }
 
   Future<pw.Document> _createReport(List<CTPdf> reportedItems) async {
-    final report = pw.Document();
+    final report = pw.Document(pageMode: PdfPageMode.fullscreen);
+    final baseFont = await PdfGoogleFonts.nunitoMedium();
+    final boldFont = await PdfGoogleFonts.nunitoBold();
+    final headerStyle = pw.TextStyle(fontSize: 6, fontBold: boldFont);
+    final rowStyle = pw.TextStyle(fontSize: 5, font: baseFont);
+
+    pw.Widget buildTextWithPadding(String text, pw.TextStyle style) =>
+        pw.Padding(
+            padding: const pw.EdgeInsets.symmetric(
+              vertical: 3.0,
+              horizontal: 5.0,
+            ),
+            child: pw.Text(
+              text,
+              style: style,
+            ));
+
+    final header = pw.TableRow(
+        children: pdfColumns<CTPdf>()
+            .map((caption) => buildTextWithPadding(caption, headerStyle))
+            .toList());
+
+    final data = reportedItems
+        .map((item) => pw.TableRow(
+            children: item.pdfRow
+                .map((text) => buildTextWithPadding(text.toString(), rowStyle))
+                .toList()))
+        .toList();
+
+    final table = pw.Table(
+      border: pw.TableBorder.all(),
+      children: [
+        header,
+        ...data,
+      ],
+    );
 
     report.addPage(pw.Page(
-      theme: pw.ThemeData.withFont(
-        base: await PdfGoogleFonts.nunitoMedium(),
-      ),
-      build: (context) => pw.Table.fromTextArray(
-        headers: columnNamesOf<CTPdf>(),
-        data: reportedItems.map((item) => item.row).toList(),
-      ),
-    ));
+        pageFormat: PdfPageFormat.a4,
+        orientation: pw.PageOrientation.portrait,
+        clip: true,
+        theme: pw.ThemeData.withFont(
+          base: await PdfGoogleFonts.nunitoMedium(),
+        ),
+        build: (context) => table));
 
     return report;
   }

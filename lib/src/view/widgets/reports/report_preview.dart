@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
@@ -43,9 +42,8 @@ class ReportPreview<CTPdf extends ConvertibleToPdf<CTPdf>> extends StatelessWidg
           build: (format) => report.save(),
           allowSharing: true,
           allowPrinting: true,
-          initialPageFormat: PdfPageFormat.a4,
           pdfFileName: 'Report_on_$fileName',
-          canChangeOrientation: true,
+          canChangeOrientation: false,
         )
     );
   }

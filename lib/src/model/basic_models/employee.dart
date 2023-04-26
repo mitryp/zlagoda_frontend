@@ -42,13 +42,6 @@ class Employee extends Model with ConvertibleToRow<Employee>, ConvertibleToPdf<E
         labelCaption: 'Табельний номер',
         validator: hasLength(10),
       ),
-      FieldDescription<String, Employee>(
-        'login',
-        (o) => o.login,
-        labelCaption: 'Логін',
-        fieldDisplayMode: FieldDisplayMode.inModelView,
-        validator: notEmpty,
-      ),
       FieldDescription<Name, Employee>.serializable(
         'employeeName',
         (o) => o.employeeName,
@@ -105,6 +98,13 @@ class Employee extends Model with ConvertibleToRow<Employee>, ConvertibleToPdf<E
         serializableEditorBuilder: addressEditorBuilder,
         fieldDisplayMode: FieldDisplayMode.inModelView,
       ),
+      FieldDescription<String, Employee>(
+        'login',
+            (o) => o.login,
+        labelCaption: 'Логін',
+        fieldDisplayMode: FieldDisplayMode.inModelView,
+        validator: notEmpty,
+      ),
       FieldDescription<String?, Employee>(
         'password',
         (o) => o.password,
@@ -155,4 +155,10 @@ class Employee extends Model with ConvertibleToRow<Employee>, ConvertibleToPdf<E
   @override
   ShortCashier toSearchModel() =>
       ShortCashier(primaryKey: employeeId, descriptiveAttr: '$employeeId ${employeeName.fullName}');
+
+  @override
+  List<dynamic> get pdfRow =>
+    schema.fields
+        .sublist(0, schema.fields.length - 2)
+        .map((field) => field.fieldGetter(this)).toList();
 }

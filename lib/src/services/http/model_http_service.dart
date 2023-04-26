@@ -9,7 +9,6 @@ import '../../model/basic_models/store_product.dart';
 import '../../model/interfaces/serializable.dart';
 import '../../model/joined_models/joined_store_product.dart';
 import '../../model/joined_models/product_with_category.dart';
-import '../../model/other_models/table_receipt.dart';
 import '../../typedefs.dart';
 import '../../utils/json_decode.dart';
 import '../query_builder/query_builder.dart';
@@ -142,11 +141,11 @@ class ClientService extends ModelHttpService<Client, Client> {
         );
 }
 
-class ReceiptService extends ModelHttpService<TableReceipt, Receipt> {
+class ReceiptService extends ModelHttpService<Receipt, Receipt> {
   const ReceiptService()
       : super(
           route: 'receipts',
-          collectionCastFunction: TableReceipt.fromJson,
+          collectionCastFunction: Receipt.fromJson,
           singleCastFunction: Receipt.fromJson,
         );
 }

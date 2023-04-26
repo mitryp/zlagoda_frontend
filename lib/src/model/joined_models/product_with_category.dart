@@ -68,4 +68,13 @@ class ProductWithCategory extends _ProductWithCategory
         onSelectChanged: (_) async => updateCallback(
             await redirectToModelView(context).then((v) => v.status)),
       );
+
+  @override
+  List<dynamic> get pdfRow => [
+        product.upc,
+        product.productName,
+        product.manufacturer,
+        product.specs,
+        category.categoryName,
+      ];
 }
