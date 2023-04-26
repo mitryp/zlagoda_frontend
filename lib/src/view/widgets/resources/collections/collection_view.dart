@@ -49,6 +49,8 @@ abstract class CollectionSearchFilterDelegate {
   List<Widget> buildFilters(BuildContext context);
 
   Widget buildSort(BuildContext context);
+
+  String subRoute(BuildContext context) => '';
 }
 
 typedef CsfDelegateConstructor = CollectionSearchFilterDelegate Function({
@@ -98,10 +100,11 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>,
   late final StreamController<void> updateStreamController = StreamController();
 
   @override
-  void initState() {
-    super.initState();
-
-    widget.queryBuilder.paginationLimit = itemsPerPage;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    widget.queryBuilder
+      ..paginationLimit = itemsPerPage
+      ..subRoute = searchFilterDelegate.subRoute(context);
     fetchItems();
   }
 

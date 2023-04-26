@@ -13,10 +13,10 @@ Future<ValueStatusWrapper<StoreProduct>?> showPromCreationDialog(
     BuildContext context, StoreProduct model) {
   return showCreationDialog<ValueStatusWrapper<StoreProduct>>(
     context: context,
-    inputBuilder: (textController) => PromStoreProductTextField(
-        controller: textController, validator: isNonNegativeInteger),
+    inputBuilder: (textController) =>
+        PromStoreProductTextField(controller: textController, validator: isNonNegativeInteger),
     buttonProps: [
-      ButtonProps<PromStoreProduct>(
+      ButtonProps<StoreProduct>(
         fetchCallback: (quantity) {
           return update(
               PromStoreProduct(
@@ -26,24 +26,23 @@ Future<ValueStatusWrapper<StoreProduct>?> showPromCreationDialog(
               controlTotalQuantity: true);
         },
         caption: 'Встановити',
-        message:
-            'Кількість пов\'язаних неакційних товарів буде відредаговано так, '
-                'щоб загальна кількість товару на складі не змінилася',
+        message: 'Кількість пов\'язаних неакційних товарів буде відредаговано так, '
+            'щоб загальна кількість товару на складі не змінилася',
       ),
-      ButtonProps<PromStoreProduct>(
+      ButtonProps<StoreProduct>(
         fetchCallback: (quantity) {
           return update(
-              PromStoreProduct(
-                baseStoreProductId: model.baseStoreProductId!,
-                quantity: quantity,
-              ),
-              controlTotalQuantity: false);
+            PromStoreProduct(
+              baseStoreProductId: model.baseStoreProductId!,
+              quantity: quantity,
+            ),
+            controlTotalQuantity: false,
+          );
         },
         caption: 'Встановити без обліку',
         color: secondary,
-        message:
-            'Буде встановлено нову кількість акційних товарів без '
-                'зміни кількості неакційних товарів',
+        message: 'Буде встановлено нову кількість акційних товарів без '
+            'зміни кількості неакційних товарів',
       ),
     ],
   );

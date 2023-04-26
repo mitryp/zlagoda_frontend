@@ -7,8 +7,9 @@ class QueryBuilder {
   int paginationOffset = 0;
   final Set<Filter> _filters = {};
   Sort sort;
+  String subRoute;
 
-  QueryBuilder({required this.sort});
+  QueryBuilder({required this.sort, this.subRoute = ''});
 
   void addFilter(Filter filter) {
     _filters.remove(filter);

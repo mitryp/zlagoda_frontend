@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../model/basic_models/employee.dart';
 import '../../../model/basic_models/receipt.dart';
 import '../../../model/other_models/table_receipt.dart';
 import '../../../model/search_models/short_cashier.dart';
@@ -7,6 +8,7 @@ import '../../../services/query_builder/filter.dart';
 import '../../../services/query_builder/sort.dart';
 import '../../../utils/navigation.dart';
 import '../../../utils/value_status.dart';
+import '../../widgets/permissions/user_manager.dart';
 import '../../widgets/queries/connected_model_filter.dart';
 import '../../widgets/queries/filters/date_filter.dart';
 import '../../widgets/queries/sort_block.dart';
@@ -39,13 +41,14 @@ class ReceiptsSearchFilters extends CollectionSearchFilterDelegate {
         addFilter: addFilter,
         removeFilter: removeFilter,
       ),
-      ConnectedModelFilter<String, ShortCashier>(
-        filterOption: FilterOption.employeeId,
-        addFilter: addFilter,
-        removeFilterByOption: removeFilter,
-        caption: 'Всі касири',
-        searchHint: 'Пошук касирів за табельним номером або ПІБ...',
-      ),
+      if (UserManager.of(context).hasPosition(Position.manager))
+        ConnectedModelFilter<String, ShortCashier>(
+          filterOption: FilterOption.employeeId,
+          addFilter: addFilter,
+          removeFilterByOption: removeFilter,
+          caption: 'Всі касири',
+          searchHint: 'Пошук касирів за табельним номером або ПІБ...',
+        ),
     ];
   }
 
@@ -66,4 +69,8 @@ class ReceiptsSearchFilters extends CollectionSearchFilterDelegate {
       setSort: updateSort,
     );
   }
+
+  @override
+  String subRoute(BuildContext context) =>
+      UserManager.of(context).hasPosition(Position.cashier) ? 'me' : '';
 }

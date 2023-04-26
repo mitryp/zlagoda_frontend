@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
 
 import '../../../model/basic_models/employee.dart';
 import '../../../services/auth/user.dart';
@@ -56,7 +57,8 @@ class UserManager extends InheritedWidget {
   bool hasPosition(Position position) => currentUser?.role == position;
 
   bool hasPositionPermissions(Position position) {
-    if (currentUser == null) return false;
-    return currentUser!.role == Position.manager || currentUser!.role == position;
+    final user = currentUser;
+    if (user == null) return false;
+    return user!.role == Position.manager || user!.role == position;
   }
 }
