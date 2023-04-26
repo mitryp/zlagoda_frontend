@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 
 import '../../../../model/basic_models/employee.dart';
+import '../../../../model/basic_models/receipt.dart';
+import '../../../../model/basic_models/store_product.dart';
 import '../../../../model/interfaces/model.dart';
+import '../../../../services/auth/user.dart';
 import '../../../../theme.dart';
 import '../../../../typedefs.dart';
 import '../../../../utils/exceptions.dart';
 import '../../../../utils/locales.dart';
 import '../../../../utils/navigation.dart';
 import '../../../../utils/value_status.dart';
+import '../../../dialogs/usages/show_prom_creation_dialog.dart';
 import '../../../pages/page_base.dart';
 import '../../permissions/authorizer.dart';
 import '../../text_link.dart';
@@ -107,19 +111,18 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
         ),
         floatingActionButton: widget.additionalButtonsBuilders != null
             ? Flex(
-            direction: Axis.horizontal,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: makeSeparated([
-              ...widget.additionalButtonsBuilders!.map((builder) => builder(context)),
-              buildEditButton(),
-            ]))
+                direction: Axis.horizontal,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: makeSeparated([
+                  ...widget.additionalButtonsBuilders!.map((builder) => builder(context)),
+                  buildEditButton(),
+                ]))
             : buildEditButton(),
       ),
     );
   }
 
-  Widget buildLoadingPlaceholder() =>
-      const Center(child: CircularProgressIndicator());
+  Widget buildLoadingPlaceholder() => const Center(child: CircularProgressIndicator());
 
   Widget buildErrorMessage() {
     return Center(
@@ -153,28 +156,70 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
   }
 
   Widget buildEditButton() {
+    final model = this.model;
+
+    final VoidCallback onPressed;
+    if (model is! StoreProduct || !model.isProm) {
+      onPressed = _processEditPress;
+    } else {
+      onPressed = _processStoreProductEditPress;
+    }
+
     return Authorizer.emptyUnauthorized(
-      authorizationStrategy: hasPosition(Position.manager),
+      authorizationStrategy: (User? user) =>
+          hasPosition(Position.manager).call(user) && M != Receipt,
       child: ElevatedButton.icon(
         label: const Text('Редагувати'),
         icon: const Icon(Icons.edit),
-        onPressed: _processEditPress,
+        onPressed: onPressed,
       ),
     );
   }
 
   void _processEditPress() async {
-    final valueStatus = await AppNavigation.of(context).openModelEditViewFor(model,
-        connectedModels: connectedModelTables.map((t) => t.model).toList());
-    final status = valueStatus.status;
+    final future = AppNavigation.of(context).openModelEditViewFor<M>(
+      model,
+      connectedModels: connectedModelTables.map((t) => t.model).toList(),
+    );
+    _processModelChange(future);
+
+    // final statusWrapper = await AppNavigation.of(context).openModelEditViewFor(
+    //   model,
+    //   connectedModels: connectedModelTables.map((t) => t.model).toList(),
+    // );
+    // final status = statusWrapper.status;
+    //
+    // if (!mounted || status == ValueChangeStatus.notChanged) return;
+    // changeStatus = statusWrapper;
+    // if (status == ValueChangeStatus.deleted || status == ValueChangeStatus.created) {
+    //   return Navigator.of(context).pop(statusWrapper);
+    // }
+    // model = statusWrapper.value!;
+    // fetchResources(fetchModel: false, fetchConnectedTables: true);
+  }
+
+  void _processStoreProductEditPress() async {
+    final future = showPromCreationDialog(context, model as StoreProduct)
+        .then((v) => v ?? ValueStatusWrapper<StoreProduct>.notChanged());
+
+    _processModelChange(future as Future<ValueStatusWrapper<M>>);
+  }
+
+  void _processModelChange(
+    Future<ValueStatusWrapper<M>> wrappedOperation, {
+    bool fetchMainModel = false,
+  }) async {
+    final statusWrapper = await wrappedOperation;
+
+    final status = statusWrapper.status;
 
     if (!mounted || status == ValueChangeStatus.notChanged) return;
-    changeStatus = valueStatus;
+    changeStatus = statusWrapper;
     if (status == ValueChangeStatus.deleted || status == ValueChangeStatus.created) {
-      return Navigator.of(context).pop(valueStatus);
+      return Navigator.of(context).pop(statusWrapper);
     }
-    model = valueStatus.value!;
-    fetchResources(fetchModel: false, fetchConnectedTables: true);
+    model = statusWrapper.value!;
+    fetchResources(fetchModel: fetchMainModel, fetchConnectedTables: !fetchMainModel);
   }
 }
 

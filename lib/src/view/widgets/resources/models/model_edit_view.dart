@@ -66,7 +66,6 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
     return Scaffold(
       appBar: AppBar(
         title: Text('${isEditing ? 'Редагування' : 'Створення'} ${makeModelLocalizedName<M>()}'),
-        titleTextStyle: const TextStyle(color: Colors.black),
         actions: [
           if (isEditing) buildDeleteButton(),
         ],

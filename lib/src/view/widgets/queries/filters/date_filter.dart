@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../model/schema/field_type.dart';
 import '../../../../services/query_builder/filter.dart';
 import '../../../../theme.dart';
 import 'types.dart';
@@ -74,7 +75,7 @@ class _DateFilterState extends State<DateFilter> {
 
     setState(() {
       options[1] =
-          '${start.year}.${start.month}.${start.day} - ${end.year}.${end.month}.${end.day}';
+          '${FieldType.date.presentation(start)} - ${FieldType.date.presentation(end)}';
     });
   }
 

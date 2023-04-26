@@ -60,6 +60,7 @@ final mainTheme = ThemeData.light().copyWith(
       backgroundColor: Colors.transparent,
       elevation: 0,
       iconTheme: IconThemeData(color: Colors.black),
+      titleTextStyle: TextStyle(fontSize: 16)
     ),
     chipTheme: ChipThemeData(
       padding: defaultButtonStyle.padding!.resolve({})! / 2,

@@ -14,11 +14,12 @@ class ButtonProps<T> {
   final Color color;
   final String? message;
 
-  const ButtonProps(
-      {required this.fetchCallback,
-      required this.caption,
-      this.color = primary,
-      this.message});
+  const ButtonProps({
+    required this.fetchCallback,
+    required this.caption,
+    this.color = primary,
+    this.message,
+  });
 }
 
 class CreationDialog extends StatefulWidget {
@@ -44,8 +45,7 @@ class _CreationDialogState extends State<CreationDialog> {
     if (!formKey.currentState!.validate()) return;
 
     setState(() => isLoading = true);
-    final res = await props.fetchCallback(int.parse(widget.controller.text))
-        as StoreProduct?;
+    final res = await props.fetchCallback(int.parse(widget.controller.text)) as StoreProduct?;
     if (!mounted) return;
 
     setState(() => isLoading = false);
@@ -55,20 +55,15 @@ class _CreationDialogState extends State<CreationDialog> {
         : ValueStatusWrapper<StoreProduct>.updated(res));
   }
 
-  List<Widget> buildActions() {
-    return widget.buttonProps
-        .map((props) => Tooltip(
-              message: props.message,
-              child: ElevatedButton(
-                onPressed: () async => _onPressed(props),
-                style: ButtonStyle(
-                    backgroundColor: MaterialStatePropertyAll(props.color)),
-                child: isLoading
-                    ? const CircularProgressIndicator()
-                    : Text(props.caption),
-              ),
-            ))
-        .toList();
+  Widget buildButtonFromProp(ButtonProps props) {
+    return Tooltip(
+      message: props.message,
+      child: ElevatedButton(
+        onPressed: () async => _onPressed(props),
+        style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(props.color)),
+        child: isLoading ? const CircularProgressIndicator() : Text(props.caption),
+      ),
+    );
   }
 
   @override
@@ -82,7 +77,7 @@ class _CreationDialogState extends State<CreationDialog> {
         child: widget.inputBuilder(widget.controller),
       ),
       actionsAlignment: MainAxisAlignment.spaceAround,
-      actions: buildActions(),
+      actions: widget.buttonProps.map(buildButtonFromProp).toList(),
     );
   }
 }
