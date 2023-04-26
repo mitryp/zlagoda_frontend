@@ -15,8 +15,7 @@ import '../../widgets/queries/sort_block.dart';
 import '../../widgets/resources/collections/collection_view.dart';
 import '../../widgets/resources/collections/model_collection_view.dart';
 
-Future<ValueStatusWrapper<Receipt>> _redirectToReceiptCreation(
-        BuildContext context) =>
+Future<ValueStatusWrapper<Receipt>> _redirectToReceiptCreation(BuildContext context) =>
     AppNavigation.of(context).openModelCreation<Receipt>();
 
 class ReceiptsView extends ModelCollectionView<TableReceipt, Receipt> {

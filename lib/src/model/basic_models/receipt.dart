@@ -13,7 +13,7 @@ import '../search_models/short_client.dart';
 import 'client.dart';
 import 'employee.dart';
 
-class Receipt extends TableReceipt with ConvertibleToPdf<Receipt>{
+class Receipt extends TableReceipt with ConvertibleToPdf<Receipt> {
   static final Schema<Receipt> schema = Schema(
     Receipt.new,
     [
@@ -74,7 +74,7 @@ class Receipt extends TableReceipt with ConvertibleToPdf<Receipt>{
       ),
       FieldDescription<int, Receipt>(
         'discount',
-            (o) => o.discount,
+        (o) => o.discount,
         labelCaption: 'Знижка',
         fieldType: FieldType.number,
       ),

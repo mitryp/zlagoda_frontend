@@ -118,8 +118,8 @@ class _ReceiptModelViewState extends State<ReceiptModelView> {
   Iterable<Widget> buildReferences() {
     final client = receipt.clientId, employee = receipt.employeeId;
     return [
-      buildReference('Клієнт', buildLink<Client>(receipt.clientName?.fullName, client)),
-      buildReference('Касир', buildLink<Employee>(receipt.employeeName.fullName, employee)),
+      buildReference('Клієнт:', buildLink<Client>(receipt.clientName?.fullName, client)),
+      buildReference('Касир:', buildLink<Employee>(receipt.employeeName.fullName, employee)),
     ];
   }
 

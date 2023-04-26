@@ -10,7 +10,7 @@ import '../model_schema_factory.dart';
 Iterable<dynamic> rowValues<R extends Serializable>(R convertible) {
   final schema = makeModelSchema<R>();
 
-  return schema.fields.where((r) => r.isShownInTable).map((r) => r.fieldGetter(convertible));
+  return schema.fields.where((r) => r.isShownInTable).map((r) => r.presentFieldOf(convertible));
 }
 
 
