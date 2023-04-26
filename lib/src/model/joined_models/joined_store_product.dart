@@ -10,6 +10,7 @@ import '../../view/dialogs/confirmation_dialog.dart';
 import '../../view/dialogs/contents/prom_store_product_creation_dialog_content.dart';
 import '../../view/dialogs/creation_dialog.dart';
 import '../basic_models/store_product.dart';
+import '../interfaces/convertible_to_pdf.dart';
 import '../interfaces/convertible_to_row.dart';
 import '../interfaces/serializable.dart';
 import '../model_reference.dart';
@@ -24,7 +25,7 @@ abstract class _JoinedStoreProduct implements Serializable {
 }
 
 class JoinedStoreProduct extends _JoinedStoreProduct
-    with ConvertibleToRow<JoinedStoreProduct> {
+    with ConvertibleToRow<JoinedStoreProduct>, ConvertibleToPdf<JoinedStoreProduct> {
   static final Schema<JoinedStoreProduct> schema = Schema(
     JoinedStoreProduct.new,
     [

@@ -1,5 +1,6 @@
 import '../../typedefs.dart';
 import '../common_models/name.dart';
+import '../interfaces/convertible_to_pdf.dart';
 import '../joined_models/joined_sale.dart';
 import '../model_reference.dart';
 import '../other_models/table_receipt.dart';
@@ -12,7 +13,7 @@ import '../search_models/short_client.dart';
 import 'client.dart';
 import 'employee.dart';
 
-class Receipt extends TableReceipt {
+class Receipt extends TableReceipt with ConvertibleToPdf<Receipt>{
   static final Schema<Receipt> schema = Schema(
     Receipt.new,
     [

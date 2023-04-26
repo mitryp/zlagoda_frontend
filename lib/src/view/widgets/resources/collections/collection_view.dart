@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../../../model/interfaces/convertible_to_pdf.dart';
 import '../../../../model/interfaces/convertible_to_row.dart';
 import '../../../../services/http/helpers/collection_slice_wrapper.dart';
 import '../../../../services/http/helpers/http_service_factory.dart';
@@ -10,8 +10,10 @@ import '../../../../services/http/model_http_service.dart';
 import '../../../../services/query_builder/filter.dart';
 import '../../../../services/query_builder/query_builder.dart';
 import '../../../../services/query_builder/sort.dart';
+import '../../../../theme.dart';
 import '../../../../utils/value_status.dart';
 import '../../../pages/page_base.dart';
+import '../../reports/open_report_button.dart';
 import '../../utils/helping_functions.dart';
 import 'model_collection_view.dart';
 
@@ -60,10 +62,11 @@ typedef CsfDelegateConstructor = CollectionSearchFilterDelegate Function({
     -> add button
  */
 
-class CollectionView<SCol extends ConvertibleToRow<SCol>>
+class CollectionView<SCol extends ConvertibleToRow<SCol>, CTPdf extends ConvertibleToPdf<CTPdf>>
     extends StatefulWidget {
   final RedirectCallbackWithValueStatus onAddPressed;
   final QueryBuilder queryBuilder;
+  late final QueryBuilder initialQB;
   final CsfDelegateConstructor searchFilterDelegate;
 
   CollectionView({
@@ -72,15 +75,15 @@ class CollectionView<SCol extends ConvertibleToRow<SCol>>
     required this.queryBuilder,
     super.key,
   }) {
-    queryBuilder.paginationLimit = itemsPerPage;
+    initialQB = QueryBuilder(sort: queryBuilder.sort);
   }
 
   @override
-  State<CollectionView<SCol>> createState() => _CollectionViewState<SCol>();
+  State<CollectionView<SCol, CTPdf>> createState() => _CollectionViewState<SCol, CTPdf>();
 }
 
-class _CollectionViewState<SCol extends ConvertibleToRow<SCol>>
-    extends State<CollectionView<SCol>> with RouteAware {
+class _CollectionViewState<SCol extends ConvertibleToRow<SCol>, CTPdf extends ConvertibleToPdf<CTPdf>>
+    extends State<CollectionView<SCol, CTPdf>> with RouteAware {
   late final ModelHttpService<SCol, dynamic> httpService =
       makeModelHttpService<SCol>() as ModelHttpService<SCol, dynamic>;
 
@@ -94,6 +97,8 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>>
   @override
   void initState() {
     super.initState();
+
+    widget.queryBuilder.paginationLimit = itemsPerPage;
     fetchItems();
   }
 
@@ -102,6 +107,12 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        actions: [
+          ReportButton<CTPdf>(queryBuilder: widget.initialQB),
+        ],
+        automaticallyImplyLeading: false,
+      ),
       body: PageBase.column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -159,6 +170,13 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>>
         }),
         label: const Text('Створити'),
       );
+
+  Widget buildReportButton() {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: ReportButton<CTPdf>(queryBuilder: widget.initialQB),
+    );
+  }
 }
 
 class CollectionTable<R extends ConvertibleToRow<R>> extends StatefulWidget {
@@ -235,8 +253,8 @@ class _CollectionTableState<R extends ConvertibleToRow<R>>
       );
     }
 
-    print(isLoaded);
-    print(items.map((item) => item.toJson()));
+    // print(isLoaded);
+    // print(items.map((item) => item.toJson()));
 
     return PaginatedDataTable(
       showCheckboxColumn: false,

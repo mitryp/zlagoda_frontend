@@ -75,6 +75,9 @@ class Product extends Model with ConvertibleToRow<Product> {
   get primaryKey => upc;
 
   @override
+  String toString() => '$upc $productName';
+
+  @override
   List<ForeignKey> get foreignKeys =>
       [foreignKey<Category, ShortCategory>('categoryId', categoryId)];
 

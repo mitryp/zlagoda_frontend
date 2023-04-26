@@ -5,6 +5,7 @@ import '../../utils/navigation.dart';
 import '../../utils/value_status.dart';
 import '../common_models/address.dart';
 import '../common_models/name.dart';
+import '../interfaces/convertible_to_pdf.dart';
 import '../interfaces/convertible_to_row.dart';
 import '../interfaces/model.dart';
 import '../interfaces/serializable.dart';
@@ -31,7 +32,7 @@ enum Position implements Serializable {
   String toString() => caption;
 }
 
-class Employee extends Model with ConvertibleToRow<Employee> {
+class Employee extends Model with ConvertibleToRow<Employee>, ConvertibleToPdf<Employee> {
   static final Schema<Employee> schema = Schema(
     Employee.new,
     [

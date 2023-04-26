@@ -14,7 +14,7 @@ import '../../widgets/resources/collections/model_collection_view.dart';
 Future<ValueStatusWrapper> _redirectToAddingModel(BuildContext context) =>
     AppNavigation.of(context).openModelCreation<Employee>();
 
-class EmployeesView extends ModelCollectionView<Employee> {
+class EmployeesView extends ModelCollectionView<Employee, Employee> {
   const EmployeesView({super.key})
       : super(
     defaultSortField: SortOption.employeeSurname,

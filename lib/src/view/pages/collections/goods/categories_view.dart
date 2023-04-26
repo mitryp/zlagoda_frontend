@@ -12,7 +12,7 @@ import '../../../widgets/resources/collections/model_collection_view.dart';
 Future<ValueStatusWrapper> _redirectToAddingModel(BuildContext context) =>
     AppNavigation.of(context).openModelCreation<Category>();
 
-class CategoriesView extends ModelCollectionView<Category> {
+class CategoriesView extends ModelCollectionView<Category, Category> {
   const CategoriesView({super.key})
       : super(
           defaultSortField: SortOption.categoryName,

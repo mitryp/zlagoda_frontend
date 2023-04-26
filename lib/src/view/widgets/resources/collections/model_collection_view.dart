@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 
+import '../../../../model/interfaces/convertible_to_pdf.dart';
 import '../../../../model/interfaces/convertible_to_row.dart';
 import '../../../../model/model_schema_factory.dart';
 import '../../../../model/schema/schema.dart';
 import '../../../../services/query_builder/query_builder.dart';
 import '../../../../services/query_builder/sort.dart';
-import '../../../../typedefs.dart';
 import '../../../../utils/value_status.dart';
 import 'collection_view.dart';
 
-typedef RedirectCallbackWithValueStatus = Future<ValueStatusWrapper> Function(BuildContext);
+typedef RedirectCallbackWithValueStatus = Future<ValueStatusWrapper> Function(
+    BuildContext);
 
-abstract class ModelCollectionView<SCol extends ConvertibleToRow<SCol>> extends StatefulWidget {
+abstract class ModelCollectionView<SCol extends ConvertibleToRow<SCol>,
+    CTPdf extends ConvertibleToPdf<CTPdf>> extends StatefulWidget {
   final CsfDelegateConstructor searchFilterDelegate;
   final SortOption defaultSortField;
   final RedirectCallbackWithValueStatus onAddPressed;
@@ -24,18 +26,19 @@ abstract class ModelCollectionView<SCol extends ConvertibleToRow<SCol>> extends 
   });
 
   @override
-  State<ModelCollectionView<SCol>> createState() => _ModelCollectionViewState<SCol>();
+  State<ModelCollectionView<SCol, CTPdf>> createState() =>
+      _ModelCollectionViewState<SCol, CTPdf>();
 }
 
-class _ModelCollectionViewState<SCol extends ConvertibleToRow<SCol>>
-    extends State<ModelCollectionView<SCol>> {
+class _ModelCollectionViewState<SCol extends ConvertibleToRow<SCol>, CTPdf extends ConvertibleToPdf<CTPdf>>
+    extends State<ModelCollectionView<SCol, CTPdf>> {
   late final queryBuilder = QueryBuilder(sort: Sort(widget.defaultSortField));
 
   Schema<SCol> get elementSchema => makeModelSchema<SCol>();
 
   @override
   Widget build(BuildContext context) {
-    return CollectionView<SCol>(
+    return CollectionView<SCol, CTPdf>(
       searchFilterDelegate: widget.searchFilterDelegate,
       onAddPressed: widget.onAddPressed,
       queryBuilder: queryBuilder,

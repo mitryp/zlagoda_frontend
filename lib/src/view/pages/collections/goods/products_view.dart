@@ -16,7 +16,7 @@ import '../../../widgets/resources/collections/model_collection_view.dart';
 Future<ValueStatusWrapper> _redirectToAddingModel(BuildContext context) =>
     AppNavigation.of(context).openModelCreation<Product>();
 
-class ProductsView extends ModelCollectionView<ProductWithCategory> {
+class ProductsView extends ModelCollectionView<ProductWithCategory, ProductWithCategory> {
   const ProductsView({super.key})
       : super(
           defaultSortField: SortOption.productName,

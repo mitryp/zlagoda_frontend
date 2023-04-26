@@ -38,6 +38,8 @@ dependencies:
   http: ^0.13.5
   flutter_secure_storage: ^8.0.0
   path: ^1.8.2
+  printing: ^5.10.3
+  pdf: ^3.10.1
 
 dev_dependencies:
   flutter_test:
