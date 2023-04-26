@@ -2,11 +2,11 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-import '../../model/interfaces/serializable.dart';
-import '../../typedefs.dart';
-import '../../utils/exceptions.dart';
-import '../middleware/middleware_application.dart';
-import '../middleware/response/response_middleware.dart';
+import '../../../model/interfaces/serializable.dart';
+import '../../../typedefs.dart';
+import '../../../utils/exceptions.dart';
+import '../../middleware/middleware_application.dart';
+import '../../middleware/response/response_middleware.dart';
 
 typedef JsonCastFunction<S extends Serializable> = S? Function(JsonMap json);
 typedef ControllerSuccessfulLogic<T> = T Function(http.Response response);

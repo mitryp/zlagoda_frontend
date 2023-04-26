@@ -13,7 +13,8 @@ import '../../model/other_models/table_receipt.dart';
 import '../../typedefs.dart';
 import '../../utils/json_decode.dart';
 import '../query_builder/query_builder.dart';
-import 'http_service_helper.dart';
+import 'helpers/collection_slice_wrapper.dart';
+import 'helpers/http_service_helper.dart';
 
 typedef JsonCastFunction<S extends Serializable> = S? Function(JsonMap json);
 typedef ControllerSuccessfulLogic<T> = T Function(http.Response response);
@@ -38,7 +39,7 @@ abstract class ModelHttpService<SCol extends Serializable, SSingle extends Seria
 
   String makeRoute([Object? path]) => 'api/$route${path != null ? '/$path' : ''}';
 
-  Future<List<SCol>> get(QueryBuilder queryBuilder) async {
+  Future<CollectionSliceWrapper<SCol>> get(QueryBuilder queryBuilder) async {
     final response = await makeRequest(
       HttpMethod.get,
       Uri.http(baseRoute, makeRoute(), queryBuilder.queryParams),
@@ -46,13 +47,19 @@ abstract class ModelHttpService<SCol extends Serializable, SSingle extends Seria
       (err) => http.Response(err is http.ClientException ? err.message : 'Unknown $err', 503),
     );
 
-    return httpServiceController(response, (response) {
+    final totalCount = int.parse(response.headers['x-total-count']!);
+    final items = await httpServiceController(response, (response) {
       return decodeResponseBody<List<dynamic>>(response)
           .map((m) => collectionCastFunction(m))
           .where((e) => e != null)
           .toList()
           .cast<SCol>();
     });
+
+    return CollectionSliceWrapper<SCol>(
+      items: items,
+      totalCount: totalCount
+    );
   }
 
   Future<SSingle?> singleById(dynamic id) async {

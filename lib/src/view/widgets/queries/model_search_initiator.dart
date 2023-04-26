@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../model/interfaces/search_model.dart';
-import '../../../services/http/http_service_factory.dart';
+import '../../../services/http/helpers/http_service_factory.dart';
 import '../../../typedefs.dart';
 import 'search_popup_delegate.dart';
 

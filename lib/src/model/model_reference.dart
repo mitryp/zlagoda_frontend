@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-import '../services/http/http_service_factory.dart';
+import '../services/http/helpers/http_service_factory.dart';
 import '../services/http/model_http_service.dart';
 import '../typedefs.dart';
 import '../view/widgets/queries/model_search_initiator.dart';

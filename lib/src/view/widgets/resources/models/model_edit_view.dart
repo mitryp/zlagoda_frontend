@@ -7,7 +7,7 @@ import '../../../../model/schema/field_description.dart';
 import '../../../../model/schema/field_type.dart';
 import '../../../../model/schema/schema.dart';
 import '../../../../model/schema/validators.dart';
-import '../../../../services/http/http_service_factory.dart';
+import '../../../../services/http/helpers/http_service_factory.dart';
 import '../../../../services/http/model_http_service.dart';
 import '../../../../utils/locales.dart';
 import '../../../../utils/value_status.dart';
