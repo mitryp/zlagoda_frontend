@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
-import '../../../model/basic_models/client.dart';
 import '../../../model/basic_models/category.dart';
+import '../../../model/basic_models/client.dart';
 import '../../../model/basic_models/employee.dart';
 import '../../../model/basic_models/receipt.dart';
 import '../../../model/interfaces/convertible_to_pdf.dart';

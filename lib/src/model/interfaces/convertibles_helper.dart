@@ -1,8 +1,7 @@
 import '../joined_models/joined_store_product.dart';
 import '../joined_models/product_with_category.dart';
-import 'serializable.dart';
-
 import '../model_schema_factory.dart';
+import 'serializable.dart';
 
 /// Returns the values of the fields of the [convertible] which are displayed in the DataRow in the order
 /// of their [FieldDescription]s in the [Schema].

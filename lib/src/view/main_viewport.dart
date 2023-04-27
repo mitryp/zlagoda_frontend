@@ -8,10 +8,10 @@ import '../services/middleware/response/response_display_middleware.dart';
 import '../utils/json_decode.dart';
 import '../utils/navigation.dart';
 import 'app_pages.dart';
-import 'widgets/middleware_context/request_middleware_context.dart';
-import 'widgets/middleware_context/response_middleware_context.dart';
 import 'widgets/auth/authorizer.dart';
 import 'widgets/auth/user_manager.dart';
+import 'widgets/middleware_context/request_middleware_context.dart';
+import 'widgets/middleware_context/response_middleware_context.dart';
 
 class MainViewport extends StatefulWidget {
   const MainViewport({super.key});

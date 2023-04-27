@@ -3,7 +3,6 @@ import '../../model/common_models/name.dart';
 import '../../model/interfaces/serializable.dart';
 import '../../model/schema/enum_constraints.dart';
 import '../../model/schema/field_description.dart';
-import '../../model/schema/field_type.dart';
 import '../../model/schema/schema.dart';
 import '../../typedefs.dart';
 

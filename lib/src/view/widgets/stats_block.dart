@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 
 import '../../model/schema/extractors.dart';
 import '../../services/http/helpers/http_service_helper.dart';

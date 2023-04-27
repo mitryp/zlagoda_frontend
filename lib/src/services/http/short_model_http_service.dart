@@ -1,5 +1,3 @@
-import 'package:http/http.dart' as http;
-
 import '../../model/interfaces/search_model.dart';
 import '../../model/search_models/short_cashier.dart';
 import '../../model/search_models/short_category.dart';

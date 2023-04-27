@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 import 'package:http/http.dart' show Response;
 
 import '../../../view/widgets/middleware_context/response_middleware_context.dart';
