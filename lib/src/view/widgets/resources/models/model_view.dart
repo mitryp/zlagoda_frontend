@@ -34,10 +34,10 @@ class ModelView<M extends Model> extends StatefulWidget {
   });
 
   @override
-  State<ModelView<M>> createState() => _ModelViewState<M>();
+  State<ModelView<M>> createState() => ModelViewState<M>();
 }
 
-class _ModelViewState<M extends Model> extends State<ModelView<M>> {
+class ModelViewState<M extends Model> extends State<ModelView<M>> {
   late M model;
   late List<ModelTable> connectedModelTables;
   bool isResourceLoaded = false;

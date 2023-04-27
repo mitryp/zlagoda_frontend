@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../../../model/basic_models/employee.dart';
 import '../../../model/basic_models/receipt.dart';
+import '../../../model/schema/extractors.dart';
 import '../../../model/search_models/short_cashier.dart';
 import '../../../services/query_builder/filter.dart';
 import '../../../services/query_builder/sort.dart';
+import '../../../typedefs.dart';
 import '../../../utils/navigation.dart';
 import '../../../utils/value_status.dart';
 import '../../widgets/auth/user_manager.dart';
@@ -76,8 +78,8 @@ class ReceiptsSearchFilters extends CollectionSearchFilterDelegate {
   @override
   Widget? buildStats(BuildContext context, Stream<void> updateStream) {
     return StatsBlock(
-      const [
-        StatsFetcher<int>(
+      [
+        StatsFetcher<String>(
             fieldName: 'sum',
             label: 'Сума фільтрованих чеків',
             url: 'api/receipts/total_sum',
@@ -85,10 +87,21 @@ class ReceiptsSearchFilters extends CollectionSearchFilterDelegate {
               FilterOption.dateMin,
               FilterOption.dateMax,
               FilterOption.employeeId,
-            ]),
+            ],
+          fieldExtractor: _CurrencyExtractor(),
+        ),
       ],
       updateStream: updateStream,
       queryBuilder: queryBuilder,
     );
+  }
+}
+
+class _CurrencyExtractor extends Extractor<String> {
+  @override
+  String? extractFrom(JsonMap json, String field) {
+      final coins = Extractor<int>().extractFrom(json, field);
+      if (coins == null) return null;
+      return '${(coins / 100).toStringAsFixed(2)} грн.';
   }
 }

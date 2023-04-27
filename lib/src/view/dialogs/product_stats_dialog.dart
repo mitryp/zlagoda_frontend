@@ -2,26 +2,30 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../model/basic_models/product.dart';
 import '../../services/query_builder/filter.dart';
 import '../../services/query_builder/query_builder.dart';
 import '../../services/query_builder/sort.dart';
 import '../widgets/queries/filters/date_filter.dart';
+import '../widgets/resources/models/model_view.dart';
 import '../widgets/stats_block.dart';
 import 'confirmation_dialog.dart';
 
 class ProductStatsDialogContent extends StatefulWidget {
-  const ProductStatsDialogContent({super.key});
+  final String upc;
+
+  const ProductStatsDialogContent({required this.upc, super.key});
 
   @override
   State<ProductStatsDialogContent> createState() => _ProductStatsDialogContentState();
 }
 
 class _ProductStatsDialogContentState extends State<ProductStatsDialogContent> {
-  static const fetcher = StatsFetcher<int>(
+  late final fetcher = StatsFetcher<int>(
       fieldName: 'quantity',
       label: 'Кількість одиниць товару проданого за заданий час',
-      url: 'api/products/total_sold',
-      allowedFilters: [
+      url: 'api/products/${widget.upc}/total_sold',
+      allowedFilters: const [
         FilterOption.dateMin,
         FilterOption.dateMax,
       ]);
@@ -49,7 +53,7 @@ class _ProductStatsDialogContentState extends State<ProductStatsDialogContent> {
         DateFilter(addFilter: addFilter, removeFilter: removeFilter),
         SizedBox(height: ConfirmationDialog.defaultStyle.padding),
         StatsBlock(
-          const [fetcher],
+          [fetcher],
           updateStream: updateController.stream,
           queryBuilder: queryBuilder,
         ),
@@ -59,10 +63,14 @@ class _ProductStatsDialogContentState extends State<ProductStatsDialogContent> {
 }
 
 Widget buildProductStatsDialogButton(BuildContext context) {
+  final key = context.widget.key as GlobalKey<ModelViewState<Product>>;
+
   void showStatsDialog(BuildContext context) => showConfirmationDialog(
         context: context,
         builder: (context) => ConfirmationDialog(
-          content: const ProductStatsDialogContent(),
+          content: ProductStatsDialogContent(
+            upc: key.currentState!.model.upc,
+          ),
           style: ConfirmationDialog.defaultStyle.copyWith(cancelButtonLabel: null),
         ),
       );

@@ -112,7 +112,7 @@ Future<String> makeStatsRequest<T>(
       (e) => statsFetcher.allowedFilters.map((e) => '${e.name}Filter').contains(e.key),
     );
   }
-  print('params: $params, queryBuilder params: ${queryBuilder?.queryParams}');
+
   final response = await makeRequest(
     HttpMethod.get,
     Uri.http(baseRoute, statsFetcher.url, params == null ? null : Map.fromEntries(params)),
