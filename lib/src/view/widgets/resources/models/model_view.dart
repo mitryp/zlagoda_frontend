@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../model/basic_models/client.dart';
 import '../../../../model/basic_models/employee.dart';
+import '../../../../model/basic_models/product.dart';
 import '../../../../model/basic_models/receipt.dart';
 import '../../../../model/basic_models/store_product.dart';
 import '../../../../model/interfaces/model.dart';
@@ -44,7 +45,9 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
   ValueStatusWrapper<M> changeStatus = ValueStatusWrapper.notChanged();
 
   UserAuthorizationStrategy get authStrategy =>
-      (M == Receipt || M == Client || M == Employee) ? hasUser : hasPosition(Position.manager);
+      (M == StoreProduct || M == Product || M == Receipt || M == Client || M == Employee)
+          ? hasUser
+          : hasPosition(Position.manager);
 
   @override
   void didChangeDependencies() {

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../model/basic_models/employee.dart';
-import '../../../../model/basic_models/receipt.dart';
 import '../../../../model/interfaces/model.dart';
 import '../../../../model/interfaces/serializable.dart';
 import '../../../../model/model_schema_factory.dart';
@@ -11,12 +9,12 @@ import '../../../../model/schema/schema.dart';
 import '../../../../model/schema/validators.dart';
 import '../../../../services/http/helpers/http_service_factory.dart';
 import '../../../../services/http/model_http_service.dart';
+import '../../../../services/middleware/response/response_display_middleware.dart';
 import '../../../../utils/locales.dart';
 import '../../../../utils/value_status.dart';
 import '../../../dialogs/confirmation_dialog.dart';
 import '../../../pages/page_base.dart';
 import '../../misc/clickable_absorb_pointer.dart';
-import '../../auth/authorizer.dart';
 
 class ModelEditForm<M extends Model> extends StatefulWidget {
   final M? model;
@@ -32,10 +30,8 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
   late final Schema<M> schema = makeModelSchema<M>(M);
   late final ModelHttpService<dynamic, M> httpService =
       makeModelHttpService<M>() as ModelHttpService<dynamic, M>;
-  final Map<FieldDescription<dynamic, M>, TextEditingController>
-      fieldsToControllers = {};
-  final Map<FieldDescription<dynamic, M>, Serializable?> fieldsToSerializable =
-      {};
+  final Map<FieldDescription<dynamic, M>, TextEditingController> fieldsToControllers = {};
+  final Map<FieldDescription<dynamic, M>, Serializable?> fieldsToSerializable = {};
   late final GlobalKey<FormState> formKey = GlobalKey();
 
   bool get isEditing => widget.model != null;
@@ -57,10 +53,8 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
       fieldsToControllers[field] = TextEditingController(text: presentation);
     }
 
-    for (final field
-        in schema.fields.where((e) => e.fieldType == FieldType.serializable)) {
-      fieldsToSerializable[field] =
-          isEditing ? field.fieldGetter(widget.model!) : null;
+    for (final field in schema.fields.where((e) => e.fieldType == FieldType.serializable)) {
+      fieldsToSerializable[field] = isEditing ? field.fieldGetter(widget.model!) : null;
     }
   }
 
@@ -107,8 +101,7 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
     );
   }
 
-  Widget buildOwnFormField(
-      MapEntry<FieldDescription<dynamic, M>, TextEditingController> entry) {
+  Widget buildOwnFormField(MapEntry<FieldDescription<dynamic, M>, TextEditingController> entry) {
     final field = entry.key;
     final controller = entry.value;
 
@@ -140,8 +133,8 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
     );
   }
 
-  Widget buildEnumConstrainedField(FieldDescription<dynamic, dynamic> field,
-      TextEditingController controller) {
+  Widget buildEnumConstrainedField(
+      FieldDescription<dynamic, dynamic> field, TextEditingController controller) {
     final items = field.enumConstraint!.values
         .map((e) => DropdownMenuItem(value: e.index, child: Text('$e')))
         .toList();
@@ -163,8 +156,7 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
     );
   }
 
-  Widget buildDateField(
-      FieldDescription<dynamic, M> field, TextEditingController controller) {
+  Widget buildDateField(FieldDescription<dynamic, M> field, TextEditingController controller) {
     return ClickableAbsorbPointer(
       cursor: SystemMouseCursors.text,
       onTap: () async {
@@ -218,11 +210,11 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
   Widget buildForeignKeyEditor(
       MapEntry<FieldDescription<dynamic, M>, TextEditingController> entry) {
     final field = entry.key;
-    final foreignKey = widget.model?.foreignKeys
-            .firstWhere((key) => key.foreignKeyName == field.fieldName) ??
-        field.defaultForeignKey!;
-    final connectedModel = widget.connectedModels?.firstWhere(
-        (e) => e.runtimeType == field.defaultForeignKey!.modelType);
+    final foreignKey =
+        widget.model?.foreignKeys.firstWhere((key) => key.foreignKeyName == field.fieldName) ??
+            field.defaultForeignKey!;
+    final connectedModel = widget.connectedModels
+        ?.firstWhere((e) => e.runtimeType == field.defaultForeignKey!.modelType);
 
     return foreignKey.makeEditor(
       updateCallback: (newForeignKey) {
@@ -237,7 +229,7 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
     return ElevatedButton.icon(
       icon: Icon(isEditing ? Icons.save : Icons.add),
       onPressed: () {
-        if (!(formKey.currentState?.validate() ?? true)) return;
+        if (!(formKey.currentState?.validate() ?? true) || !validateForeignKeys()) return;
         _processUpdatedModel((isEditing ? _update() : _create()).then((val) {
           if (val == null) return ValueStatusWrapper.notChanged();
           if (isEditing) return ValueStatusWrapper.updated(val);
@@ -326,8 +318,7 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
 
     return json.map((key, value) {
       var processedValue = Schema.processValue(value);
-      if (processedValue is Map &&
-          processedValue.values.every((e) => e is String && e.isEmpty))
+      if (processedValue is Map && processedValue.values.every((e) => e is String && e.isEmpty))
         processedValue = null;
 
       return MapEntry(key, processedValue);
@@ -335,4 +326,23 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
   }
 
   M? generateEditedModel() => schema.fromJson(generateJson());
+
+  bool validateForeignKeys() {
+    for (final entry in fieldsToControllers.entries) {
+      final field = entry.key;
+      final controller = entry.value;
+
+      if (field.foreignKeyOptionality != ForeignKeyOptionality.required) continue;
+
+      if (controller.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          statusSnackBar("Значення обов'язкового посилання "
+              '"${field.labelCaption}" не встановлено', isSuccess: false),
+        );
+        return false;
+      }
+    }
+
+    return true;
+  }
 }

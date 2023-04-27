@@ -32,6 +32,7 @@ class FieldDescription<R, O> {
   final DateConstraints? dateConstraints;
   final ForeignKey? defaultForeignKey;
   final TransitiveFieldPresentation? transitiveFieldPresentation;
+  final ForeignKeyOptionality? foreignKeyOptionality;
 
   const FieldDescription(
     this.fieldName,
@@ -46,6 +47,7 @@ class FieldDescription<R, O> {
         defaultForeignKey = null,
         serializableEditorBuilder = null,
         transitiveFieldPresentation = null,
+        foreignKeyOptionality = null,
         assert(fieldType != FieldType.transitive),
         assert(fieldType != FieldType.constrainedToEnum),
         assert(fieldType != FieldType.serializable),
@@ -59,6 +61,7 @@ class FieldDescription<R, O> {
     required ForeignKey this.defaultForeignKey,
     this.fieldDisplayMode = FieldDisplayMode.inModelView,
     this.isEditable = true,
+    this.foreignKeyOptionality = ForeignKeyOptionality.required,
   })  : enumConstraint = null,
         validator = _noValidation,
         fieldType = FieldType.stringForeignKey,
@@ -73,6 +76,7 @@ class FieldDescription<R, O> {
     required ForeignKey this.defaultForeignKey,
     this.fieldDisplayMode = FieldDisplayMode.inModelView,
     this.isEditable = true,
+    this.foreignKeyOptionality = ForeignKeyOptionality.required,
   })  : enumConstraint = null,
         validator = _noValidation,
         fieldType = FieldType.intForeignKey,
@@ -90,6 +94,7 @@ class FieldDescription<R, O> {
   })  : validator = _noValidation,
         fieldType = FieldType.constrainedToEnum,
         serializableEditorBuilder = null,
+        foreignKeyOptionality = null,
         dateConstraints = null,
         defaultForeignKey = null,
         transitiveFieldPresentation = null;
@@ -103,6 +108,7 @@ class FieldDescription<R, O> {
   })  : fieldType = FieldType.serializable,
         isEditable = true,
         enumConstraint = null,
+        foreignKeyOptionality = null,
         validator = _noValidation,
         dateConstraints = null,
         defaultForeignKey = null,
@@ -116,6 +122,7 @@ class FieldDescription<R, O> {
     this.fieldDisplayMode = FieldDisplayMode.everywhere,
   })  : fieldType = FieldType.transitive,
         isEditable = false,
+        foreignKeyOptionality = null,
         enumConstraint = null,
         validator = _noValidation,
         dateConstraints = null,
@@ -197,4 +204,9 @@ enum FieldDisplayMode {
   inModelView,
   whenEditing,
   none;
+}
+
+enum ForeignKeyOptionality {
+  optional,
+  required;
 }
