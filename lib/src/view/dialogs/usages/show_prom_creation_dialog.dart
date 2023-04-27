@@ -18,7 +18,7 @@ Future<ValueStatusWrapper<StoreProduct>?> showPromCreationDialog(
     buttonProps: [
       ButtonProps<StoreProduct>(
         fetchCallback: (quantity) {
-          return update(
+          return PromStoreProductService.update(
               PromStoreProduct(
                 baseStoreProductId: model.baseStoreProductId!,
                 quantity: quantity,
@@ -31,7 +31,7 @@ Future<ValueStatusWrapper<StoreProduct>?> showPromCreationDialog(
       ),
       ButtonProps<StoreProduct>(
         fetchCallback: (quantity) {
-          return update(
+          return PromStoreProductService.update(
             PromStoreProduct(
               baseStoreProductId: model.baseStoreProductId!,
               quantity: quantity,

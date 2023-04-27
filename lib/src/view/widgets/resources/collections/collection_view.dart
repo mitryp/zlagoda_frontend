@@ -1,11 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-
-import '../../../../model/basic_models/employee.dart';
+import '../../../../model/basic_models/receipt.dart';
 import '../../../../model/interfaces/convertible_to_pdf.dart';
+import '../../../../model/basic_models/employee.dart';
 import '../../../../model/interfaces/convertible_to_row.dart';
-import '../../../../model/other_models/table_receipt.dart';
 import '../../../../services/http/helpers/collection_slice_wrapper.dart';
 import '../../../../services/http/helpers/http_service_factory.dart';
 import '../../../../services/http/model_http_service.dart';
@@ -176,8 +175,9 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>,
   }
 
   Widget buildAddButton() {
-    final authStrategy =
-        SCol == TableReceipt ? hasPosition(Position.cashier) : hasPosition(Position.manager);
+    final authStrategy = SCol == Receipt
+        ? hasPosition(Position.cashier)
+        : hasPosition(Position.manager);
 
     return Authorizer.emptyUnauthorized(
         authorizationStrategy: authStrategy,

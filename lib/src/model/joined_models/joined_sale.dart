@@ -91,6 +91,9 @@ class JoinedSale extends Model with ConvertibleToRow<JoinedSale> {
   JsonMap toJson() => schema.toJson(this);
 
   @override
+  String toString() => '$upc, ${toHryvnas(price)}, $quantity';
+
+  @override
   Future<ValueStatusWrapper> redirectToModelView(BuildContext context) =>
       AppNavigation.of(context).toModelView<StoreProduct>(storeProductId);
 }

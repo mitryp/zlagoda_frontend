@@ -8,7 +8,6 @@ import '../../../model/interfaces/search_model.dart';
 import '../../../model/interfaces/serializable.dart';
 import '../../../model/joined_models/joined_store_product.dart';
 import '../../../model/joined_models/product_with_category.dart';
-import '../../../model/other_models/table_receipt.dart';
 import '../../../model/search_models/short_category.dart';
 import '../../../model/search_models/short_cashier.dart';
 import '../../../model/search_models/short_client.dart';
@@ -26,7 +25,6 @@ const _classesToServiceConstructors = <Type, Constructor<ModelHttpService>>{
   ProductWithCategory: ProductService.new,
   Client: ClientService.new,
   Receipt: ReceiptService.new,
-  TableReceipt: ReceiptService.new,
   Category: CategoryService.new
 };
 

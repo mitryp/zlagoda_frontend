@@ -5,8 +5,10 @@ import '../../typedefs.dart';
 import '../../utils/coins_to_currency.dart';
 import '../../utils/navigation.dart';
 import '../../utils/value_status.dart';
+import '../../view/dialogs/confirmation_dialog.dart';
 import '../../view/dialogs/contents/prom_store_product_creation_dialog_content.dart';
 import '../../view/dialogs/creation_dialog.dart';
+import '../../view/widgets/resources/models/model_edit_view.dart';
 import '../basic_models/store_product.dart';
 import '../interfaces/convertible_to_pdf.dart';
 import '../interfaces/convertible_to_row.dart';
@@ -100,7 +102,7 @@ class JoinedStoreProduct extends _JoinedStoreProduct
           PromStoreProductTextField(controller: textController, validator: isPositiveInteger),
       buttonProps: [
         ButtonProps<StoreProduct>(
-          fetchCallback: (quantity) => post(PromStoreProduct(
+          fetchCallback: (quantity) => PromStoreProductService.post(PromStoreProduct(
             baseStoreProductId: storeProductId,
             quantity: quantity,
           )),
@@ -109,6 +111,20 @@ class JoinedStoreProduct extends _JoinedStoreProduct
         )
       ],
     );
+  }
+
+  void _onDeleteDiscountProduct(BuildContext context) async {
+    final isConfirmed = await showConfirmationDialog(
+      context: context,
+      builder: (context) {
+        return const ConfirmationDialog.message('Ви точно хочете видалити цей ресурс?');
+      },
+    );
+
+    if (!isConfirmed) return;
+    final res = await PromStoreProductService.delete(storeProductId);
+    if (!res || !context.mounted) return;
+    Navigator.of(context).pop(ValueStatusWrapper<StoreProduct>.deleted());
   }
 
   Widget _addDiscountProductButton(BuildContext context) {
@@ -130,26 +146,31 @@ class JoinedStoreProduct extends _JoinedStoreProduct
 
     return AppNavigation.of(context).openModelViewFor<StoreProduct>(
       storeProduct,
-      additionalButtonsBuilders: isProm ? null : [_addDiscountProductButton],
+      additionalButtonsBuilders: isProm
+          ? [(context) => buildDeleteButton(() => _onDeleteDiscountProduct(context))]
+          : [_addDiscountProductButton],
     );
   }
 
+  List<String> get cellsData => [
+        upc,
+        productName,
+        manufacturer,
+        toHryvnas(price),
+        quantity.toString(),
+        toHryvnas(price * quantity),
+        isProm ? 'Так' : 'Ні',
+      ];
+
   @override
   DataRow buildRow(BuildContext context, UpdateCallback<ValueChangeStatus> updateCallback) {
-    final cells = [
-      upc,
-      productName,
-      manufacturer,
-      toHryvnas(price),
-      quantity.toString(),
-      toHryvnas(price * quantity),
-      isProm ? 'Так' : 'Ні',
-    ];
-
     return DataRow(
-      cells: cells.map((cell) => DataCell(Text(cell))).toList(),
+      cells: cellsData.map((cell) => DataCell(Text(cell))).toList(),
       onSelectChanged: (_) async =>
           updateCallback(await redirectToModelView(context).then((v) => v.status)),
     );
   }
+
+  @override
+  List<dynamic> get pdfRow => cellsData;
 }
