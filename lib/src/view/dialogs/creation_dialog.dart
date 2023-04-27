@@ -45,21 +45,13 @@ class _CreationDialogState extends State<CreationDialog> {
     if (!formKey.currentState!.validate()) return;
 
     setState(() => isLoading = true);
-    StoreProduct? res;
-    try {
-      res = await props.fetchCallback(int.parse(widget.controller.text)) as StoreProduct?;
-    } on FormatException {
-      print('caught format exception when trying to decode store product in prom store product');
-      res = const StoreProduct(upc: 'upc', price: -1, quantity: -1); // todo remove
-    }
+    final res = await props.fetchCallback(int.parse(widget.controller.text)) as StoreProduct?;
     if (!mounted) return;
 
     setState(() => isLoading = false);
     if (res == null) return;
 
-    // todo make this work
-    // Navigator.of(context).pop(ValueStatusWrapper<StoreProduct>.updated(res));
-    Navigator.of(context).pop(ValueStatusWrapper<StoreProduct>.deleted());
+    Navigator.of(context).pop(ValueStatusWrapper<StoreProduct>.updated(res));
   }
 
   Widget buildButtonFromProp(ButtonProps props) {
