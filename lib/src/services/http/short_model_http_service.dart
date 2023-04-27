@@ -20,7 +20,7 @@ class ShortModelHttpService<SM extends ShortModel> {
     final response = await makeRequest(
       HttpMethod.get,
       Uri.http(baseRoute, route),
-    ).catchError((err) => http.Response(err.message, 503));
+    );
 
     return httpServiceController(response, (response) {
       return decodeResponseBody<List<dynamic>>(response)

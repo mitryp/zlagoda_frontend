@@ -41,5 +41,8 @@ Future<http.Response> makeRequest(HttpMethod method, Uri path, {Object? body}) a
     ..body = body != null ? jsonEncode(body) : ''
     ..headers['Content-Type'] = 'application/json; charset=utf-8';
 
-  return http.Client().send(await applyRequestMiddleware(req)).then(http.Response.fromStream);
+  return http.Client()
+      .send(await applyRequestMiddleware(req))
+      .then(http.Response.fromStream)
+      .catchError((err) => http.Response('{"message": "$err"}', 503));
 }

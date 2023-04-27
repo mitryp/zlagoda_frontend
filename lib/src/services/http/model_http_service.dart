@@ -45,8 +45,6 @@ abstract class ModelHttpService<SCol extends Serializable, SSingle extends Seria
           baseRoute,
           makeRoute(queryBuilder.subRoute.isNotEmpty ? queryBuilder.subRoute : null),
           queryBuilder.queryParams),
-    ).catchError(
-      (err) => http.Response(err is http.ClientException ? err.message : 'Unknown $err', 503),
     );
 
     final totalCount = int.tryParse(response.headers['x-total-count']??'')??0;
@@ -62,8 +60,7 @@ abstract class ModelHttpService<SCol extends Serializable, SSingle extends Seria
   }
 
   Future<SSingle?> singleById(dynamic id) async {
-    final response = await makeRequest(HttpMethod.get, Uri.http(baseRoute, makeRoute(id)))
-        .catchError((err) => http.Response('$err', 503));
+    final response = await makeRequest(HttpMethod.get, Uri.http(baseRoute, makeRoute(id)));
 
     return httpServiceController(response, _tryDecodeSingleResource);
   }
@@ -73,7 +70,7 @@ abstract class ModelHttpService<SCol extends Serializable, SSingle extends Seria
       HttpMethod.post,
       Uri.http(baseRoute, makeRoute()),
       body: row.toJson(),
-    ).catchError((err) => http.Response(err.message, 503));
+    );
 
     return httpServiceController(response, _tryDecodeSingleResource);
   }
@@ -83,14 +80,13 @@ abstract class ModelHttpService<SCol extends Serializable, SSingle extends Seria
       HttpMethod.put,
       Uri.http(baseRoute, makeRoute(primaryKey)),
       body: row.toJson(),
-    ).catchError((err) => http.Response(err.message, 503));
+    );
 
     return httpServiceController(response, _tryDecodeSingleResource);
   }
 
   Future<bool> delete(dynamic id) async {
-    final response = await makeRequest(HttpMethod.delete, Uri.http(baseRoute, makeRoute(id)))
-        .catchError((err) => http.Response(err.message, 503));
+    final response = await makeRequest(HttpMethod.delete, Uri.http(baseRoute, makeRoute(id)));
 
     return httpServiceController(response, (response) => true, (response) => false);
   }

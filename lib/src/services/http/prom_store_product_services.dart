@@ -5,7 +5,7 @@ import '../../model/other_models/prom_store_product.dart';
 import '../../utils/json_decode.dart';
 import 'helpers/http_service_helper.dart';
 
-String makeRoute(int id) => 'api/store_products/$id/prom';
+String _makeRoute(int id) => 'api/store_products/$id/prom';
 
 class PromStoreProductService {
   static StoreProduct? _tryDecodeSingleResource(http.Response response) {
@@ -22,9 +22,9 @@ class PromStoreProductService {
   static Future<StoreProduct?> post(PromStoreProduct row) async {
     final response = await makeRequest(
       HttpMethod.post,
-      Uri.http(baseRoute, makeRoute(row.baseStoreProductId)),
+      Uri.http(baseRoute, _makeRoute(row.baseStoreProductId)),
       body: row.toJson(),
-    ).catchError((err) => http.Response(err.message, 503));
+    );
 
     return httpServiceController(response, _tryDecodeSingleResource, (response) => null);
   }
@@ -32,19 +32,18 @@ class PromStoreProductService {
   static Future<StoreProduct?> update(PromStoreProduct row, {required bool controlTotalQuantity}) async {
     final response = await makeRequest(
       HttpMethod.patch,
-      Uri.http(baseRoute, makeRoute(row.baseStoreProductId)),
+      Uri.http(baseRoute, _makeRoute(row.baseStoreProductId)),
       body: {
         ...row.toJson(),
         'controlTotalQuantity': controlTotalQuantity,
       },
-    ).catchError((err) => http.Response(err.message, 503));
+    );
 
     return httpServiceController(response, _tryDecodeSingleResource, (response) => null);
   }
 
   static Future<bool> delete(int id) async {
-    final response = await makeRequest(HttpMethod.delete, Uri.http(baseRoute, makeRoute(id)))
-        .catchError((err) => http.Response(err.message, 503));
+    final response = await makeRequest(HttpMethod.delete, Uri.http(baseRoute, _makeRoute(id)));
 
     return httpServiceController(response, (response) => true, (response) => false);
   }

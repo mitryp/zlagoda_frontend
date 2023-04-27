@@ -117,7 +117,7 @@ Future<String> makeStatsRequest<T>(
   final response = await makeRequest(
     HttpMethod.get,
     Uri.http(baseRoute, statsFetcher.url, params == null ? null : Map.fromEntries(params)),
-  ).catchError((err) => Response('', 503));
+  );
 
   return httpServiceController(
     response,

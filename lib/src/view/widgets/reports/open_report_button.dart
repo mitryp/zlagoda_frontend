@@ -121,6 +121,7 @@ class _ReportButtonState<CTPdf extends ConvertibleToPdf<CTPdf>>
     ).catchError((err) {
       if (!mounted) return null;
       setState(() => child = const Text('Помилка'));
+      return null;
     });
   }
 }
