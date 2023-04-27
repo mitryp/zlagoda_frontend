@@ -31,7 +31,7 @@ class FieldDescription<R, O> {
   final SerializableFieldEditor? serializableEditorBuilder;
   final DateConstraints? dateConstraints;
   final ForeignKey? defaultForeignKey;
-  final TransitiveFieldPresentation? transitiveFieldPresentation;
+  final TransitiveFieldPresentation<R>? transitiveFieldPresentation;
   final ForeignKeyOptionality? foreignKeyOptionality;
 
   const FieldDescription(
@@ -147,7 +147,7 @@ class FieldDescription<R, O> {
     final value = fieldGetter(object);
 
     if (value == null) {
-      return '';
+      return 'немає даних';
     }
 
     if (fieldType == FieldType.transitive) {

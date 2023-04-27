@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 
 import '../../model/schema/extractors.dart';
 import '../../services/http/helpers/http_service_helper.dart';
@@ -113,7 +112,7 @@ Future<String> makeStatsRequest<T>(
       (e) => statsFetcher.allowedFilters.map((e) => '${e.name}Filter').contains(e.key),
     );
   }
-  print('params: $params, queryBuilder params: ${queryBuilder?.queryParams}');
+
   final response = await makeRequest(
     HttpMethod.get,
     Uri.http(baseRoute, statsFetcher.url, params == null ? null : Map.fromEntries(params)),

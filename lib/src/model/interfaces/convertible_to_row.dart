@@ -2,11 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../typedefs.dart';
 import '../../utils/value_status.dart';
-import '../joined_models/joined_store_product.dart';
-import '../joined_models/product_with_category.dart';
-import '../model_schema_factory.dart';
-import '../schema/field_description.dart';
-import '../schema/schema.dart';
 import 'convertibles_helper.dart';
 import 'serializable.dart';
 

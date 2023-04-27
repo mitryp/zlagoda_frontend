@@ -1,5 +1,4 @@
 import '../../typedefs.dart';
-import '../basic_models/category.dart';
 import '../interfaces/search_model.dart';
 import '../schema/field_description.dart';
 import '../schema/schema.dart';

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../../typedefs.dart';
-import '../../utils/coins_to_currency.dart';
 import '../../utils/navigation.dart';
 import '../../utils/value_status.dart';
 import '../common_models/name.dart';
 import '../interfaces/convertible_to_pdf.dart';
 import '../interfaces/convertible_to_row.dart';
+import '../interfaces/model.dart';
 import '../joined_models/joined_sale.dart';
 import '../model_reference.dart';
 import '../schema/date_constraints.dart';
@@ -17,46 +17,40 @@ import '../search_models/short_cashier.dart';
 import '../search_models/short_client.dart';
 import 'client.dart';
 import 'employee.dart';
-import '../interfaces/model.dart';
 
-class Receipt extends Model
-    with ConvertibleToRow<Receipt>, ConvertibleToPdf<Receipt> {
+class Receipt extends Model with ConvertibleToRow<Receipt>, ConvertibleToPdf<Receipt> {
   static final Schema<Receipt> schema = Schema(
     Receipt.new,
     [
-      FieldDescription<int?, Receipt>(
-          'receiptId',
-              (o) => o.receiptId,
+      FieldDescription<int?, Receipt>('receiptId', (o) => o.receiptId,
           labelCaption: 'Номер чеку',
           fieldType: FieldType.number,
-          fieldDisplayMode: FieldDisplayMode.none
-      ),
+          fieldDisplayMode: FieldDisplayMode.none),
       FieldDescription<String?, Receipt>.stringForeignKey(
         'clientId',
-            (o) => o.clientId,
+        (o) => o.clientId,
         labelCaption: 'Номер картки клієнта',
         defaultForeignKey: foreignKey<Client, ShortClient>('clientId'),
         fieldDisplayMode: FieldDisplayMode.none,
       ),
       FieldDescription<Name?, Receipt>.serializable(
         'clientName',
-            (o) => o.clientName,
+        (o) => o.clientName,
         labelCaption: "Ім'я клієнта",
         serializableEditorBuilder: nameEditorBuilder,
       ),
       FieldDescription<DateTime, Receipt>(
         'date',
-            (o) => o.date,
+        (o) => o.date,
         labelCaption: 'Дата',
         fieldType: FieldType.datetime,
-        dateConstraints:
-        const DateConstraints(toFirstDate: Duration(days: 365 * 100)),
+        dateConstraints: const DateConstraints(toFirstDate: Duration(days: 365 * 100)),
       ),
       FieldDescription<int, Receipt>(
         'tax',
-            (o) => o.tax,
+        (o) => o.tax,
         labelCaption: 'Податок',
-        fieldType: FieldType.number,
+        fieldType: FieldType.currency,
       ),
       FieldDescription<int, Receipt>(
         'discount',
@@ -66,26 +60,26 @@ class Receipt extends Model
       ),
       FieldDescription<int, Receipt>(
         'cost',
-            (o) => o.cost,
+        (o) => o.cost,
         labelCaption: 'Загальна вартість',
         fieldType: FieldType.currency,
       ),
       FieldDescription<String, Receipt>.stringForeignKey(
         'employeeId',
-            (o) => o.employeeId,
+        (o) => o.employeeId,
         labelCaption: 'Табельний номер працівника',
         defaultForeignKey: foreignKey<Employee, ShortCashier>('employeeId'),
         fieldDisplayMode: FieldDisplayMode.none,
       ),
       FieldDescription<Name, Receipt>.serializable(
         'employeeName',
-            (o) => o.employeeName,
+        (o) => o.employeeName,
         labelCaption: "Ім'я касира",
         serializableEditorBuilder: nameEditorBuilder,
       ),
       FieldDescription<List<JoinedSale>, Receipt>(
         'sales',
-            (o) => o.sales,
+        (o) => o.sales,
         labelCaption: 'Продані товари',
         fieldType: FieldType.auto,
         fieldDisplayMode: FieldDisplayMode.none,
@@ -130,32 +124,11 @@ class Receipt extends Model
       AppNavigation.of(context).toModelView<Receipt>(primaryKey);
 
   @override
-  DataRow buildRow(BuildContext context,
-      UpdateCallback<ValueChangeStatus> updateCallback) {
-    final cellValues = [
-      FieldType.datetime.presentation(date),
-      clientName?.fullName ?? 'немає даних',
-      employeeName.fullName,
-      toHryvnas(cost),
-      toHryvnas(tax),
-      '$discount %'
-    ];
-    return DataRow(
-      cells: cellValues.map((v) => DataCell(Text(v))).toList(),
-      onSelectChanged: (_) async =>
-          updateCallback(
-              await redirectToModelView(context).then((v) => v.status)),
-    );
-  }
+  List<dynamic> get pdfRow => schema.fields.map((field) {
+        final value = field.fieldGetter(this);
 
-  @override
-  List<dynamic> get pdfRow => schema.fields.map((field)
-  {
-    final value = field.fieldGetter(this);
+        if (value is List<JoinedSale>) return value.join('\n');
 
-    if (value is List<JoinedSale>)
-      return value.join('\n');
-
-    return value;
-  }).toList();
+        return value;
+      }).toList();
 }

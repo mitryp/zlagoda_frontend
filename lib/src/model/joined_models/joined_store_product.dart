@@ -95,8 +95,8 @@ class JoinedStoreProduct extends _JoinedStoreProduct
   @override
   JsonMap toJson() => schema.toJson(this);
 
-  void _onAddDiscountProduct(BuildContext context) {
-    showCreationDialog(
+  Future<ValueStatusWrapper<StoreProduct>> _onAddDiscountProduct(BuildContext context) {
+    return showCreationDialog<ValueStatusWrapper<StoreProduct>>(
       context: context,
       inputBuilder: (textController) =>
           PromStoreProductTextField(controller: textController, validator: isPositiveInteger),
@@ -110,7 +110,7 @@ class JoinedStoreProduct extends _JoinedStoreProduct
           message: 'На основі неакційного товару',
         )
       ],
-    );
+    ).then((wr) => wr ?? ValueStatusWrapper<StoreProduct>.notChanged());
   }
 
   void _deleteDiscountProduct(BuildContext context) async {
@@ -132,7 +132,11 @@ class JoinedStoreProduct extends _JoinedStoreProduct
     return OutlinedButton.icon(
       label: const Text('Додати акційний товар'),
       icon: const Icon(Icons.add),
-      onPressed: () => _onAddDiscountProduct(context),
+      onPressed: () async {
+        final res = await _onAddDiscountProduct(context);
+        if (!context.mounted || res.status == ValueChangeStatus.notChanged) return;
+        Navigator.of(context).pop(res);
+      },
     );
   }
 

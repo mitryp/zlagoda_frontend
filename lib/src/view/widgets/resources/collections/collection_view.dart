@@ -1,9 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+
+import '../../../../model/basic_models/employee.dart';
 import '../../../../model/basic_models/receipt.dart';
 import '../../../../model/interfaces/convertible_to_pdf.dart';
-import '../../../../model/basic_models/employee.dart';
 import '../../../../model/interfaces/convertible_to_row.dart';
 import '../../../../services/http/helpers/collection_slice_wrapper.dart';
 import '../../../../services/http/helpers/http_service_factory.dart';
@@ -124,8 +125,9 @@ class _CollectionViewState<SCol extends ConvertibleToRow<SCol>,
                 buildSearchFilters(),
                 ReportButton<CTPdf>(queryBuilder: widget.initialQB),
               ]),
-          ConstrainedBox(
+          Container(
             constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width / 2),
+            alignment: Alignment.topLeft,
             child: CollectionTable<SCol>(
               itemsSupplier: () => httpService.get(widget.queryBuilder),
               updateStream: updateStreamController.stream,

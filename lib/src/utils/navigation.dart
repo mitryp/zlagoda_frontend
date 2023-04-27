@@ -60,6 +60,7 @@ class AppNavigation {
         .push<ValueStatusWrapper<SSingle>>(
           MaterialPageRoute(
             builder: (context) => ModelView<SSingle>(
+              key: SSingle == Product ? GlobalKey<ModelViewState<SSingle>>() : null,
               fetchFunction: () => model,
               connectedTables: connectedTables,
               additionalButtonsBuilders: additionalButtonsBuilders,

@@ -50,7 +50,9 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
             : field.presentFieldOf(model);
       }
 
-      fieldsToControllers[field] = TextEditingController(text: presentation);
+      fieldsToControllers[field] = TextEditingController(
+        text: field.fieldType != FieldType.password ? presentation?.replaceAll(' грн.', '') : null,
+      );
     }
 
     for (final field in schema.fields.where((e) => e.fieldType == FieldType.serializable)) {
@@ -326,8 +328,10 @@ class _ModelEditFormState<M extends Model> extends State<ModelEditForm<M>> {
 
       if (controller.text.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          statusSnackBar("Значення обов'язкового посилання "
-              '"${field.labelCaption}" не встановлено', isSuccess: false),
+          statusSnackBar(
+              "Значення обов'язкового посилання "
+              '"${field.labelCaption}" не встановлено',
+              isSuccess: false),
         );
         return false;
       }

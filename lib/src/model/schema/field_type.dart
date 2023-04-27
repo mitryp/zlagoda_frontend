@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../utils/coins_to_currency.dart';
+
 typedef TypeConverter<T> = T Function(String);
 typedef PresentationFunction<T> = String Function(T);
 
@@ -32,7 +34,8 @@ String _presentBool(b) => b as bool ? 'Так' : 'Ні';
 
 String _stringConverter(string) => (string as String).trim();
 
-int _currencyConverter(coins) => (double.parse(_stringConverter(coins as String)) * 100).toInt();
+int _currencyConverter(hryvnyas) =>
+    (double.parse(_stringConverter(hryvnyas as String).replaceFirst(' грн.', '')) * 100).toInt();
 
 String _toString(d) => d.toString();
 
@@ -52,7 +55,7 @@ String _presentDateTime(d) {
 
 bool _boolConverter(boolStr) => (boolStr as String) == 'Так';
 
-String _presentCurrency(coins) => ((coins as int) / 100).toStringAsFixed(2);
+String _presentCurrency(coins) => toHryvnas(coins as int);
 
 DateTime _dateConverter(String date) {
   final parts = date.split('.').map(int.parse).toList();

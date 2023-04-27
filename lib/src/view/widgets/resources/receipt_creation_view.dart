@@ -6,6 +6,7 @@ import '../../../model/search_models/short_client.dart';
 import '../../../model/search_models/short_store_product.dart';
 import '../../../services/http/helpers/http_service_factory.dart';
 import '../../../services/http/helpers/http_service_helper.dart';
+import '../../../services/middleware/response/response_display_middleware.dart';
 import '../../../theme.dart';
 import '../../../typedefs.dart';
 import '../../../utils/json_decode.dart';
@@ -132,20 +133,14 @@ class _ReceiptCreationViewState extends State<ReceiptCreationView> {
     if (!formKey.currentState!.validate()) {
       return null;
     }
-    if (clientId == null) {
-      messenger.showSnackBar(const SnackBar(
-        content: Text('Будь ласка, оберіть покупця зі списку перед тим, як продовжити'),
-      ));
-      return null;
-    }
+
     final salesJson = sales.map((s) => s.toJson()).where((e) => e != null).toList();
     if (salesJson.isEmpty) {
-      messenger.showSnackBar(
-        const SnackBar(
-          content: Text('Список продажів не може бути порожнім (впевніться, '
-              'що ви обрали товари для всіх продажів)'),
-        ),
-      );
+      messenger.showSnackBar(statusSnackBar(
+        'Список продажів не може бути порожнім (впевніться, '
+        'що ви обрали товари для всіх продажів)',
+        isSuccess: false,
+      ));
       return null;
     }
 
@@ -185,11 +180,15 @@ class _ReceiptCreationViewState extends State<ReceiptCreationView> {
         color: secondary.withOpacity(.1),
       ),
       child: ModelSearchInitiator<String, ShortClient>(
+        preserveSearchOnCancel: false,
         selectionBuilder: (context, selected) {
           const commonStyle = TextStyle(fontSize: 16);
 
           if (selected == null) {
-            return const Text('Обрати покупця', style: commonStyle);
+            return const Text(
+              'Обрати картку постійного клієнта (за наявності)',
+              style: commonStyle,
+            );
           }
           return Text.rich(
             TextSpan(

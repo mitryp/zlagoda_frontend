@@ -9,7 +9,7 @@ import '../../../utils/value_status.dart';
 import '../contents/prom_store_product_creation_dialog_content.dart';
 import '../creation_dialog.dart';
 
-Future<ValueStatusWrapper<StoreProduct>?> showPromCreationDialog(
+Future<ValueStatusWrapper<StoreProduct>> showPromCreationDialog(
     BuildContext context, StoreProduct model) {
   return showCreationDialog<ValueStatusWrapper<StoreProduct>>(
     context: context,
@@ -45,5 +45,5 @@ Future<ValueStatusWrapper<StoreProduct>?> showPromCreationDialog(
             'зміни кількості неакційних товарів',
       ),
     ],
-  );
+  ).then((wr) => wr ?? ValueStatusWrapper<StoreProduct>.notChanged());
 }
