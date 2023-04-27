@@ -15,19 +15,16 @@ class Address implements Serializable {
         'city',
         (o) => o.city,
         labelCaption: 'Місто',
-        validator: notEmpty,
       ),
       FieldDescription<String, Address>(
         'street',
         (o) => o.street,
         labelCaption: 'Вулиця',
-        validator: notEmpty,
       ),
       FieldDescription<String, Address>(
         'index',
         (o) => o.index,
         labelCaption: 'Поштовий індекс',
-        validator: notEmpty,
       ),
     ],
   );
