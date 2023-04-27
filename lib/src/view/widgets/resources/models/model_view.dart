@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../model/basic_models/category.dart';
 import '../../../../model/basic_models/client.dart';
 import '../../../../model/basic_models/employee.dart';
 import '../../../../model/basic_models/product.dart';
@@ -45,7 +46,7 @@ class ModelViewState<M extends Model> extends State<ModelView<M>> {
   ValueStatusWrapper<M> changeStatus = ValueStatusWrapper.notChanged();
 
   UserAuthorizationStrategy get authStrategy =>
-      (M == StoreProduct || M == Product || M == Receipt || M == Client || M == Employee)
+      ([StoreProduct, Product, Receipt, Client, Employee, Category].contains(M))
           ? hasUser
           : hasPosition(Position.manager);
 
