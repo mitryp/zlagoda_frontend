@@ -126,8 +126,11 @@ class SpecialQueriesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: makeSeparated(specialQueries.map((e) => buildQueryButton(e, context)).toList()),
+    return Scaffold(
+      appBar: AppBar(),
+      body: Column(
+        children: makeSeparated(specialQueries.map((e) => buildQueryButton(e, context)).toList()),
+      ),
     );
   }
 
@@ -146,7 +149,7 @@ class SpecialQueriesPage extends StatelessWidget {
   }
 
   Widget makeDialog(SpecialQuery query) {
-    if (query.queryType == QueryType.static) {
+    if (query.isStaticQuery) {
       return StaticSpecialQueryDialog(query);
     }
 
@@ -195,6 +198,12 @@ class _StaticSpecialQueryDialogState extends State<StaticSpecialQueryDialog> {
 
   @override
   Widget build(BuildContext context) {
+    return Dialog(
+      child: buildContent(),
+    );
+  }
+
+  Widget buildContent() {
     if (!isLoaded) {
       return const Center(
         child: CircularProgressIndicator(),
@@ -231,6 +240,43 @@ class _SingleInputQueryDialogState extends State<SingleInputQueryDialog> {
   bool isLoading = false;
   bool isLoaded = false;
 
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Column(
+        children: [
+          Form(
+            key: formKey,
+            child: widget.inputBuilder(controller),
+          ),
+          OutlinedButton(onPressed: _processFetch, child: const Text('Виконати запит')),
+          buildOutput(),
+        ],
+      ),
+    );
+  }
+
+  Widget buildOutput() {
+    if (isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    if (!isLoaded) {
+      return const Center(
+        child: Text('Запиту ще не було'),
+      );
+    }
+
+    return widget.query.makePresentationWidget(context, json);
+  }
+
+  void _processFetch() {
+    if (!formKey.currentState!.validate()) return;
+    fetchQuery(widget.query.inputConverter!(controller.text));
+  }
+
   Future<void> fetchQuery(dynamic param) async {
     setState(() {
       isLoading = true;
@@ -257,38 +303,5 @@ class _SingleInputQueryDialogState extends State<SingleInputQueryDialog> {
       isLoading = false;
       isLoaded = true;
     });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Form(
-          key: formKey,
-          child: widget.inputBuilder(controller),
-        ),
-        OutlinedButton(onPressed: _processFetch, child: const Text('Виконати запит')),
-      ],
-    );
-  }
-
-  Widget buildOutput() {
-    if (isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
-
-    if (!isLoaded) {
-      return const Center(
-        child: Text('Запиту ще не було'),
-      );
-    }
-
-    return widget.query.makePresentationWidget(context, json);
-  }
-
-  void _processFetch() {
-    if (!formKey.currentState!.validate()) return;
   }
 }
