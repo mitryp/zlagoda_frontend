@@ -8,10 +8,13 @@ import '../../../model/interfaces/convertibles_helper.dart';
 import '../../../model/interfaces/model.dart';
 import '../../../model/joined_models/joined_sale.dart';
 import '../../../model/schema/field_type.dart';
+import '../../../services/http/helpers/http_service_helper.dart';
 import '../../../utils/coins_to_currency.dart';
 import '../../../utils/navigation.dart';
 import '../../../utils/value_status.dart';
+import '../../dialogs/confirmation_dialog.dart';
 import '../text_link.dart';
+import 'models/model_edit_view.dart';
 
 typedef ReceiptFetchFunction = Future<Receipt> Function();
 
@@ -45,7 +48,6 @@ class _ReceiptModelViewState extends State<ReceiptModelView> {
       receipt = await widget.fetchFunction();
     } catch (err) {
       if (!mounted) return;
-      rethrow;
       return setState(() => error = err);
     }
 
@@ -54,28 +56,39 @@ class _ReceiptModelViewState extends State<ReceiptModelView> {
 
   @override
   Widget build(BuildContext context) {
+    Widget? guard;
+
     if (error != null) {
-      return Center(
+      guard = Center(
         child: Text('$error'),
       );
     }
 
     if (!isLoaded) {
-      return const Center(child: CircularProgressIndicator());
+      guard = const Center(child: CircularProgressIndicator());
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Чек')),
-      body: ConstrainedBox(
-        constraints: const BoxConstraints.tightFor(),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              buildReceiptInfo(),
-              buildSales(),
-            ],
-          ),
+      appBar: AppBar(
+        title: const Text('Чек'),
+        actions: [
+          if (isLoaded) buildDeleteButton(processDeletion),
+        ],
+      ),
+      body: guard ?? buildBody(),
+    );
+  }
+
+  ConstrainedBox buildBody() {
+    return ConstrainedBox(
+      constraints: const BoxConstraints.tightFor(),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            buildReceiptInfo(),
+            buildSales(),
+          ],
         ),
       ),
     );
@@ -178,5 +191,23 @@ class _ReceiptModelViewState extends State<ReceiptModelView> {
         });
       },
     );
+  }
+
+  Future<void> processDeletion() async {
+    final isConfirmed = await showConfirmationDialog(
+      context: context,
+      builder: (context) => const ConfirmationDialog.message('Ви точно хочете видалити чек?'),
+    );
+
+    if (!mounted || !isConfirmed) return;
+
+    final response = await makeRequest(
+      HttpMethod.delete,
+      Uri.http(baseRoute, 'api/receipts/${receipt.receiptId}'),
+    );
+
+    final deleted = await httpServiceController(response, (response) => true, (response) => false);
+    if (!mounted || !deleted) return;
+    Navigator.of(context).pop(ValueStatusWrapper<Receipt>.deleted());
   }
 }
