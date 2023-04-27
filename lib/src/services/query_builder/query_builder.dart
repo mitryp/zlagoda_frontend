@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import '../../model/basic_models/employee.dart';
 import 'filter.dart';
 import 'sort.dart';
@@ -6,6 +8,7 @@ class QueryBuilder {
   int paginationLimit = 0;
   int paginationOffset = 0;
   final Set<Filter> _filters = {};
+  final Map _otherParams = {};
   Sort sort;
   String subRoute;
 
@@ -18,6 +21,9 @@ class QueryBuilder {
 
   void removeFilter(FilterOption filterOption) =>
       _filters.removeWhere((e) => e.filterOption == filterOption);
+
+  void addOtherParam(String key, dynamic value) =>
+    _otherParams[key] = value;
 
   Set<Filter> get filters => _filters;
 
@@ -38,6 +44,9 @@ class QueryBuilder {
 
       queryParams['${filter.fieldName}Filter'] = '$value';
     }
+
+    for (final param in _otherParams.keys)
+      queryParams[param] = '${_otherParams[param]}';
 
     return queryParams;
   }
