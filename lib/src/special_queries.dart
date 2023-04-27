@@ -10,35 +10,22 @@ abstract class SpecialQuery {
   final String path;
   final String? parameterName;
   final String queryName;
-  final QueryType queryType;
   final InputBuilder? inputBuilder;
   final InputConverter? inputConverter;
 
   const SpecialQuery(
     this.path,
-    this.queryName,
-    this.queryType, {
+    this.queryName, {
     this.parameterName,
     this.inputBuilder,
     this.inputConverter,
   });
 
+  bool get isStaticQuery => parameterName == null;
+
   Uri makeUri(Map<String, String> queryParams);
 
   Widget makePresentationWidget(BuildContext context, dynamic json);
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is SpecialQuery && runtimeType == other.runtimeType && path == other.path;
-
-  @override
-  int get hashCode => path.hashCode;
-}
-
-enum QueryType {
-  static,
-  withParam;
 }
 
 class CustomersWithMinPurchasesCount extends SpecialQuery {
