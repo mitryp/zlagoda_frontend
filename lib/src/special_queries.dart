@@ -12,7 +12,7 @@ abstract class SpecialQuery {
 
   Uri makeUri(Map<String, String> queryParams);
 
-  Widget makePresentationWidget(BuildContext context, JsonMap json);
+  Widget makePresentationWidget(BuildContext context, dynamic json);
 
   @override
   bool operator ==(Object other) =>
@@ -27,7 +27,7 @@ class CustomersWithMinPurchasesCount extends SpecialQuery {
   const CustomersWithMinPurchasesCount() : super('api/clients/?');
 
   @override
-  Widget makePresentationWidget(BuildContext context, JsonMap json) {
+  Widget makePresentationWidget(BuildContext context, dynamic json) {
     // TODO: implement makePresentationWidget
     throw UnimplementedError();
   }

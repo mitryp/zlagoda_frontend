@@ -199,7 +199,7 @@ class _SingleInputQueryPageState extends State<SingleInputQueryPage> {
   final controller = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
-  late JsonMap json;
+  late dynamic json;
   bool isLoading = false;
   bool isLoaded = false;
 
