@@ -113,7 +113,7 @@ class JoinedStoreProduct extends _JoinedStoreProduct
     );
   }
 
-  void _onDeleteDiscountProduct(BuildContext context) async {
+  void _deleteDiscountProduct(BuildContext context) async {
     final isConfirmed = await showConfirmationDialog(
       context: context,
       builder: (context) {
@@ -122,7 +122,8 @@ class JoinedStoreProduct extends _JoinedStoreProduct
     );
 
     if (!isConfirmed) return;
-    final res = await PromStoreProductService.delete(storeProductId);
+
+    final res = await PromStoreProductService.delete(baseStoreProductId!);
     if (!res || !context.mounted) return;
     Navigator.of(context).pop(ValueStatusWrapper<StoreProduct>.deleted());
   }
@@ -147,8 +148,8 @@ class JoinedStoreProduct extends _JoinedStoreProduct
     return AppNavigation.of(context).openModelViewFor<StoreProduct>(
       storeProduct,
       additionalButtonsBuilders: isProm
-          ? [(context) => buildDeleteButton(() => _onDeleteDiscountProduct(context))]
-          : [_addDiscountProductButton],
+          ? [(context) => buildDeleteButton(() => _deleteDiscountProduct(context))]
+          : [(context) => _addDiscountProductButton(context)],
     );
   }
 
