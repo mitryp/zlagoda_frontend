@@ -128,8 +128,10 @@ class SpecialQueriesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Column(
-        children: makeSeparated(specialQueries.map((e) => buildQueryButton(e, context)).toList()),
+      body: Center(
+        child: Column(
+          children: makeSeparated(specialQueries.map((e) => buildQueryButton(e, context)).toList()),
+        ),
       ),
     );
   }
@@ -186,7 +188,7 @@ class _StaticSpecialQueryDialogState extends State<StaticSpecialQueryDialog> {
     final res = await httpServiceController<dynamic>(
       response,
       (response) => decodeResponseBody(response),
-      (response) => {},
+      (response) => null,
     );
 
     if (!mounted) return;
@@ -285,7 +287,10 @@ class _SingleInputQueryDialogState extends State<SingleInputQueryDialog> {
 
     final response = await makeRequest(
       HttpMethod.get,
-      widget.query.makeUri({widget.query.parameterName!: param.toString()}),
+      widget.query.makeUri({
+        if (param != null && (param is! String || param.isNotEmpty))
+          widget.query.parameterName!: param.toString()
+      }),
     );
 
     if (!mounted) return;

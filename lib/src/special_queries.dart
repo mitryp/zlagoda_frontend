@@ -195,9 +195,9 @@ class SoldFor extends SpecialQuery {
                 DataCell(Text(item['upc'])),
                 DataCell(Text(item['productName'])),
                 DataCell(Text(item['categoryName'])),
-                DataCell(Text(item['soldFor'])),
+                DataCell(Text('${item['soldFor'] / 100} грн.')),
               ]))
-          .toList(),
+          .toList().cast<DataRow>(),
     );
   }
 }
@@ -215,7 +215,6 @@ class PurchasedByAllClients extends SpecialQuery {
   static Widget input(TextEditingController controller) {
     return TextFormField(
       controller: controller,
-      validator: notEmpty,
       autovalidateMode: AutovalidateMode.onUserInteraction,
     );
   }
@@ -238,7 +237,7 @@ class PurchasedByAllClients extends SpecialQuery {
                 DataCell(Text(item['productName'])),
                 DataCell(Text(item['categoryName'])),
               ]))
-          .toList(),
+          .toList().cast<DataRow>(),
     );
   }
 }
