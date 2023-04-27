@@ -68,7 +68,7 @@ class _DateFilterState extends State<DateFilter> {
     }
 
     final start = dateTimeRange.start;
-    final end = dateTimeRange.end;
+    final end = dateTimeRange.end.add(const Duration(hours: 23, minutes: 59, seconds: 59));
 
     widget.addFilter(Filter(FilterOption.dateMin, start));
     widget.addFilter(Filter(FilterOption.dateMax, end));
