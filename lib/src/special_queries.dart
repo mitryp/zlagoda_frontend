@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'services/http/helpers/http_service_helper.dart';
 
 import 'typedefs.dart';
 import 'view/dialogs/creation_dialog.dart';
@@ -10,20 +11,18 @@ abstract class SpecialQuery {
   final String path;
   final String? parameterName;
   final String queryName;
-  final QueryType queryType;
   final InputBuilder? inputBuilder;
   final InputConverter? inputConverter;
 
   const SpecialQuery(
     this.path,
-    this.queryName,
-    this.queryType, {
+    this.queryName,{
     this.parameterName,
     this.inputBuilder,
     this.inputConverter,
   });
 
-  Uri makeUri(Map<String, String> queryParams);
+  Uri makeUri(Map<String, String> queryParams) => Uri.http('$baseRoute/api', path, queryParams);
 
   Widget makePresentationWidget(BuildContext context, dynamic json);
 
@@ -36,23 +35,55 @@ abstract class SpecialQuery {
   int get hashCode => path.hashCode;
 }
 
-enum QueryType {
-  static,
-  withParam;
-}
-
-class CustomersWithMinPurchasesCount extends SpecialQuery {
-  const CustomersWithMinPurchasesCount() : super('api/clients/?');
+class RegularClients extends SpecialQuery {
+  const RegularClients() : super('clients/regular_clients', 'minPurchases');
 
   @override
   Widget makePresentationWidget(BuildContext context, dynamic json) {
-    // TODO: implement makePresentationWidget
-    throw UnimplementedError();
-  }
+    const columnNames = [
+      'Номер картки клієнта',
+      'Прізвище',
+      'Ім\'я',
+      'Кількість чеків'
+    ];
 
-  @override
-  Uri makeUri(Map<String, String> queryParams) {
-    // TODO: implement makeUri
-    throw UnimplementedError();
+    return DataTable(
+        columns: columnNames.map((name) => DataColumn(label: Text(name))).toList(),
+        rows: json.map((item) => DataRow(cells: [
+          DataCell(item['card_number']),
+          DataCell(item['cust_surname']),
+          DataCell(item['cust_name']),
+          DataCell(item['total_receipts']),
+        ])).toList(),
+    );
   }
 }
+
+// class ReceiptsWithAllCategories extends SpecialQuery {
+//   const ReceiptsWithAllCategories() : super('clients/receipts_with_all_categories');
+//
+//   @override
+//   Widget makePresentationWidget(BuildContext context, dynamic json) {
+//     const columnNames = [
+//       'Номер чека',
+//       'Табельний номер касира',
+//       'Ім\'я касира',
+//       'Номер карти клієнта',
+//       'Ім\'я клієнта',
+//       'Дата створення чека',
+//       'Вартість',
+//       'ПДВ',
+//     ];
+//
+//     return DataTable(
+//       columns: columnNames.map((name) => DataColumn(label: Text(name))).toList(),
+//       rows: json.map((item) => DataRow(cells: [
+//         DataCell(item['check_number']),
+//         DataCell(item['cust_surname']),
+//         DataCell(item['cust_name']),
+//         DataCell(item['total_receipts']),
+//       ])).toList(),
+//     );
+//   }
+// }
+//
