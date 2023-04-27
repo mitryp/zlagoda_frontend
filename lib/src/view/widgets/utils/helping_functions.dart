@@ -8,7 +8,7 @@ List<Widget> makeSeparated(List<Widget> widgets, [int separatorWidth = 16]) {
       .entries
       .map((entry) => entry.key == nOfElements - 1
       ? [entry.value]
-      : [entry.value, const SizedBox(width: 10)])
+      : [entry.value, const SizedBox.square(dimension: 10)])
       .expand((e) => e)
       .toList();
 }

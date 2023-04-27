@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../services/http/helpers/http_service_helper.dart';
 import '../../special_queries.dart';
-import '../../typedefs.dart';
 import '../../utils/json_decode.dart';
 import '../dialogs/creation_dialog.dart';
+import '../widgets/utils/helping_functions.dart';
 
 //
 // class SpecialQueriesPage extends StatefulWidget {
@@ -126,7 +126,35 @@ class SpecialQueriesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Column(
+      children: makeSeparated(specialQueries.map((e) => buildQueryButton(e, context)).toList()),
+    );
+  }
+
+  Widget buildQueryButton(SpecialQuery query, BuildContext context) {
+    return OutlinedButton(
+      onPressed: () => processQuery(query, context),
+      child: Text(query.queryName),
+    );
+  }
+
+  void processQuery(SpecialQuery query, BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => makeDialog(query),
+    );
+  }
+
+  Widget makeDialog(SpecialQuery query) {
+    if (query.queryType == QueryType.static) {
+      return StaticSpecialQueryDialog(query);
+    }
+
+    return SingleInputQueryDialog(
+      query,
+      inputBuilder: query.inputBuilder!,
+      inputConverter: query.inputConverter!,
+    );
   }
 }
 
@@ -140,7 +168,7 @@ class StaticSpecialQueryDialog extends StatefulWidget {
 }
 
 class _StaticSpecialQueryDialogState extends State<StaticSpecialQueryDialog> {
-  late final JsonMap json;
+  late final dynamic json;
   bool isLoaded = false;
 
   @override
@@ -152,13 +180,13 @@ class _StaticSpecialQueryDialogState extends State<StaticSpecialQueryDialog> {
   Future<void> fetchQuery() async {
     final response = await makeRequest(HttpMethod.get, widget.query.makeUri({}));
 
-    final res = await httpServiceController<Map<String, dynamic>>(
+    final res = await httpServiceController<dynamic>(
       response,
       (response) => decodeResponseBody(response),
       (response) => {},
     );
 
-    if (!mounted || res.isEmpty) return;
+    if (!mounted) return;
     setState(() {
       json = res;
       isLoaded = true;
@@ -179,12 +207,12 @@ class _StaticSpecialQueryDialogState extends State<StaticSpecialQueryDialog> {
 
 typedef InputConverter = dynamic Function(String input);
 
-class SingleInputQueryPage extends StatefulWidget {
+class SingleInputQueryDialog extends StatefulWidget {
   final SpecialQuery query;
   final InputBuilder inputBuilder;
   final InputConverter inputConverter;
 
-  const SingleInputQueryPage(
+  const SingleInputQueryDialog(
     this.query, {
     required this.inputBuilder,
     required this.inputConverter,
@@ -192,10 +220,10 @@ class SingleInputQueryPage extends StatefulWidget {
   });
 
   @override
-  State<SingleInputQueryPage> createState() => _SingleInputQueryPageState();
+  State<SingleInputQueryDialog> createState() => _SingleInputQueryDialogState();
 }
 
-class _SingleInputQueryPageState extends State<SingleInputQueryPage> {
+class _SingleInputQueryDialogState extends State<SingleInputQueryDialog> {
   final controller = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
@@ -216,7 +244,7 @@ class _SingleInputQueryPageState extends State<SingleInputQueryPage> {
 
     if (!mounted) return;
 
-    final res = await httpServiceController<Map<String, dynamic>>(
+    final res = await httpServiceController<dynamic>(
       response,
       (response) => decodeResponseBody(response),
       (response) => {},
@@ -253,7 +281,7 @@ class _SingleInputQueryPageState extends State<SingleInputQueryPage> {
 
     if (!isLoaded) {
       return const Center(
-        child: Text('Запиту не було'),
+        child: Text('Запиту ще не було'),
       );
     }
 

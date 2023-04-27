@@ -19,7 +19,6 @@ final collectionsToCaptions = {
   Receipt: 'receipts'
 };
 
-
 class ReportPreview<CTPdf extends ConvertibleToPdf<CTPdf>> extends StatelessWidget {
   final pw.Document report;
 

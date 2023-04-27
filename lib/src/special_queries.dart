@@ -1,14 +1,27 @@
 import 'package:flutter/material.dart';
 
 import 'typedefs.dart';
+import 'view/dialogs/creation_dialog.dart';
+import 'view/pages/special_queries_page.dart';
 
 typedef JsonPresenter = Widget Function(JsonMap json);
 
 abstract class SpecialQuery {
   final String path;
   final String? parameterName;
+  final String queryName;
+  final QueryType queryType;
+  final InputBuilder? inputBuilder;
+  final InputConverter? inputConverter;
 
-  const SpecialQuery(this.path, [this.parameterName]);
+  const SpecialQuery(
+    this.path,
+    this.queryName,
+    this.queryType, {
+    this.parameterName,
+    this.inputBuilder,
+    this.inputConverter,
+  });
 
   Uri makeUri(Map<String, String> queryParams);
 
@@ -17,10 +30,15 @@ abstract class SpecialQuery {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is SpecialQuery && runtimeType == other.runtimeType && path == other.path;
+      other is SpecialQuery && runtimeType == other.runtimeType && path == other.path;
 
   @override
   int get hashCode => path.hashCode;
+}
+
+enum QueryType {
+  static,
+  withParam;
 }
 
 class CustomersWithMinPurchasesCount extends SpecialQuery {
@@ -37,6 +55,4 @@ class CustomersWithMinPurchasesCount extends SpecialQuery {
     // TODO: implement makeUri
     throw UnimplementedError();
   }
-  
-  
 }
