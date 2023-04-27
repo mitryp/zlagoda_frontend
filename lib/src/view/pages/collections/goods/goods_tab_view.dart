@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../model/basic_models/employee.dart';
-import '../../../widgets/permissions/user_manager.dart';
+import '../../../widgets/auth/user_manager.dart';
 import 'categories_view.dart';
 import 'products_view.dart';
 import 'store_products_view.dart';

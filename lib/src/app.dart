@@ -4,7 +4,7 @@ import 'services/auth/user.dart';
 import 'theme.dart';
 import 'view/main_viewport.dart';
 import 'view/pages/login.dart';
-import 'view/widgets/permissions/user_provider.dart';
+import 'view/widgets/auth/user_provider.dart';
 
 class ZlagodaApplication extends StatefulWidget {
   const ZlagodaApplication({super.key});

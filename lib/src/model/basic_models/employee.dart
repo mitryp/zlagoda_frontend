@@ -78,9 +78,12 @@ class Employee extends Model with ConvertibleToRow<Employee>, ConvertibleToPdf<E
         (o) => o.birthDate,
         labelCaption: 'Дата народження',
         fieldType: FieldType.date,
-        dateConstraints: const DateConstraints(
-          toFirstDate: Duration(days: 365 * 100),
-          toLastDate: Duration(days: 365 * 18),
+        dateConstraints: DateConstraints(
+          toFirstDate: const Duration(days: 365 * 100),
+          toLastDate: () {
+            final now = DateTime.now();
+            return Duration(days: now.copyWith(year: now.year - 18).difference(now).inDays.abs());
+          }(),
         ),
         fieldDisplayMode: FieldDisplayMode.inModelView,
       ),

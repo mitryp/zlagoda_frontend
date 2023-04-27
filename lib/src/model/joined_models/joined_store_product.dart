@@ -25,9 +25,7 @@ abstract class _JoinedStoreProduct implements Serializable {
 }
 
 class JoinedStoreProduct extends _JoinedStoreProduct
-    with
-        ConvertibleToRow<JoinedStoreProduct>,
-        ConvertibleToPdf<JoinedStoreProduct> {
+    with ConvertibleToRow<JoinedStoreProduct>, ConvertibleToPdf<JoinedStoreProduct> {
   static final Schema<JoinedStoreProduct> schema = Schema(
     JoinedStoreProduct.new,
     [
@@ -67,8 +65,7 @@ class JoinedStoreProduct extends _JoinedStoreProduct
         (o) => o.baseStoreProductId,
         labelCaption: 'ID базового товару у магазині',
         fieldDisplayMode: FieldDisplayMode.none,
-        defaultForeignKey:
-            foreignKey<StoreProduct, ShortProduct>('baseStoreProductId'),
+        defaultForeignKey: foreignKey<StoreProduct, ShortProduct>('baseStoreProductId'),
       ),
     ],
   );
@@ -101,8 +98,8 @@ class JoinedStoreProduct extends _JoinedStoreProduct
   void _onAddDiscountProduct(BuildContext context) {
     showCreationDialog(
       context: context,
-      inputBuilder: (textController) => PromStoreProductTextField(
-          controller: textController, validator: isPositiveInteger),
+      inputBuilder: (textController) =>
+          PromStoreProductTextField(controller: textController, validator: isPositiveInteger),
       buttonProps: [
         ButtonProps<StoreProduct>(
           fetchCallback: (quantity) => PromStoreProductService.post(PromStoreProduct(
@@ -120,19 +117,18 @@ class JoinedStoreProduct extends _JoinedStoreProduct
     final isConfirmed = await showConfirmationDialog(
       context: context,
       builder: (context) {
-        return const ConfirmationDialog.message(
-            'Ви точно хочете видалити цей ресурс?');
+        return const ConfirmationDialog.message('Ви точно хочете видалити цей ресурс?');
       },
     );
 
     if (!isConfirmed) return;
-    final res = await PromStoreProductService.delete(baseStoreProductId!);
-    //if (!res || !mounted) return;
-    //Navigator.of(context).pop(ValueStatusWrapper<StoreProduct>.deleted());
+    final res = await PromStoreProductService.delete(storeProductId);
+    if (!res || !context.mounted) return;
+    Navigator.of(context).pop(ValueStatusWrapper<StoreProduct>.deleted());
   }
 
   Widget _addDiscountProductButton(BuildContext context) {
-    return ElevatedButton.icon(
+    return OutlinedButton.icon(
       label: const Text('Додати акційний товар'),
       icon: const Icon(Icons.add),
       onPressed: () => _onAddDiscountProduct(context),
@@ -167,12 +163,11 @@ class JoinedStoreProduct extends _JoinedStoreProduct
       ];
 
   @override
-  DataRow buildRow(
-      BuildContext context, UpdateCallback<ValueChangeStatus> updateCallback) {
+  DataRow buildRow(BuildContext context, UpdateCallback<ValueChangeStatus> updateCallback) {
     return DataRow(
       cells: cellsData.map((cell) => DataCell(Text(cell))).toList(),
-      onSelectChanged: (_) async => updateCallback(
-          await redirectToModelView(context).then((v) => v.status)),
+      onSelectChanged: (_) async =>
+          updateCallback(await redirectToModelView(context).then((v) => v.status)),
     );
   }
 

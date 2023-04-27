@@ -7,7 +7,7 @@ import '../../../../model/schema/schema.dart';
 import '../../../../services/query_builder/query_builder.dart';
 import '../../../../services/query_builder/sort.dart';
 import '../../../../utils/value_status.dart';
-import '../../permissions/authorizer.dart';
+import '../../auth/authorizer.dart';
 import 'collection_view.dart';
 
 typedef RedirectCallbackWithValueStatus = Future<ValueStatusWrapper> Function(

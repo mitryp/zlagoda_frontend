@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../model/basic_models/client.dart';
 import '../../../../model/basic_models/employee.dart';
+import '../../../../model/basic_models/product.dart';
 import '../../../../model/basic_models/receipt.dart';
 import '../../../../model/basic_models/store_product.dart';
 import '../../../../model/interfaces/model.dart';
@@ -14,8 +15,8 @@ import '../../../../utils/navigation.dart';
 import '../../../../utils/value_status.dart';
 import '../../../dialogs/usages/show_prom_creation_dialog.dart';
 import '../../../pages/page_base.dart';
-import '../../permissions/authorizer.dart';
-import '../../permissions/user_manager.dart';
+import '../../auth/authorizer.dart';
+import '../../auth/user_manager.dart';
 import '../../text_link.dart';
 import '../../utils/helping_functions.dart';
 import 'model_table.dart';
@@ -44,7 +45,9 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
   ValueStatusWrapper<M> changeStatus = ValueStatusWrapper.notChanged();
 
   UserAuthorizationStrategy get authStrategy =>
-      (M == Receipt || M == Client) ? hasUser : hasPosition(Position.manager);
+      (M == StoreProduct || M == Product || M == Receipt || M == Client || M == Employee)
+          ? hasUser
+          : hasPosition(Position.manager);
 
   @override
   void didChangeDependencies() {
@@ -79,15 +82,19 @@ class _ModelViewState<M extends Model> extends State<ModelView<M>> {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = UserManager.of(context).currentUser;
     Widget? guard;
 
-    if (!authStrategy.call(UserManager.of(context).currentUser)) {
-      guard = Authorizer.noPermissionPlaceholder;
-    } else if (exception != null) {
+    if (exception != null) {
       guard = buildErrorMessage();
     } else if (!isResourceLoaded) {
       guard = buildLoadingPlaceholder();
+    } else if (!authStrategy.call(currentUser) &&
+        model is! Employee &&
+        (model as Employee).employeeId != currentUser?.userId) {
+      guard = Authorizer.noPermissionPlaceholder;
     }
+
     if (guard != null) {
       return Scaffold(
         appBar: AppBar(),

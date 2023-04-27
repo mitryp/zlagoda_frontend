@@ -10,8 +10,8 @@ import '../utils/navigation.dart';
 import 'app_pages.dart';
 import 'widgets/middleware_context/request_middleware_context.dart';
 import 'widgets/middleware_context/response_middleware_context.dart';
-import 'widgets/permissions/authorizer.dart';
-import 'widgets/permissions/user_manager.dart';
+import 'widgets/auth/authorizer.dart';
+import 'widgets/auth/user_manager.dart';
 
 class MainViewport extends StatefulWidget {
   const MainViewport({super.key});

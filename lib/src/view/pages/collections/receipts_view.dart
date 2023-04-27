@@ -7,12 +7,13 @@ import '../../../services/query_builder/filter.dart';
 import '../../../services/query_builder/sort.dart';
 import '../../../utils/navigation.dart';
 import '../../../utils/value_status.dart';
-import '../../widgets/permissions/user_manager.dart';
+import '../../widgets/auth/user_manager.dart';
 import '../../widgets/queries/connected_model_filter.dart';
 import '../../widgets/queries/filters/date_filter.dart';
 import '../../widgets/queries/sort_block.dart';
 import '../../widgets/resources/collections/collection_view.dart';
 import '../../widgets/resources/collections/model_collection_view.dart';
+import '../../widgets/stats_block.dart';
 
 Future<ValueStatusWrapper<Receipt>> _redirectToReceiptCreation(BuildContext context) =>
     AppNavigation.of(context).openModelCreation<Receipt>();
@@ -71,4 +72,23 @@ class ReceiptsSearchFilters extends CollectionSearchFilterDelegate {
   @override
   String subRoute(BuildContext context) =>
       UserManager.of(context).hasPosition(Position.cashier) ? 'me' : '';
+
+  @override
+  Widget? buildStats(BuildContext context, Stream<void> updateStream) {
+    return StatsBlock(
+      const [
+        StatsFetcher<int>(
+            fieldName: 'sum',
+            label: 'Сума фільтрованих чеків',
+            url: 'api/receipts/total_sum',
+            allowedFilters: [
+              FilterOption.dateMin,
+              FilterOption.dateMax,
+              FilterOption.employeeId,
+            ]),
+      ],
+      updateStream: updateStream,
+      queryBuilder: queryBuilder,
+    );
+  }
 }
