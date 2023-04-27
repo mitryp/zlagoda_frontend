@@ -122,7 +122,8 @@ class JoinedStoreProduct extends _JoinedStoreProduct
     );
 
     if (!isConfirmed) return;
-    final res = await PromStoreProductService.delete(storeProductId);
+
+    final res = await PromStoreProductService.delete(baseStoreProductId!);
     if (!res || !context.mounted) return;
     Navigator.of(context).pop(ValueStatusWrapper<StoreProduct>.deleted());
   }
