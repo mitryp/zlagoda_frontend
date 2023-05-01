@@ -158,7 +158,7 @@ class BestCashiers extends SingleInputSpecialQuery {
   const BestCashiers()
       : super(
           'employees/best_cashiers',
-          'Касири, що продали товарів більше ніж',
+          'Найпродуктивніші касири',
           parameterName: 'minSold',
           inputConverter: intConverter,
           inputBuilder: input,
@@ -174,11 +174,12 @@ class BestCashiers extends SingleInputSpecialQuery {
 
     return DataTable(
       columns: columnNames.map((name) => DataColumn(label: Text(name))).toList(),
-      rows: json
+      rows: (json as List<dynamic>)
+          .cast<JsonMap>()
           .map((item) => DataRow(cells: [
                 DataCell(Text(item['id_employee'])),
                 DataCell(Text('${item['empl_surname']} ${item['empl_name']}')),
-                DataCell(Text(item['num_products_sold'])),
+                DataCell(Text('${item['num_products_sold']}')),
               ]))
           .toList(),
     );
@@ -234,20 +235,12 @@ class SoldFor extends SingleInputSpecialQuery {
   }
 }
 
-class PurchasedByAllClients extends SingleInputSpecialQuery {
+class PurchasedByAllClients extends StaticSpecialQuery {
   const PurchasedByAllClients()
       : super(
           'products/purchased_by_all_clients',
           'Товари куплені всіма клієнтами',
-          parameterName: 'clientSurnameFilter',
-          inputConverter: converter,
-          inputBuilder: input,
         );
-
-  static Widget input(TextEditingController controller) =>
-      inputWithLabel('Прізвище клієнта має містити (необов.)')(controller);
-
-  static converter(String s) => s.trim();
 
   @override
   Widget makePresentationWidget(BuildContext context, dynamic json) {
