@@ -43,7 +43,10 @@ class _SingleInputQueryDialogState extends State<SingleInputQueryDialog> {
               child: widget.query.inputBuilder(controller),
             ),
             OutlinedButton(onPressed: _processFetch, child: const Text('Виконати запит')),
-            buildOutput(),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: buildOutput(),
+            ),
           ]),
         ),
       ),

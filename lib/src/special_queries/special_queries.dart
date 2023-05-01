@@ -34,7 +34,7 @@ class RegularClients extends SingleInputSpecialQuery {
   static Widget input(TextEditingController controller) {
     return inputWithLabel(
       'Мінімальна кількість покупок клієнта',
-      validator: isPositiveInteger,
+      validator: isNonNegativeInteger,
     )(controller);
   }
 
@@ -229,8 +229,7 @@ class SoldFor extends SingleInputSpecialQuery {
                 DataCell(Text(item['categoryName'])),
                 DataCell(Text('${((item['soldFor'] as int) / 100).toStringAsFixed(2)} грн.')),
               ]))
-          .toList()
-          .cast<DataRow>(),
+          .toList(),
     );
   }
 }
@@ -245,17 +244,18 @@ class PurchasedByAllClients extends SingleInputSpecialQuery {
           inputBuilder: input,
         );
 
-  static Widget input(TextEditingController controller) {
-    return TextFormField(
-      controller: controller,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-    );
-  }
+  static Widget input(TextEditingController controller) =>
+      inputWithLabel('Прізвище клієнта має містити (необов.)')(controller);
 
   static converter(String s) => s.trim();
 
   @override
   Widget makePresentationWidget(BuildContext context, dynamic json) {
+    final guard = makeListGuard(context, json);
+    if (guard != null) {
+      return guard;
+    }
+
     const columnNames = [
       'UPC',
       'Назва продукту',
@@ -264,14 +264,16 @@ class PurchasedByAllClients extends SingleInputSpecialQuery {
 
     return DataTable(
       columns: columnNames.map((name) => DataColumn(label: Text(name))).toList(),
-      rows: json
-          .map((item) => DataRow(cells: [
-                DataCell(Text(item['upc'])),
-                DataCell(Text(item['productName'])),
-                DataCell(Text(item['categoryName'])),
-              ]))
-          .toList()
-          .cast<DataRow>(),
+      rows: (json as List<dynamic>)
+          .cast<JsonMap>()
+          .map(
+            (item) => DataRow(cells: [
+              DataCell(Text(item['upc'])),
+              DataCell(Text(item['productName'])),
+              DataCell(Text(item['categoryName'])),
+            ]),
+          )
+          .toList(),
     );
   }
 }
