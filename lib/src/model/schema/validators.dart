@@ -19,6 +19,13 @@ FieldValidator hasLength(int length) => all([notEmpty, (s) => _exactLengthValida
 
 FieldValidator get isInteger => all([notEmpty, _integerValidator]);
 
+FieldValidator optional(FieldValidator validator) {
+  return (s) {
+    if (s?.isEmpty ?? true) return null;
+    return validator(s);
+  };
+}
+
 FieldValidator get isPositiveInteger => all([
       isInteger,
       (s) => _positiveIntegerValidator(int.parse(s!)),

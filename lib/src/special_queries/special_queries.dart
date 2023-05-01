@@ -1,61 +1,47 @@
 import 'package:flutter/material.dart';
 
-import 'model/schema/validators.dart';
-import 'services/http/helpers/http_service_helper.dart';
-import 'typedefs.dart';
-import 'view/dialogs/creation_dialog.dart';
-import 'view/pages/special_queries_page.dart';
+import '../model/schema/validators.dart';
+import '../view/dialogs/creation_dialog.dart';
+import 'special_query_base.dart';
 
-typedef JsonPresenter = Widget Function(JsonMap json);
-
-abstract class SpecialQuery {
-  final String path;
-  final String? parameterName;
-  final String queryName;
-  final InputBuilder? inputBuilder;
-  final InputConverter? inputConverter;
-
-  const SpecialQuery(
-    this.path,
-    this.queryName, {
-    this.parameterName,
-    this.inputBuilder,
-    this.inputConverter,
-  });
-
-  Uri makeUri(Map<String, String> queryParams) => Uri.http(baseRoute, 'api/$path', queryParams);
-
-  Widget makePresentationWidget(BuildContext context, dynamic json);
-
-  bool get isStaticQuery => parameterName == null;
+InputBuilder inputWithLabel(String label, {FieldValidator? validator}) {
+  return (controller) => TextFormField(
+        controller: controller,
+        validator: validator,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        decoration: InputDecoration(label: Text(label)),
+      );
 }
 
-Widget input(TextEditingController controller) {
-  return TextFormField(
-    validator: isPositiveInteger,
-    controller: controller,
-    autovalidateMode: AutovalidateMode.onUserInteraction,
-  );
-}
+int intConverter(String text) => int.parse(text.trim());
 
-class RegularClients extends SpecialQuery {
-  static converter(String text) => int.parse(text.trim());
+class RegularClients extends SingleInputSpecialQuery {
+  static Widget input(TextEditingController controller) {
+    return inputWithLabel(
+      'Мінімальна кількість покупок клієнта',
+      validator: isPositiveInteger,
+    )(controller);
+  }
 
   const RegularClients()
       : super(
           'clients/regular_clients',
-          'Отримати постійних клієнтів',
+          'Постійні клієнти',
           parameterName: 'minPurchases',
           inputBuilder: input,
-          inputConverter: converter,
+          inputConverter: intConverter,
         );
 
   @override
   Widget makePresentationWidget(BuildContext context, dynamic json) {
-    if (json is! List) {
+    if (json is! List<dynamic>) {
       return const Center(
         child: Text('Помилка виконання'),
       );
+    }
+
+    if (json.isEmpty) {
+      return const Text('Рядків, що відповідають фільтру, не знайдено');
     }
 
     const columnNames = ['Номер картки клієнта', 'Прізвище', 'Ім\'я', 'Кількість чеків'];
@@ -63,18 +49,19 @@ class RegularClients extends SpecialQuery {
     return DataTable(
       columns: columnNames.map((name) => DataColumn(label: Text(name))).toList(),
       rows: json
+          .cast<Map<String, dynamic>>()
           .map((item) => DataRow(cells: [
-                DataCell(item['card_number']),
-                DataCell(item['cust_surname']),
-                DataCell(item['cust_name']),
-                DataCell(item['total_receipts']),
+                DataCell(Text(item['card_number']!)),
+                DataCell(Text(item['cust_surname']!)),
+                DataCell(Text(item['cust_name']!)),
+                DataCell(Text('${item['total_receipts']}')),
               ]))
           .toList(),
     );
   }
 }
 
-class ReceiptsWithAllCategories extends SpecialQuery {
+class ReceiptsWithAllCategories extends StaticSpecialQuery {
   const ReceiptsWithAllCategories()
       : super('receipts/receipts_with_all_categories', 'Чеки з продуктами усіх категорій');
 
@@ -109,7 +96,7 @@ class ReceiptsWithAllCategories extends SpecialQuery {
   }
 }
 
-class ProductsSoldByAllCashiers extends SpecialQuery {
+class ProductsSoldByAllCashiers extends StaticSpecialQuery {
   const ProductsSoldByAllCashiers()
       : super('products/sold_by_all_cashiers', 'Товари, продані всіма касирами');
 
@@ -134,17 +121,20 @@ class ProductsSoldByAllCashiers extends SpecialQuery {
   }
 }
 
-class BestCashiers extends SpecialQuery {
+class BestCashiers extends SingleInputSpecialQuery {
+  static Widget input(TextEditingController controller) => inputWithLabel(
+        'Мінімальна кількість продажів касира',
+        validator: isPositiveInteger,
+      )(controller);
+
   const BestCashiers()
       : super(
           'employees/best_cashiers',
           'Касири, що продали товарів більше ніж',
           parameterName: 'minSold',
-          inputConverter: converter,
+          inputConverter: intConverter,
           inputBuilder: input,
         );
-
-  static converter(String text) => int.parse(text.trim());
 
   @override
   Widget makePresentationWidget(BuildContext context, dynamic json) {
@@ -167,17 +157,25 @@ class BestCashiers extends SpecialQuery {
   }
 }
 
-class SoldFor extends SpecialQuery {
+class SoldFor extends SingleInputSpecialQuery {
+  static Widget input(TextEditingController controller) => inputWithLabel(
+        'Мінімальна сумарна вартість продажів (необов.)',
+        validator: optional(isNonNegativeInteger),
+      )(controller);
+
+  static String converter(String text) {
+    final integerValue = int.tryParse(text.trim());
+    return integerValue != null ? (integerValue * 100).toStringAsFixed(2) : '';
+  }
+
   const SoldFor()
       : super(
           'products/sold_for',
-          'Сумарна вартість продажів',
+          'Сумарна вартість продажів товарів',
           parameterName: 'minTotalFilter',
           inputBuilder: input,
           inputConverter: converter,
         );
-
-  static converter(String text) => int.parse(text.trim());
 
   @override
   Widget makePresentationWidget(BuildContext context, dynamic json) {
@@ -195,14 +193,15 @@ class SoldFor extends SpecialQuery {
                 DataCell(Text(item['upc'])),
                 DataCell(Text(item['productName'])),
                 DataCell(Text(item['categoryName'])),
-                DataCell(Text('${item['soldFor'] / 100} грн.')),
+                DataCell(Text('${((item['soldFor'] as int) / 100).toStringAsFixed(2)} грн.')),
               ]))
-          .toList().cast<DataRow>(),
+          .toList()
+          .cast<DataRow>(),
     );
   }
 }
 
-class PurchasedByAllClients extends SpecialQuery {
+class PurchasedByAllClients extends SingleInputSpecialQuery {
   const PurchasedByAllClients()
       : super(
           'products/purchased_by_all_clients',
@@ -237,7 +236,8 @@ class PurchasedByAllClients extends SpecialQuery {
                 DataCell(Text(item['productName'])),
                 DataCell(Text(item['categoryName'])),
               ]))
-          .toList().cast<DataRow>(),
+          .toList()
+          .cast<DataRow>(),
     );
   }
 }

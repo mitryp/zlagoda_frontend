@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../model/basic_models/employee.dart';
-import '../special_queries.dart';
+import '../special_queries/special_queries.dart';
 import 'pages/collections/clients_view.dart';
 import 'pages/collections/employees_view.dart';
 import 'pages/collections/goods/goods_tab_view.dart';
 import 'pages/collections/receipts_view.dart';
-import 'pages/special_queries_page.dart';
+import 'special_pages/special_queries_page.dart';
 
 enum AppPage {
   goods(Icons.list, label: 'Товари'),
