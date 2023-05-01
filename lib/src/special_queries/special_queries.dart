@@ -130,9 +130,9 @@ class ProductsSoldByAllCashiers extends StaticSpecialQuery {
     }
 
     const columnNames = [
+      'UPC',
       'Назва товару',
-      'Категорія',
-      'Властивості',
+      'Виробник',
     ];
 
     return DataTable(
@@ -140,9 +140,9 @@ class ProductsSoldByAllCashiers extends StaticSpecialQuery {
       rows: (json as List<dynamic>)
           .cast<JsonMap>()
           .map((item) => DataRow(cells: [
+                DataCell(Text(item['UPC'])),
                 DataCell(Text(item['product_name'])),
-                DataCell(Text(item['category_name'])),
-                DataCell(Text(item['characteristics'])),
+                DataCell(Text(item['manufacturer'])),
               ]))
           .toList(),
     );
