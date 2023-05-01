@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../services/http/helpers/http_service_helper.dart';
 import '../../../special_queries/special_query_base.dart';
 import '../../../utils/json_decode.dart';
+import '../../widgets/utils/helping_functions.dart';
+import '../confirmation_dialog.dart';
 
 class StaticSpecialQueryDialog extends StatefulWidget {
   final StaticSpecialQuery query;
@@ -41,8 +43,25 @@ class _StaticSpecialQueryDialogState extends State<StaticSpecialQueryDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      child: buildContent(),
+    return ConfirmationDialog(
+      content: SingleChildScrollView(
+        child: Column(
+          children: makeSeparated([
+            Text(
+              widget.query.queryName,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: buildContent(),
+            ),
+          ]),
+        ),
+      ),
+      style: ConfirmationDialog.defaultStyle.copyWith(
+        acceptButtonLabel: 'Закрити',
+        cancelButtonLabel: null,
+      ),
     );
   }
 

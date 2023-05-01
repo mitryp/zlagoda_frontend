@@ -126,10 +126,12 @@ class SpecialQueriesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: Center(
-        child: Column(
-          children: makeSeparated(specialQueries.map((e) => buildQueryButton(e, context)).toList()),
+      body: SafeArea(
+        minimum: const EdgeInsets.all(16),
+        child: Center(
+          child: Column(
+            children: makeSeparated(specialQueries.map((e) => buildQueryButton(e, context)).toList()),
+          ),
         ),
       ),
     );
