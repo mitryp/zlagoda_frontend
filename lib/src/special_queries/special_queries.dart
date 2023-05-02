@@ -163,7 +163,7 @@ class ProductsSoldByAllCashiers extends StaticSpecialQuery {
 
 class BestCashiers extends SingleInputSpecialQuery {
   static Widget input(TextEditingController controller) => inputWithLabel(
-        'Мінімальна кількість продажів касира',
+        'Мінімальна кількість проданих товарів',
         validator: isPositiveInteger,
       )(controller);
 
