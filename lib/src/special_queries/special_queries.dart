@@ -178,6 +178,11 @@ class BestCashiers extends SingleInputSpecialQuery {
 
   @override
   Widget makePresentationWidget(BuildContext context, dynamic json) {
+    final guard = makeListGuard(context, json);
+    if (guard != null) {
+      return guard;
+    }
+
     const columnNames = [
       'Табельний номер',
       'Ім\'я касира',
