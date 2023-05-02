@@ -12,7 +12,13 @@ InputBuilder inputWithLabel(String label, {FieldValidator? validator}) {
         controller: controller,
         validator: validator,
         autovalidateMode: AutovalidateMode.onUserInteraction,
-        decoration: InputDecoration(label: Text(label)),
+        decoration: InputDecoration(
+          label: Text(
+            label,
+            softWrap: false,
+            overflow: TextOverflow.fade,
+          ),
+        ),
       );
 }
 
