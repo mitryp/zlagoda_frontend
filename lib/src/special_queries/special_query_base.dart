@@ -15,7 +15,7 @@ abstract class StaticSpecialQuery {
 
   Uri makeUri(Map<String, String> queryParams) => Uri.http(baseRoute, 'api/$path', queryParams);
 
-  Widget makePresentationWidget(BuildContext context, dynamic json);
+  Widget makePresentationWidget(BuildContext context, dynamic json, VoidCallback updateCallback);
 }
 
 abstract class SingleInputSpecialQuery extends StaticSpecialQuery {

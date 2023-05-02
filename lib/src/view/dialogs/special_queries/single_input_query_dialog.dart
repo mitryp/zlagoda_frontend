@@ -66,7 +66,7 @@ class _SingleInputQueryDialogState extends State<SingleInputQueryDialog> {
       );
     }
 
-    return widget.query.makePresentationWidget(context, json);
+    return widget.query.makePresentationWidget(context, json, _processFetch);
   }
 
   void _processFetch() {

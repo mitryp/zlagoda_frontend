@@ -16,7 +16,7 @@ class StaticSpecialQueryDialog extends StatefulWidget {
 }
 
 class _StaticSpecialQueryDialogState extends State<StaticSpecialQueryDialog> {
-  late final dynamic json;
+  late dynamic json;
   bool isLoaded = false;
 
   @override
@@ -72,6 +72,6 @@ class _StaticSpecialQueryDialogState extends State<StaticSpecialQueryDialog> {
       );
     }
 
-    return widget.query.makePresentationWidget(context, json);
+    return widget.query.makePresentationWidget(context, json, fetchQuery);
   }
 }

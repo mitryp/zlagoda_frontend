@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../model/basic_models/client.dart';
+import '../model/basic_models/employee.dart';
+import '../model/basic_models/product.dart';
+import '../model/basic_models/receipt.dart';
 import '../model/schema/field_type.dart';
 import '../model/schema/validators.dart';
 import '../typedefs.dart';
 import '../utils/coins_to_currency.dart';
+import '../utils/navigation.dart';
 import '../view/dialogs/creation_dialog.dart';
 import 'special_query_base.dart';
 
@@ -54,42 +59,40 @@ class RegularClients extends SingleInputSpecialQuery {
         );
 
   @override
-  Widget makePresentationWidget(BuildContext context, dynamic json) {
+  Widget makePresentationWidget(BuildContext context, dynamic json, VoidCallback updateCallback) {
     final guard = makeListGuard(context, json);
     if (guard != null) {
       return guard;
     }
 
-    const columnNames = [
-      'Номер картки клієнта',
-      'Прізвище',
-      'Ім\'я',
-      'Кількість чеків'
-    ];
+    const columnNames = ['Номер картки клієнта', 'Прізвище', 'Ім\'я', 'Кількість чеків'];
 
     return DataTable(
-      columns:
-          columnNames.map((name) => DataColumn(label: Text(name))).toList(),
-      rows: (json as List<dynamic>)
-          .cast<JsonMap>()
-          .map((item) => DataRow(cells: [
-                DataCell(Text(item['card_number']!)),
-                DataCell(Text(item['cust_surname']!)),
-                DataCell(Text(item['cust_name']!)),
-                DataCell(Text('${item['total_receipts']}')),
-              ]))
-          .toList(),
+      showCheckboxColumn: false,
+      columns: columnNames.map((name) => DataColumn(label: Text(name))).toList(),
+      rows: (json as List<dynamic>).cast<JsonMap>().map((item) {
+        final clientId = item['card_number'];
+        return DataRow(
+          cells: [
+            DataCell(Text(clientId)),
+            DataCell(Text(item['cust_surname']!)),
+            DataCell(Text(item['cust_name']!)),
+            DataCell(Text('${item['total_receipts']}')),
+          ],
+          onSelectChanged: (_) =>
+              AppNavigation.of(context).toModelView<Client>(clientId).whenComplete(updateCallback),
+        );
+      }).toList(),
     );
   }
 }
 
 class ReceiptsWithAllCategories extends StaticSpecialQuery {
   const ReceiptsWithAllCategories()
-      : super('receipts/receipts_with_all_categories',
-            'Чеки з продуктами усіх категорій');
+      : super('receipts/receipts_with_all_categories', 'Чеки з продуктами усіх категорій');
 
   @override
-  Widget makePresentationWidget(BuildContext context, dynamic json) {
+  Widget makePresentationWidget(BuildContext context, dynamic json, VoidCallback updateCallback) {
     final guard = makeListGuard(context, json);
     if (guard != null) {
       return guard;
@@ -107,28 +110,32 @@ class ReceiptsWithAllCategories extends StaticSpecialQuery {
     ];
 
     return DataTable(
-      columns:
-          columnNames.map((name) => DataColumn(label: Text(name))).toList(),
+      showCheckboxColumn: false,
+      columns: columnNames.map((name) => DataColumn(label: Text(name))).toList(),
       rows: (json as List<dynamic>).cast<JsonMap>().map((item) {
-        final customerFirstName = item['cust_name'],
-            customerLastName = item['cust_surname'];
-        final customerName =
-            [customerFirstName, customerLastName].contains(null)
-                ? 'немає даних'
-                : '$customerLastName $customerFirstName';
-        final printDate = FieldType.datetime.presentation(
-            DateTime.fromMillisecondsSinceEpoch(item['print_date'] * 1000));
+        final customerFirstName = item['cust_name'], customerLastName = item['cust_surname'];
+        final customerName = [customerFirstName, customerLastName].contains(null)
+            ? 'немає даних'
+            : '$customerLastName $customerFirstName';
+        final printDate = FieldType.datetime
+            .presentation(DateTime.fromMillisecondsSinceEpoch(item['print_date'] * 1000));
+        final receiptNumber = item['receipt_number'];
 
-        return DataRow(cells: [
-          DataCell(Text('${item['receipt_number']}')),
-          DataCell(Text(item['id_employee'])),
-          DataCell(Text('${item['empl_surname']} ${item['empl_name']}')),
-          DataCell(Text(item['card_number'] ?? 'немає даних')),
-          DataCell(Text(customerName)),
-          DataCell(Text(printDate)),
-          DataCell(Text(toHryvnas(item['sum_total']))),
-          DataCell(Text(toHryvnas(item['vat']))),
-        ]);
+        return DataRow(
+          cells: [
+            DataCell(Text('$receiptNumber')),
+            DataCell(Text(item['id_employee'])),
+            DataCell(Text('${item['empl_surname']} ${item['empl_name']}')),
+            DataCell(Text(item['card_number'] ?? 'немає даних')),
+            DataCell(Text(customerName)),
+            DataCell(Text(printDate)),
+            DataCell(Text(toHryvnas(item['sum_total']))),
+            DataCell(Text(toHryvnas(item['vat']))),
+          ],
+          onSelectChanged: (_) => AppNavigation.of(context)
+              .toModelView<Receipt>(receiptNumber)
+              .whenComplete(updateCallback),
+        );
       }).toList(),
     );
   }
@@ -136,11 +143,10 @@ class ReceiptsWithAllCategories extends StaticSpecialQuery {
 
 class ProductsSoldByAllCashiers extends StaticSpecialQuery {
   const ProductsSoldByAllCashiers()
-      : super(
-            'products/sold_by_all_cashiers', 'Товари, продані всіма касирами');
+      : super('products/sold_by_all_cashiers', 'Товари, продані всіма касирами');
 
   @override
-  Widget makePresentationWidget(BuildContext context, dynamic json) {
+  Widget makePresentationWidget(BuildContext context, dynamic json, VoidCallback updateCallback) {
     final guard = makeListGuard(context, json);
     if (guard != null) {
       return guard;
@@ -153,16 +159,20 @@ class ProductsSoldByAllCashiers extends StaticSpecialQuery {
     ];
 
     return DataTable(
-      columns:
-          columnNames.map((name) => DataColumn(label: Text(name))).toList(),
-      rows: (json as List<dynamic>)
-          .cast<JsonMap>()
-          .map((item) => DataRow(cells: [
-                DataCell(Text(item['UPC'])),
-                DataCell(Text(item['product_name'])),
-                DataCell(Text(item['manufacturer'])),
-              ]))
-          .toList(),
+      showCheckboxColumn: false,
+      columns: columnNames.map((name) => DataColumn(label: Text(name))).toList(),
+      rows: (json as List<dynamic>).cast<JsonMap>().map((item) {
+        final upc = item['UPC'];
+        return DataRow(
+          cells: [
+            DataCell(Text(upc)),
+            DataCell(Text(item['product_name'])),
+            DataCell(Text(item['manufacturer'])),
+          ],
+          onSelectChanged: (_) =>
+              AppNavigation.of(context).toModelView<Product>(upc).whenComplete(updateCallback),
+        );
+      }).toList(),
     );
   }
 }
@@ -183,7 +193,7 @@ class BestCashiers extends SingleInputSpecialQuery {
         );
 
   @override
-  Widget makePresentationWidget(BuildContext context, dynamic json) {
+  Widget makePresentationWidget(BuildContext context, dynamic json, VoidCallback updateCallback) {
     final guard = makeListGuard(context, json);
     if (guard != null) {
       return guard;
@@ -196,16 +206,21 @@ class BestCashiers extends SingleInputSpecialQuery {
     ];
 
     return DataTable(
-      columns:
-          columnNames.map((name) => DataColumn(label: Text(name))).toList(),
-      rows: (json as List<dynamic>)
-          .cast<JsonMap>()
-          .map((item) => DataRow(cells: [
-                DataCell(Text(item['id_employee'])),
-                DataCell(Text('${item['empl_surname']} ${item['empl_name']}')),
-                DataCell(Text('${item['num_products_sold']}')),
-              ]))
-          .toList(),
+      showCheckboxColumn: false,
+      columns: columnNames.map((name) => DataColumn(label: Text(name))).toList(),
+      rows: (json as List<dynamic>).cast<JsonMap>().map((item) {
+        final employeeId = item['id_employee'];
+        return DataRow(
+          cells: [
+            DataCell(Text(employeeId)),
+            DataCell(Text('${item['empl_surname']} ${item['empl_name']}')),
+            DataCell(Text('${item['num_products_sold']}')),
+          ],
+          onSelectChanged: (_) => AppNavigation.of(context)
+              .toModelView<Employee>(employeeId)
+              .whenComplete(updateCallback),
+        );
+      }).toList(),
     );
   }
 }
@@ -232,7 +247,7 @@ class SoldFor extends SingleInputSpecialQuery {
         );
 
   @override
-  Widget makePresentationWidget(BuildContext context, dynamic json) {
+  Widget makePresentationWidget(BuildContext context, dynamic json, VoidCallback updateCallback) {
     final guard = makeListGuard(context, json);
     if (guard != null) {
       return guard;
@@ -240,24 +255,27 @@ class SoldFor extends SingleInputSpecialQuery {
 
     const columnNames = [
       'UPC',
-      'Назва продукту',
+      'Назва товару',
       'Категорія',
       'Сумарна вартість продажів',
     ];
 
     return DataTable(
-      columns:
-          columnNames.map((name) => DataColumn(label: Text(name))).toList(),
-      rows: (json as List<dynamic>)
-          .cast<Map<String, dynamic>>()
-          .map((item) => DataRow(cells: [
-                DataCell(Text(item['upc'])),
-                DataCell(Text(item['productName'])),
-                DataCell(Text(item['categoryName'])),
-                DataCell(Text(
-                    '${((item['soldFor'] as int) / 100).toStringAsFixed(2)} грн.')),
-              ]))
-          .toList(),
+      showCheckboxColumn: false,
+      columns: columnNames.map((name) => DataColumn(label: Text(name))).toList(),
+      rows: (json as List<dynamic>).cast<Map<String, dynamic>>().map((item) {
+        final upc = item['upc'];
+        return DataRow(
+          cells: [
+            DataCell(Text(upc)),
+            DataCell(Text(item['productName'])),
+            DataCell(Text(item['categoryName'])),
+            DataCell(Text('${((item['soldFor'] as int) / 100).toStringAsFixed(2)} грн.')),
+          ],
+          onSelectChanged: (_) =>
+              AppNavigation.of(context).toModelView<Product>(upc).whenComplete(updateCallback),
+        );
+      }).toList(),
     );
   }
 }
@@ -278,7 +296,7 @@ class PurchasedByAllClients extends SingleInputSpecialQuery {
   static converter(String s) => s.trim();
 
   @override
-  Widget makePresentationWidget(BuildContext context, dynamic json) {
+  Widget makePresentationWidget(BuildContext context, dynamic json, VoidCallback updateCallback) {
     final guard = makeListGuard(context, json);
     if (guard != null) {
       return guard;
@@ -286,23 +304,27 @@ class PurchasedByAllClients extends SingleInputSpecialQuery {
 
     const columnNames = [
       'UPC',
-      'Назва продукту',
+      'Назва товару',
       'Категорія',
     ];
 
     return DataTable(
-      columns:
-          columnNames.map((name) => DataColumn(label: Text(name))).toList(),
-      rows: (json as List<dynamic>)
-          .cast<JsonMap>()
-          .map(
-            (item) => DataRow(cells: [
-              DataCell(Text(item['upc'])),
+      showCheckboxColumn: false,
+      columns: columnNames.map((name) => DataColumn(label: Text(name))).toList(),
+      rows: (json as List<dynamic>).cast<JsonMap>().map(
+        (item) {
+          final upc = item['upc'];
+          return DataRow(
+            cells: [
+              DataCell(Text(upc)),
               DataCell(Text(item['productName'])),
               DataCell(Text(item['categoryName'])),
-            ]),
-          )
-          .toList(),
+            ],
+            onSelectChanged: (_) =>
+                AppNavigation.of(context).toModelView<Product>(upc).whenComplete(updateCallback),
+          );
+        },
+      ).toList(),
     );
   }
 }
