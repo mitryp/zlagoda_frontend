@@ -213,12 +213,13 @@ class BestCashiers extends SingleInputSpecialQuery {
 class SoldFor extends SingleInputSpecialQuery {
   static Widget input(TextEditingController controller) => inputWithLabel(
         'Мінімальна сумарна вартість продажів (необов.)',
-        validator: optional(isNonNegativeInteger),
+        validator: optional(isPositiveDouble),
       )(controller);
 
   static String converter(String text) {
-    final integerValue = int.tryParse(text.trim());
-    return integerValue != null ? (integerValue * 100).toStringAsFixed(2) : '';
+    final doubleValue = double.tryParse(text.trim());
+
+    return doubleValue != null ? (doubleValue * 100).toStringAsFixed(2) : '';
   }
 
   const SoldFor()
