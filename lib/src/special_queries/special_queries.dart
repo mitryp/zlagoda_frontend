@@ -227,7 +227,7 @@ class BestCashiers extends SingleInputSpecialQuery {
 
 class SoldFor extends SingleInputSpecialQuery {
   static Widget input(TextEditingController controller) => inputWithLabel(
-        'Мінімальна сумарна вартість продажів (необов.)',
+        'Мінімальна вартість продажів',
         validator: optional(isCurrencyValue),
       )(controller);
 
@@ -291,7 +291,7 @@ class PurchasedByAllClients extends SingleInputSpecialQuery {
         );
 
   static Widget input(TextEditingController controller) =>
-      inputWithLabel('Прізвище клієнта має містити (необов.)')(controller);
+      inputWithLabel('Прізвище клієнта має містити')(controller);
 
   static converter(String s) => s.trim();
 
