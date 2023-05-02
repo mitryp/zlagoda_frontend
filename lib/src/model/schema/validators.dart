@@ -44,8 +44,10 @@ FieldValidator isIntegerInRange(int min, int max) => all([
 FieldValidator get isDouble => all([notEmpty, _doubleValidator]);
 
 FieldValidator get isPositiveDouble => all([
-  notEmpty,
-  (s) => _positiveDoubleValidator(double.tryParse(s!) == null ? -1.0 : double.parse(s))]);
+      notEmpty,
+      isDouble,
+      (s) => _nonNegativeDoubleValidator(double.parse(s!)),
+    ]);
 
 FieldValidator get isPhoneNumber => all([
       startsWith('+'),
@@ -75,4 +77,4 @@ String? _nonNegativeIntegerValidator(int n) => n < 0 ? 'Число повинн�
 String? _doubleValidator(String? s) =>
     double.tryParse(s!) == null ? 'Значення повинно бути дробовим числом' : null;
 
-String? _positiveDoubleValidator(double n) => n <= 0 ? 'Число повинно бути більшим за 0' : null;
+String? _nonNegativeDoubleValidator(double n) => n < 0 ? 'Число не повинно бути меншим за 0' : null;
