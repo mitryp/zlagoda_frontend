@@ -60,7 +60,7 @@ class Employee extends Model with ConvertibleToRow<Employee>, ConvertibleToPdf<E
         labelCaption: 'Зарплатня',
         fieldType: FieldType.currency,
         fieldDisplayMode: FieldDisplayMode.inModelView,
-        validator: isDouble,
+        validator: isCurrencyValue,
       ),
       FieldDescription<DateTime, Employee>(
         'workStartDate',

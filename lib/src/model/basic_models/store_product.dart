@@ -33,6 +33,7 @@ class StoreProduct extends Model {
         (o) => o.price,
         labelCaption: 'Ціна',
         fieldType: FieldType.currency,
+        validator: isCurrencyValue,
       ),
       FieldDescription<int, StoreProduct>(
         'quantity',

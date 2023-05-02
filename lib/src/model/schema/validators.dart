@@ -3,11 +3,22 @@ typedef FieldValidator = String? Function(String?);
 FieldValidator all(List<FieldValidator> validators) {
   return (s) {
     for (final validator in validators) {
-      final String? error = validator(s);
+      final error = validator(s);
       if (error != null) return error;
     }
 
     return null;
+  };
+}
+
+FieldValidator any(List<FieldValidator> validators) {
+  return (s) {
+    String? error;
+    for (final validator in validators) {
+      error = validator(s);
+      if (error == null) return null;
+    }
+    return error;
   };
 }
 
@@ -41,9 +52,15 @@ FieldValidator isIntegerInRange(int min, int max) => all([
       (s) => _rangeIntegerValidator(int.parse(s!), min, max),
     ]);
 
+FieldValidator get isCurrencyValue => all([
+      notEmpty,
+      isNonNegativeDouble,
+      (s) => _nonNegativeCurrencyValidator(s!),
+    ]);
+
 FieldValidator get isDouble => all([notEmpty, _doubleValidator]);
 
-FieldValidator get isPositiveDouble => all([
+FieldValidator get isNonNegativeDouble => all([
       notEmpty,
       isDouble,
       (s) => _nonNegativeDoubleValidator(double.parse(s!)),
@@ -57,6 +74,11 @@ FieldValidator get isPhoneNumber => all([
 
 FieldValidator startsWith(String pattern) =>
     all([notEmpty, (s) => _startsWithValidator(s, pattern)]);
+
+String? _nonNegativeCurrencyValidator(String pattern) {
+  final match = RegExp(r'^\d+(\.\d{1,2})?\s*$').matchAsPrefix(pattern);
+  return match == null ? 'Число може один або два знаки після коми' : null;
+}
 
 String? _rangeIntegerValidator(int value, int min, int max) =>
     value >= min && value <= max ? null : 'Число повинно знаходитися в межах від $min до $max';

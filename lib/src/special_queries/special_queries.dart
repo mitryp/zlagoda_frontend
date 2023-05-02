@@ -180,7 +180,7 @@ class ProductsSoldByAllCashiers extends StaticSpecialQuery {
 class BestCashiers extends SingleInputSpecialQuery {
   static Widget input(TextEditingController controller) => inputWithLabel(
         'Мінімальна кількість проданих товарів',
-        validator: isPositiveInteger,
+        validator: isNonNegativeInteger,
       )(controller);
 
   const BestCashiers()
@@ -228,7 +228,7 @@ class BestCashiers extends SingleInputSpecialQuery {
 class SoldFor extends SingleInputSpecialQuery {
   static Widget input(TextEditingController controller) => inputWithLabel(
         'Мінімальна сумарна вартість продажів (необов.)',
-        validator: optional(isPositiveDouble),
+        validator: optional(isCurrencyValue),
       )(controller);
 
   static String converter(String text) {
