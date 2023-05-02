@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../../model/basic_models/employee.dart';
+import '../../services/auth/user.dart';
 import '../../special_queries/special_query_base.dart';
 import '../dialogs/special_queries/single_input_query_dialog.dart';
 import '../dialogs/special_queries/static_query_dialog.dart';
+import '../widgets/auth/authorizer.dart';
 import '../widgets/utils/helping_functions.dart';
 
 //
@@ -118,6 +121,8 @@ import '../widgets/utils/helping_functions.dart';
 //   }
 // }
 
+bool _isManager(User? user) => hasPosition(Position.manager)(user);
+
 class SpecialQueriesPage extends StatelessWidget {
   final List<StaticSpecialQuery> specialQueries;
 
@@ -125,15 +130,18 @@ class SpecialQueriesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        minimum: const EdgeInsets.all(16),
-        child: Center(
-          child: Column(
-            children: makeSeparated(specialQueries.map((e) => buildQueryButton(e, context)).toList()),
+    return Authorizer(
+      authorizationStrategy: _isManager,
+      child: Scaffold(
+        body: SafeArea(
+          minimum: const EdgeInsets.all(16),
+          child: Center(
+            child: Column(
+              children: makeSeparated(specialQueries.map((e) => buildQueryButton(e, context)).toList()),
+            ),
           ),
         ),
-      ),
+      )
     );
   }
 

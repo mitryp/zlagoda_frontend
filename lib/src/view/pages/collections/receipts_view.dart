@@ -17,7 +17,8 @@ import '../../widgets/resources/collections/collection_view.dart';
 import '../../widgets/resources/collections/model_collection_view.dart';
 import '../../widgets/stats_block.dart';
 
-Future<ValueStatusWrapper<Receipt>> _redirectToReceiptCreation(BuildContext context) =>
+Future<ValueStatusWrapper<Receipt>> _redirectToReceiptCreation(
+        BuildContext context) =>
     AppNavigation.of(context).openModelCreation<Receipt>();
 
 class ReceiptsView extends ModelCollectionView<Receipt, Receipt> {
@@ -77,9 +78,10 @@ class ReceiptsSearchFilters extends CollectionSearchFilterDelegate {
 
   @override
   Widget? buildStats(BuildContext context, Stream<void> updateStream) {
-    return StatsBlock(
-      [
-        StatsFetcher<String>(
+    if (UserManager.of(context).hasPosition(Position.manager))
+      return StatsBlock(
+        [
+          StatsFetcher<String>(
             fieldName: 'sum',
             label: 'Сума фільтрованих чеків',
             url: 'api/receipts/total_sum',
@@ -88,20 +90,22 @@ class ReceiptsSearchFilters extends CollectionSearchFilterDelegate {
               FilterOption.dateMax,
               FilterOption.employeeId,
             ],
-          fieldExtractor: _CurrencyExtractor(),
-        ),
-      ],
-      updateStream: updateStream,
-      queryBuilder: queryBuilder,
-    );
+            fieldExtractor: _CurrencyExtractor(),
+          ),
+        ],
+        updateStream: updateStream,
+        queryBuilder: queryBuilder,
+      );
+
+    return null;
   }
 }
 
 class _CurrencyExtractor extends Extractor<String> {
   @override
   String? extractFrom(JsonMap json, String field) {
-      final coins = Extractor<int>().extractFrom(json, field);
-      if (coins == null) return null;
-      return '${(coins / 100).toStringAsFixed(2)} грн.';
+    final coins = Extractor<int>().extractFrom(json, field);
+    if (coins == null) return null;
+    return '${(coins / 100).toStringAsFixed(2)} грн.';
   }
 }

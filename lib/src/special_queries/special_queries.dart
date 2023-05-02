@@ -104,7 +104,7 @@ class ReceiptsWithAllCategories extends StaticSpecialQuery {
       columns:
           columnNames.map((name) => DataColumn(label: Text(name))).toList(),
       rows: (json as List<dynamic>).cast<JsonMap>().map((item) {
-        final customerFirstName = item['cust_surname'],
+        final customerFirstName = item['cust_name'],
             customerLastName = item['cust_surname'];
         final customerName =
             [customerFirstName, customerLastName].contains(null)
