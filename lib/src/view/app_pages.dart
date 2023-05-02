@@ -17,9 +17,8 @@ enum AppPage {
 
   final IconData iconData;
   final String label;
-  final Position requiredPosition;
 
-  const AppPage(this.iconData, {required this.label, this.requiredPosition = Position.cashier});
+  const AppPage(this.iconData, {required this.label});
 
   String get route => '/app/$name';
 
