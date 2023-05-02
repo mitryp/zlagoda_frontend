@@ -98,6 +98,7 @@ class _ReceiptModelViewState extends State<ReceiptModelView> {
     final info = {
       'Дата': FieldType.datetime.presentation(receipt.date),
       'Вартість': toHryvnas(receipt.cost),
+      'Застосована загальна знижка': '${receipt.discount}%',
       'Податок': toHryvnas(receipt.tax),
     };
 
