@@ -54,10 +54,16 @@ class RegularClients extends SingleInputSpecialQuery {
       return guard;
     }
 
-    const columnNames = ['Номер картки клієнта', 'Прізвище', 'Ім\'я', 'Кількість чеків'];
+    const columnNames = [
+      'Номер картки клієнта',
+      'Прізвище',
+      'Ім\'я',
+      'Кількість чеків'
+    ];
 
     return DataTable(
-      columns: columnNames.map((name) => DataColumn(label: Text(name))).toList(),
+      columns:
+          columnNames.map((name) => DataColumn(label: Text(name))).toList(),
       rows: (json as List<dynamic>)
           .cast<JsonMap>()
           .map((item) => DataRow(cells: [
@@ -73,7 +79,8 @@ class RegularClients extends SingleInputSpecialQuery {
 
 class ReceiptsWithAllCategories extends StaticSpecialQuery {
   const ReceiptsWithAllCategories()
-      : super('receipts/receipts_with_all_categories', 'Чеки з продуктами усіх категорій');
+      : super('receipts/receipts_with_all_categories',
+            'Чеки з продуктами усіх категорій');
 
   @override
   Widget makePresentationWidget(BuildContext context, dynamic json) {
@@ -94,14 +101,17 @@ class ReceiptsWithAllCategories extends StaticSpecialQuery {
     ];
 
     return DataTable(
-      columns: columnNames.map((name) => DataColumn(label: Text(name))).toList(),
+      columns:
+          columnNames.map((name) => DataColumn(label: Text(name))).toList(),
       rows: (json as List<dynamic>).cast<JsonMap>().map((item) {
-        final customerFirstName = item['cust_surname'], customerLastName = item['cust_surname'];
-        final customerName = [customerFirstName, customerLastName].contains(null)
-            ? 'немає даних'
-            : '$customerLastName $customerFirstName';
-        final printDate = FieldType.datetime
-            .presentation(DateTime.fromMillisecondsSinceEpoch(item['print_date'] * 1000));
+        final customerFirstName = item['cust_surname'],
+            customerLastName = item['cust_surname'];
+        final customerName =
+            [customerFirstName, customerLastName].contains(null)
+                ? 'немає даних'
+                : '$customerLastName $customerFirstName';
+        final printDate = FieldType.datetime.presentation(
+            DateTime.fromMillisecondsSinceEpoch(item['print_date'] * 1000));
 
         return DataRow(cells: [
           DataCell(Text('${item['receipt_number']}')),
@@ -120,7 +130,8 @@ class ReceiptsWithAllCategories extends StaticSpecialQuery {
 
 class ProductsSoldByAllCashiers extends StaticSpecialQuery {
   const ProductsSoldByAllCashiers()
-      : super('products/sold_by_all_cashiers', 'Товари, продані всіма касирами');
+      : super(
+            'products/sold_by_all_cashiers', 'Товари, продані всіма касирами');
 
   @override
   Widget makePresentationWidget(BuildContext context, dynamic json) {
@@ -136,7 +147,8 @@ class ProductsSoldByAllCashiers extends StaticSpecialQuery {
     ];
 
     return DataTable(
-      columns: columnNames.map((name) => DataColumn(label: Text(name))).toList(),
+      columns:
+          columnNames.map((name) => DataColumn(label: Text(name))).toList(),
       rows: (json as List<dynamic>)
           .cast<JsonMap>()
           .map((item) => DataRow(cells: [
@@ -173,7 +185,8 @@ class BestCashiers extends SingleInputSpecialQuery {
     ];
 
     return DataTable(
-      columns: columnNames.map((name) => DataColumn(label: Text(name))).toList(),
+      columns:
+          columnNames.map((name) => DataColumn(label: Text(name))).toList(),
       rows: (json as List<dynamic>)
           .cast<JsonMap>()
           .map((item) => DataRow(cells: [
@@ -221,26 +234,36 @@ class SoldFor extends SingleInputSpecialQuery {
     ];
 
     return DataTable(
-      columns: columnNames.map((name) => DataColumn(label: Text(name))).toList(),
+      columns:
+          columnNames.map((name) => DataColumn(label: Text(name))).toList(),
       rows: (json as List<dynamic>)
           .cast<Map<String, dynamic>>()
           .map((item) => DataRow(cells: [
                 DataCell(Text(item['upc'])),
                 DataCell(Text(item['productName'])),
                 DataCell(Text(item['categoryName'])),
-                DataCell(Text('${((item['soldFor'] as int) / 100).toStringAsFixed(2)} грн.')),
+                DataCell(Text(
+                    '${((item['soldFor'] as int) / 100).toStringAsFixed(2)} грн.')),
               ]))
           .toList(),
     );
   }
 }
 
-class PurchasedByAllClients extends StaticSpecialQuery {
+class PurchasedByAllClients extends SingleInputSpecialQuery {
   const PurchasedByAllClients()
       : super(
           'products/purchased_by_all_clients',
           'Товари куплені всіма клієнтами',
+          parameterName: 'clientSurnameFilter',
+          inputConverter: converter,
+          inputBuilder: input,
         );
+
+  static Widget input(TextEditingController controller) =>
+      inputWithLabel('Прізвище клієнта має містити (необов.)')(controller);
+
+  static converter(String s) => s.trim();
 
   @override
   Widget makePresentationWidget(BuildContext context, dynamic json) {
@@ -256,7 +279,8 @@ class PurchasedByAllClients extends StaticSpecialQuery {
     ];
 
     return DataTable(
-      columns: columnNames.map((name) => DataColumn(label: Text(name))).toList(),
+      columns:
+          columnNames.map((name) => DataColumn(label: Text(name))).toList(),
       rows: (json as List<dynamic>)
           .cast<JsonMap>()
           .map(
