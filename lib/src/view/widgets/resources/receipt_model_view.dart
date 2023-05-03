@@ -96,6 +96,7 @@ class _ReceiptModelViewState extends State<ReceiptModelView> {
 
   Widget buildReceiptInfo() {
     final info = {
+      'Номер': '${receipt.receiptId}',
       'Дата': FieldType.datetime.presentation(receipt.date),
       'Вартість': toHryvnas(receipt.cost),
       'Застосована загальна знижка': '${receipt.discount}%',

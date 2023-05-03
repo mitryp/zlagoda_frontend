@@ -22,10 +22,12 @@ class Receipt extends Model with ConvertibleToRow<Receipt>, ConvertibleToPdf<Rec
   static final Schema<Receipt> schema = Schema(
     Receipt.new,
     [
-      FieldDescription<int?, Receipt>('receiptId', (o) => o.receiptId,
-          labelCaption: 'Номер чеку',
-          fieldType: FieldType.number,
-          fieldDisplayMode: FieldDisplayMode.none),
+      FieldDescription<int?, Receipt>(
+        'receiptId',
+        (o) => o.receiptId,
+        labelCaption: 'Номер',
+        fieldType: FieldType.number,
+      ),
       FieldDescription<String?, Receipt>.stringForeignKey(
         'clientId',
         (o) => o.clientId,
