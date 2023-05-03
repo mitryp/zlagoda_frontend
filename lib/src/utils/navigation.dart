@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../model/basic_models/employee.dart';
 import '../model/basic_models/product.dart';
 import '../model/basic_models/receipt.dart';
 import '../model/basic_models/store_product.dart';
@@ -10,6 +11,7 @@ import '../services/http/helpers/http_service_factory.dart';
 import '../services/http/model_http_service.dart';
 import '../view/dialogs/product_stats_dialog.dart';
 import '../view/dialogs/usages/show_prom_creation_dialog.dart';
+import '../view/widgets/auth/user_manager.dart';
 import '../view/widgets/resources/collections/collection_view_factory.dart';
 import '../view/widgets/resources/models/model_edit_view.dart';
 import '../view/widgets/resources/models/model_table.dart';
@@ -52,7 +54,9 @@ class AppNavigation {
       {List<ModelTable>? connectedTables, List<WidgetBuilder>? additionalButtonsBuilders}) {
     assert(SSingle != Model);
 
-    if (SSingle == Product && additionalButtonsBuilders == null) {
+    if (SSingle == Product &&
+        additionalButtonsBuilders == null &&
+        UserManager.of(context).hasPosition(Position.manager)) {
       additionalButtonsBuilders = [buildProductStatsDialogButton];
     }
 
